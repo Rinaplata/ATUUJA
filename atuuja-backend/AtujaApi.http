@@ -1,0 +1,6 @@
+@AtujaApi_HostAddress = http://localhost:5220
+
+GET {{AtujaApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
