@@ -46,6 +46,68 @@ public class StoriesController : ControllerBase
 
         return Ok(new { message = "Relato creado exitosamente.", RelatoId = relatoId });
     }
+
+    [HttpDelete("delete/{relatoId}")]
+    public async Task<IActionResult> DeleteStory(string relatoId)
+
+    {
+    var storiesCollection = _firestoreDb.Collection("relatos");
+    var storySnapshot = await storiesCollection.Document(relatoId).GetSnapshotAsync();
+
+    if (!storySnapshot.Exists)
+    {
+        return NotFound("El relato no existe.");
+    }
+
+    await storiesCollection.Document(relatoId).DeleteAsync();
+    
+    return Ok(new { message = "Relato eliminado exitosamente." });
+}
+
+
+   [HttpGet("list")]
+    public async Task<IActionResult> ListStories()
+    {
+    var storiesCollection = _firestoreDb.Collection("relatos");
+    var storySnapshot = await storiesCollection.GetSnapshotAsync();
+
+    var storiesList = new List<Dictionary<string, object>>();
+
+    foreach (var document in storySnapshot.Documents)
+    {
+        var story = document.ToDictionary();
+        story["RelatoId"] = document.Id; // Añadir el ID del documento al diccionario
+        storiesList.Add(story);
+    }
+
+    return Ok(storiesList);
+}
+
+[HttpPut("update/{relatoId}")]
+public async Task<IActionResult> UpdateStory(string relatoId, [FromBody] StoryCreate model)
+{
+    var storiesCollection = _firestoreDb.Collection("relatos");
+    var storySnapshot = await storiesCollection.Document(relatoId).GetSnapshotAsync();
+
+    if (!storySnapshot.Exists)
+    {
+        return NotFound("El relato no existe.");
+    }
+
+    var updatedStory = new Dictionary<string, object>
+    {
+        { "Titulo", model.Titulo },
+        { "Contenido", model.Contenido },
+        { "PalabrasResaltadas", model.PalabrasResaltadas },
+        { "AudioUrl", model.AudioUrl }
+    };
+
+    await storiesCollection.Document(relatoId).UpdateAsync(updatedStory);
+
+    return Ok(new { message = "Relato actualizado exitosamente." });
+}
+
+    
 }
 
 public class StoryCreate
