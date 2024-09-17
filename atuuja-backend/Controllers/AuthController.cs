@@ -32,7 +32,7 @@ public class AuthController : ControllerBase
 
         if (userSnapshot.Exists)
         {
-            return Conflict("El usuario ya existe.");
+            return Conflict("El usuario ya existe!.");
         }
         var newUser = new Dictionary<string, object>
         {
