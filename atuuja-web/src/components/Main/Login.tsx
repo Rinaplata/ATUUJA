@@ -38,7 +38,7 @@ const Login: React.FC = () => {
               <form>
                 <div className="mb-6">
                   <div className="relative">
-                    <span className="absolute left-0 top-0 h-full w-12 flex items-center justify-center bg-thirdAtuuja text-white rounded-l-lg">
+                    <span className="absolute left-0 top-0 h-full w-12 flex items-center justify-center bg-thirdAtuuja text-primaryAtuuja rounded-l-lg">
                       <svg
                         className="fill-current"
                         width="22"
@@ -48,26 +48,24 @@ const Login: React.FC = () => {
                         xmlns="http://www.w3.org/2000/svg"
                       >
                         <g opacity="0.5">
-                          <path
+                        <path
                             d="M19.2516 3.30005H2.75156C1.58281 3.30005 0.585938 4.26255 0.585938 5.46567V16.6032C0.585938 17.7719 1.54844 18.7688 2.75156 18.7688H19.2516C20.4203 18.7688 21.4172 17.8063 21.4172 16.6032V5.4313C21.4172 4.26255 20.4203 3.30005 19.2516 3.30005ZM19.2516 4.84692C19.2859 4.84692 19.3203 4.84692 19.3547 4.84692L11.0016 10.2094L2.64844 4.84692C2.68281 4.84692 2.71719 4.84692 2.75156 4.84692H19.2516ZM19.2516 17.1532H2.75156C2.40781 17.1532 2.13281 16.8782 2.13281 16.5344V6.35942L10.1766 11.5157C10.4172 11.6875 10.6922 11.7563 10.9672 11.7563C11.2422 11.7563 11.5172 11.6875 11.7578 11.5157L19.8016 6.35942V16.5688C19.8703 16.9125 19.5953 17.1532 19.2516 17.1532Z"
-                            fill="none" // Se remueve el relleno para solo mostrar el borde
-                            stroke="var(--color-primaryAtuuja)" // Aquí aplicamos el borde primaryAtuuja
-                            strokeWidth="2" // Ajusta el grosor del borde
+                            fill=""
                           />
                         </g>
                       </svg>
                     </span>
                     <input
                       type="email"
-                      placeholder="Correo"
-                      className="w-full pl-14 rounded-lg border border-white bg-while py-4 pr-10 text-black outline-none focus:border-while focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primaryAtuuja"
+                      placeholder="Correo electrónico"
+                      className="w-full pl-14 rounded-lg custom-placeholder border border-white bg-while py-2 pr-10 text-black outline-none focus:border-while focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-subTitleAtuuja-xs dark:focus:border-primaryAtuuja"
                     />
                   </div>
                 </div>
 
                 <div className="mb-6">
                   <div className="relative">
-                    <span className="absolute left-0 top-0 h-full w-12 flex items-center justify-center bg-thirdAtuuja text-white rounded-l-lg">
+                    <span className="absolute left-0 top-0 h-full w-12 flex items-center justify-center bg-thirdAtuuja text-primaryAtuuja rounded-l-lg">
                       <svg
                         className="fill-current"
                         width="22"
@@ -91,7 +89,7 @@ const Login: React.FC = () => {
                     <input
                       type="password"
                       placeholder="Contraseña"
-                      className="w-full pl-14 rounded-lg border border-white bg-white py-4 pr-10 text-black outline-none focus:border-while focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primaryAtuuja"
+                      className="w-full pl-14 custom-placeholder rounded-lg border-white bg-white py-2 pr-10 text-subTitleAtuuja-xs outline-none focus:border-while focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primaryAtuuja"
                     />
                   </div>
                 </div>

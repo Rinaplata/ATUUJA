@@ -19,6 +19,13 @@
 }
 
 @layer components {
+  .custom-placeholder {
+    @apply placeholder-secondaryAtuuja;
+  }
+}
+
+
+@layer components {
   .border-radius-atuuja {
     border-radius: 3.5rem; 
   }

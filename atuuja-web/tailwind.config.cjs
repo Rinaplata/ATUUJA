@@ -29,7 +29,7 @@ module.exports = {
         bodydark2: '#8A99AF',
         primary: '#3C50E0', 
         primaryAtuuja: '#9A2C2B',
-        secondaryAtuuja: '#394446',
+        secondaryAtuuja: '#565656',
         thirdAtuuja: '#FFD1CA',
         secondary: '#80CAEE',
         stroke: '#E2E8F0',
