@@ -7,6 +7,7 @@ module.exports = {
   theme: {
     fontFamily: {
       satoshi: ['Satoshi', 'sans-serif'],
+      poppins: ['Poppins', 'sans-serif'],
     },
     screens: {
       '2xsm': '375px',
@@ -22,10 +23,14 @@ module.exports = {
         black: '#1C2434',
         'black-2': '#010101',
         body: '#64748B',
+        bodyAtuuja: '#FFF0ED',
         bodydark: '#AEB7C0',
         bodydark1: '#DEE4EE',
         bodydark2: '#8A99AF',
-        primary: '#3C50E0',
+        primary: '#3C50E0', 
+        primaryAtuuja: '#9A2C2B',
+        secondaryAtuuja: '#394446',
+        thirdAtuuja: '#FFD1CA',
         secondary: '#80CAEE',
         stroke: '#E2E8F0',
         gray: '#EFF4FB',
@@ -61,6 +66,8 @@ module.exports = {
         'title-md2': ['26px', '30px'],
         'title-sm': ['20px', '26px'],
         'title-xsm': ['18px', '24px'],
+        'subtiele-xsm': ['16px'],
+        'subTitleAtuuja-xs': ['14px']
       },
       spacing: {
         4.5: '1.125rem',
@@ -213,6 +220,7 @@ module.exports = {
       },
       transitionProperty: { width: 'width', stroke: 'stroke' },
       borderWidth: {
+        3.6: '3.5rem',
         6: '6px',
       },
       boxShadow: {

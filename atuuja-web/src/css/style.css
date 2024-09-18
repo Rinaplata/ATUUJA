@@ -4,12 +4,27 @@
 
 @layer base {
   body {
-    @apply font-satoshi font-normal text-base text-body bg-whiten relative z-1;
+    @apply font-poppins
+     font-normal text-base text-body bg-bodyAtuuja relative z-1;
   }
 }
 
 @layer components {
 }
+
+@layer components {
+  .logo-custom-atuuja {
+    width: 270px;
+  }
+}
+
+@layer components {
+  .border-radius-atuuja {
+    border-radius: 3.5rem; 
+  }
+}
+
+
 
 @layer utilities {
   /* Chrome, Safari and Opera */
