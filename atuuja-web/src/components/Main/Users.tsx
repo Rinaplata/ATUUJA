@@ -1,7 +1,7 @@
 import React from 'react';
 import TableThree from '../Tables/TableThree';
 
-export default function Story() {
+export default function Users() {
   return (
     <div>
       {/* Buscador */}
@@ -41,19 +41,20 @@ export default function Story() {
         </form>
       </div>
       <div className="p-20">
+      <h1>relatos</h1>
         {/* Botón Nuevo */}
-        <div className="mb-4">
+{/*         <div className="mb-4">
           <button className="bg-primaryAtuuja text-white py-2 px-8 rounded ml-4">
             Nuevo
           </button>
-        </div>
+        </div> */}
 
         {/* Tabla */}
-        <div>
+{/*         <div>
           <div className="max-w-[63rem]">
             <TableThree />
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
