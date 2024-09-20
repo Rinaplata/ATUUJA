@@ -1,7 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import SidebarLinkGroup from './SidebarLinkGroup';
-import Logo from '../../images/logo/logo.svg';
+import Logo from '../../images/logo/logoAside.png';
+import {
+  UserIcon,
+  DocumentTextIcon,
+  BookOpenIcon,
+  GiftIcon,
+} from '@heroicons/react/24/outline';
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -17,7 +23,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
   const storedSidebarExpanded = localStorage.getItem('sidebar-expanded');
   const [sidebarExpanded, setSidebarExpanded] = useState(
-    storedSidebarExpanded === null ? false : storedSidebarExpanded === 'true'
+    storedSidebarExpanded === null ? false : storedSidebarExpanded === 'true',
   );
 
   // close on click outside
@@ -58,14 +64,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   return (
     <aside
       ref={sidebar}
-      className={`absolute left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hidden bg-black duration-300 ease-linear dark:bg-boxdark lg:static lg:translate-x-0 ${
+      className={`absolute left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hidden bg-white duration-300 ease-linear dark:bg-boxdark lg:static lg:translate-x-0 ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}
     >
       {/* <!-- SIDEBAR HEADER --> */}
       <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
         <NavLink to="/">
-          <img src={Logo} alt="Logo" />
+          <img src={Logo} alt="Logo" className="w-32" />
         </NavLink>
 
         <button
@@ -97,22 +103,51 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         <nav className="mt-5 py-4 px-4 lg:mt-9 lg:px-6">
           {/* <!-- Menu Group --> */}
           <div>
-            <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">
-              MENU
-            </h3>
-
             <ul className="mb-6 flex flex-col gap-1.5">
-
               {/* <!-- Menu Item story --> */}
               <li>
                 <NavLink
                   to="/Story"
-                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                    pathname.includes('story') &&
-                    'bg-graydark dark:bg-meta-4'
+                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out hover:text-primaryAtuuja dark:hover:bg-meta-4 ${
+                    pathname.includes('story') && 'bg-graydark dark:bg-meta-4'
                   }`}
                 >
-                  Story
+                  <UserIcon className="h-6 w-6 text-gray-500 group-hover:text-primaryAtuuja" />{' '}
+                  <span>Usuarios</span>
+                </NavLink>
+              </li>
+
+              <li>
+                <NavLink
+                  to="/Story"
+                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out hover:text-primaryAtuuja dark:hover:bg-meta-4 ${
+                    pathname.includes('story') && 'bg-graydark dark:bg-meta-4'
+                  }`}
+                >
+                  <DocumentTextIcon className="h-6 w-6 text-gray-500 group-hover:text-primatyAtuuja" />
+                  <span>Gestión de relatos</span>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/Story"
+                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out hover:text-primaryAtuuja dark:hover:bg-meta-4 ${
+                    pathname.includes('story') && 'bg-graydark dark:bg-meta-4'
+                  }`}
+                >
+                  <BookOpenIcon className="h-6 w-6 text-gray-500 text-secondaryAtuuja group-hover:text-primaryAtuuja" />
+                  <span>Lecciones</span>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/Story"
+                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out hover:text-primaryAtuuja dark:hover:bg-meta-4 ${
+                    pathname.includes('story') && 'bg-graydark dark:bg-meta-4'
+                  }`}
+                >
+                  <GiftIcon className="h-6 w-6 text-gray-500 group-hover:text-primary-atuuja" />
+                  <span>Recompensas</span>
                 </NavLink>
               </li>
             </ul>

@@ -20,6 +20,7 @@ module.exports = {
         current: 'currentColor',
         transparent: 'transparent',
         white: '#FFFFFF',
+        AtuujaFondo: '#F5F6F8',
         black: '#1C2434',
         'black-2': '#010101',
         body: '#64748B',
