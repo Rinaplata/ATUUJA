@@ -1,11 +1,37 @@
-import React from 'react';
-import TableThree from '../Tables/TableThree';
+import React, { useEffect, useState } from 'react';
+import UserTable from './UserTable'
+import { API_URL } from '../../../config/config'
 
-export default function Users() {
+export default function User() {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${API_URL}/Auth/list`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+      setUsers(await response.json());
+      } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+
+  };
+
+    fetchData();
+
+  }, []);
+
+
   return (
     <div>
-      {/* Buscador */}
-      <div className="w-screen">
+            {/* Buscador */}
+            <div className="w-screen">
         <form action="https://formbold.com/s/unique_form_id" method="POST">
           <div className="relative">
             <button className="absolute pl-15 left-0 top-1/2 -translate-y-1/2">
@@ -40,22 +66,15 @@ export default function Users() {
           </div>
         </form>
       </div>
-      <div className="p-20">
-      <h1>relatos</h1>
+        <div className="p-20 pr-[20rem]">
         {/* Botón Nuevo */}
-{/*         <div className="mb-4">
+        <div className="mb-3">
           <button className="bg-primaryAtuuja text-white py-2 px-8 rounded ml-4">
             Nuevo
           </button>
-        </div> */}
-
-        {/* Tabla */}
-{/*         <div>
-          <div className="max-w-[63rem]">
-            <TableThree />
-          </div>
-        </div> */}
-      </div>
+        </div>
+       <UserTable users={users} />
+       </div>
     </div>
   );
 }

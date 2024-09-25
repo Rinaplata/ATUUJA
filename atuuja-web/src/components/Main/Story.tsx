@@ -40,20 +40,16 @@ export default function Story() {
           </div>
         </form>
       </div>
-      <div className="p-20">
+      <div className="p-20 pr-[20rem]">
         {/* Botón Nuevo */}
-        <div className="mb-4">
+        <div className="mb-3">
           <button className="bg-primaryAtuuja text-white py-2 px-8 rounded ml-4">
             Nuevo
           </button>
         </div>
 
         {/* Tabla */}
-        <div>
-          <div className="max-w-[63rem]">
-            <TableThree />
-          </div>
-        </div>
+        <TableThree />
       </div>
     </div>
   );

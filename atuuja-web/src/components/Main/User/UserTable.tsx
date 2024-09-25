@@ -1,20 +1,12 @@
-import { Package } from '../../types/user';
+import React, { useState } from 'react';
 import { PencilIcon, ChartBarIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { User } from '../../../types/user';
 
-const packageData: Package[] = [
-  {
-    name: 'Rina',
-    correo: `rina@gmail.com`,
-    usuario: `rina.plata`,
-  },
-  {
-    name: 'Jhonatan',
-    correo: `Jhonatan@gmail.com`,
-    usuario: `Jhonatan.p`,
-  },
-];
+interface IUserTable {
+    users: User[];
+}
 
-const TableThree = () => {
+const TableThree : React.FC<IUserTable> = ({ users }) => {
   return (
     <div className="rounded-sm bg-transparent px-5 pt-6 pb-2.5">
       <div className="max-w-full overflow-x-auto">
@@ -36,21 +28,21 @@ const TableThree = () => {
             </tr>
           </thead>
           <tbody>
-            {packageData.map((packageItem, key) => (
+            {users.map((user, key) => (
               <tr key={key} className="bg-white">
                 <td className="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
                   <h5 className="font-medium text-black dark:text-white">
-                    {packageItem.name}
+                    {user.Username}
                   </h5>
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                   <p className="text-black dark:text-white">
-                    {packageItem.correo}
+                    {user.Email}
                   </p>
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                   <p className="text-black dark:text-white">
-                    {packageItem.usuario}
+                    {user.Username}
                   </p>
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
