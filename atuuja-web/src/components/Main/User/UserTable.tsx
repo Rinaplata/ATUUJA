@@ -8,6 +8,7 @@ import { User } from '../../../types/user';
 import Modal from '../../Tables/Modal';
 import { API_URL } from '../../../config/config';
 import Alert from '../../Tables/Alertas';
+import UserEditModal from './UserEdit';
 
 interface IUserTable {
   users: User[];
@@ -18,16 +19,22 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
   const [modalTitle, setModalTitle] = useState('');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isDeleteAction, setDeleteAction] = useState(false);
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState<
     'success' | 'error' | 'info' | undefined
   >(undefined);
 
+  const handleEditClick = (user: User) => {
+    setSelectedUser(user);
+    setEditModalOpen(true); // Abre el modal de edición
+  };
+
   const handleOpenModal = (title: string, user: User, deleteAction = false) => {
     setModalTitle(title);
     setSelectedUser(user);
     setDeleteAction(deleteAction);
-    setModalOpen(true);
+    setModalOpen(true); // Abre el modal de eliminación
   };
 
   const handleCloseModal = () => {
@@ -35,6 +42,14 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
     setSelectedUser(null);
     setDeleteAction(false);
   };
+
+  const handleUpdateSuccess = () => {
+    setAlertMessage('Usuario actualizado correctamente.');
+    setAlertType('success');
+    setEditModalOpen(false);
+    window.location.reload(); // Opcional, si quieres recargar la página o refrescar la lista de usuarios
+  };
+
   const handleDeleteUser = async () => {
     if (!selectedUser) return;
     const userId = selectedUser.Username;
@@ -74,23 +89,27 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
         <Alert
           message={alertMessage}
           type={alertType}
-          onClose={() => setAlertMessage('')  
-          }
-          
+          onClose={() => setAlertMessage('')}
         />
       )}
       <div className="max-w-full overflow-x-auto">
         <table className="w-full table-auto">
           <thead>
-            <tr className="bg-primaryAtuuja text-left dark:bg-while">
+            <tr className="bg-primaryAtuuja text-left dark:bg-white">
               <th className="min-w-[220px] py-4 px-4 font-medium text-white dark:text-white xl:pl-11">
-                Nombre
+                Usuario
               </th>
               <th className="min-w-[150px] py-4 px-4 font-medium text-white dark:text-white">
                 Correo
               </th>
               <th className="min-w-[120px] py-4 px-4 font-medium text-white dark:text-white">
-                Usuario
+                Rol
+              </th>
+              <th className="min-w-[120px] py-4 px-4 font-medium text-white dark:text-white">
+                Progreso
+              </th>
+              <th className="min-w-[120px] py-4 px-4 font-medium text-white dark:text-white">
+                Puntos Acumulados
               </th>
               <th className="py-4 px-4 font-medium text-white dark:text-white">
                 Acciones
@@ -109,12 +128,25 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
                   <p className="text-black dark:text-white">{user.Email}</p>
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                  <p className="text-black dark:text-white">{user.Username}</p>
+                  <p className="text-black dark:text-white">
+                    {/* Rol del usuario */}
+                  </p>
+                </td>
+                <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                  <p className="text-black dark:text-white">{/* Progreso */}</p>
+                </td>
+                <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                  <p className="text-black dark:text-white">
+                    {/* Puntos Acumulados */}
+                  </p>
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                   <div className="flex items-center space-x-3.5">
                     <button className="hover:text-primaryAtuuja">
-                      <PencilIcon className="h-5 w-5" />
+                      <PencilIcon
+                        className="h-5 w-5"
+                        onClick={() => handleEditClick(user)}
+                      />
                     </button>
                     <button className="hover:text-primaryAtuuja">
                       <ChartBarIcon className="h-5 w-5" />
@@ -138,7 +170,8 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
           </tbody>
         </table>
       </div>
-      {/* Modal */}
+
+      {/* Modal para eliminación de usuario */}
       <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={modalTitle}>
         {isDeleteAction ? (
           <div>
@@ -164,6 +197,18 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
           </div>
         )}
       </Modal>
+
+      {/* Modal para editar usuario */}
+      <UserEditModal
+        isOpen={isEditModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        userData={{
+          username: selectedUser?.Username ?? '',
+          email: selectedUser?.Email ?? '',
+          password:selectedUser?.Password ?? '',
+        }}
+        onSuccess={handleUpdateSuccess}
+      />
     </div>
   );
 };

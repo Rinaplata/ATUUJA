@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import UserTable from './UserTable'
 import { API_URL } from '../../../config/config'
+import UserRegister from './UserRegister'
 
 export default function User() {
   const [users, setUsers] = useState([]);
+  const [isRegisterOpen, setRegisterOpen] = useState(false);
 
   useEffect(() => {
 
@@ -27,6 +29,11 @@ export default function User() {
 
   }, []);
 
+  const handleRegister = (data: { Username: string; email: string; password: string }) => {
+    console.log('Registrar usuario:', data);
+    // Aquí puedes manejar la lógica para almacenar los datos o actualizar la lista de usuarios
+    setRegisterOpen(false); // Cerrar el modal después de registrar
+  };
 
   return (
     <div>
@@ -69,12 +76,19 @@ export default function User() {
         <div className="p-20 pr-[20rem]">
         {/* Botón Nuevo */}
         <div className="mb-3">
-          <button className="bg-primaryAtuuja text-white py-2 px-8 rounded ml-4">
+          <button className="bg-primaryAtuuja text-white py-2 px-8 rounded ml-4" 
+           onClick={() => setRegisterOpen(true)} >
             Nuevo
           </button>
         </div>
        <UserTable users={users} />
        </div>
+        {/* Modal de Registro */}
+      <UserRegister 
+        isOpen={isRegisterOpen} 
+        onClose={() => setRegisterOpen(false)} 
+        onSuccess={handleRegister}
+      />
     </div>
   );
 }
