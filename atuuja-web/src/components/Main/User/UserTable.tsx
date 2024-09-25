@@ -6,38 +6,79 @@ import {
 } from '@heroicons/react/24/outline';
 import { User } from '../../../types/user';
 import Modal from '../../Tables/Modal';
+import { API_URL } from '../../../config/config';
+import Alert from '../../Tables/Alertas';
 
 interface IUserTable {
   users: User[];
 }
 
 const TableThree: React.FC<IUserTable> = ({ users }) => {
-    const [isModalOpen, setModalOpen] = useState(false);
-    const [modalTitle, setModalTitle] = useState('');
-    const [selectedUser, setSelectedUser] = useState<User | null>(null);
-    const [isDeleteAction, setDeleteAction] = useState(false);
-  
-    const handleOpenModal = (title: string, user: User, deleteAction = false) => {
-      setModalTitle(title);
-      setSelectedUser(user);
-      setDeleteAction(deleteAction);
-      setModalOpen(true);
-    };
-  
-    const handleCloseModal = () => {
-      setModalOpen(false);
-      setSelectedUser(null);
-      setDeleteAction(false);
-    };
-  
-    const handleDeleteUser = () => {
-      // Aquí va la lógica para eliminar al usuario
-      console.log(`Eliminando al usuario: ${selectedUser?.Username}`);
-      handleCloseModal(); // Cerrar el modal después de eliminar
-    };
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [modalTitle, setModalTitle] = useState('');
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isDeleteAction, setDeleteAction] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState<
+    'success' | 'error' | 'info' | undefined
+  >(undefined);
+
+  const handleOpenModal = (title: string, user: User, deleteAction = false) => {
+    setModalTitle(title);
+    setSelectedUser(user);
+    setDeleteAction(deleteAction);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedUser(null);
+    setDeleteAction(false);
+  };
+  const handleDeleteUser = async () => {
+    if (!selectedUser) return;
+    const userId = selectedUser.Username;
+
+    try {
+      const response = await fetch(`${API_URL}/Auth/delete/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al eliminar el usuario');
+      }
+
+      // Muestra alerta de éxito
+      setAlertMessage(
+        `Usuario ${selectedUser.Username} eliminado correctamente.`,
+      );
+      setAlertType('success');
+      window.location.reload();
+
+      // Cerrar el modal después de eliminar
+      handleCloseModal();
+    } catch (error) {
+      console.error('Error al eliminar el usuario:', error);
+      setAlertMessage('Error al eliminar el usuario. Inténtalo nuevamente.');
+      setAlertType('error');
+    }
+  };
 
   return (
     <div className="rounded-sm bg-transparent px-5 pt-6 pb-2.5">
+      {/* Renderizar alerta */}
+      {alertMessage && (
+        <Alert
+          message={alertMessage}
+          type={alertType}
+          onClose={() => setAlertMessage('')  
+          }
+          
+        />
+      )}
       <div className="max-w-full overflow-x-auto">
         <table className="w-full table-auto">
           <thead>
@@ -78,7 +119,16 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
                     <button className="hover:text-primaryAtuuja">
                       <ChartBarIcon className="h-5 w-5" />
                     </button>
-                    <button className="hover:text-primaryAtuuja" onClick={() =>handleOpenModal(`Eliminar Usuario: ${user.Username}`, user, true)}>
+                    <button
+                      className="hover:text-primaryAtuuja"
+                      onClick={() =>
+                        handleOpenModal(
+                          `Eliminar Usuario: ${user.Username}`,
+                          user,
+                          true,
+                        )
+                      }
+                    >
                       <TrashIcon className="h-5 w-5" />
                     </button>
                   </div>
@@ -88,16 +138,22 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
           </tbody>
         </table>
       </div>
-     {/* Modal */}
-     <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={modalTitle}>
+      {/* Modal */}
+      <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={modalTitle}>
         {isDeleteAction ? (
           <div>
             <p>¿Estás seguro que deseas eliminar este usuario?</p>
             <div className="flex justify-end space-x-4 mt-4">
-              <button onClick={handleCloseModal} className="bg-gray-200 text-black px-4 py-2 rounded-lg hover:bg-gray-300">
+              <button
+                onClick={handleCloseModal}
+                className="bg-gray-200 text-black px-4 py-2 rounded-lg hover:bg-gray-300"
+              >
                 Cancelar
               </button>
-              <button onClick={handleDeleteUser} className="bg-primaryAtuuja text-white px-4 py-2 rounded-lg hover:bg-primaryAtuuja-700">
+              <button
+                onClick={handleDeleteUser}
+                className="bg-primaryAtuuja text-white px-4 py-2 rounded-lg hover:bg-primaryAtuuja-700"
+              >
                 Sí, estoy seguro
               </button>
             </div>
@@ -105,11 +161,10 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
         ) : (
           <div>
             <p>Acción para el usuario: {selectedUser?.Username}</p>
-            {/* Aquí puedes agregar más contenido para editar o ver detalles */}
           </div>
         )}
       </Modal>
- </div>
+    </div>
   );
 };
 
