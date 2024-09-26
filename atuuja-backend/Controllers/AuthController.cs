@@ -102,11 +102,20 @@ public class AuthController : ControllerBase
 
 
     [HttpPost("login")]
-    public IActionResult Login([FromBody] UserLogin model)
+    public async Task<IActionResult> Login([FromBody] UserLogin model)
     {
-        if (model.Username == "test" && model.Password == "password")  // Hardcoded, replace with real logic
+         var usersCollection = _firestoreDb.Collection("users");
+         var query = usersCollection.WhereEqualTo("Email", model.Email);
+        var querySnapshot = await query.GetSnapshotAsync();
+
+        if(querySnapshot.Count == 0) return Unauthorized();
+
+        var userDoc = querySnapshot.Documents[0];
+        var userData = userDoc.ToDictionary();
+
+        if (userData["Password"].ToString() == model.Password) 
         {
-            var token = GenerateJwtToken(model.Username);
+            var token = GenerateJwtToken(model.Email);
             return Ok(new { Token = token });
         }
         return Unauthorized();
@@ -224,7 +233,7 @@ public class UserRegister
 
 public class UserLogin
 {
-    public string Username { get; set; }
+    public string Email { get; set; }
     public string Password { get; set; }
 }
 

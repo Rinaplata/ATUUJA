@@ -1,11 +1,44 @@
-import React from 'react';
-import TableThree from '../Tables/TableThree';
+import React, { useEffect, useState } from 'react';
+import UserTable from './UserTable'
+import { API_URL } from '../../../config/config'
+import UserRegister from './UserRegister'
 
-export default function Story() {
+export default function User() {
+  const [users, setUsers] = useState([]);
+  const [isRegisterOpen, setRegisterOpen] = useState(false);
+
+  useEffect(() => {
+
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${API_URL}/Auth/list`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+      setUsers(await response.json());
+      } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+
+  };
+
+    fetchData();
+
+  }, []);
+
+  const handleRegister = (data: { Username: string; email: string; password: string }) => {
+    console.log('Registrar usuario:', data);
+    // Aquí puedes manejar la lógica para almacenar los datos o actualizar la lista de usuarios
+    setRegisterOpen(false); // Cerrar el modal después de registrar
+  };
+
   return (
     <div>
-      {/* Buscador */}
-      <div className="w-screen">
+            {/* Buscador */}
+            <div className="w-screen">
         <form action="https://formbold.com/s/unique_form_id" method="POST">
           <div className="relative">
             <button className="absolute pl-15 left-0 top-1/2 -translate-y-1/2">
@@ -40,17 +73,22 @@ export default function Story() {
           </div>
         </form>
       </div>
-      <div className="p-20 pr-[20rem]">
+        <div className="p-20 pr-[20rem]">
         {/* Botón Nuevo */}
         <div className="mb-3">
-          <button className="bg-primaryAtuuja text-white py-2 px-8 rounded ml-4">
+          <button className="bg-primaryAtuuja text-white py-2 px-8 rounded ml-4" 
+           onClick={() => setRegisterOpen(true)} >
             Nuevo
           </button>
         </div>
-
-        {/* Tabla */}
-        <TableThree />
-      </div>
+       <UserTable users={users} />
+       </div>
+        {/* Modal de Registro */}
+      <UserRegister 
+        isOpen={isRegisterOpen} 
+        onClose={() => setRegisterOpen(false)} 
+        onSuccess={handleRegister}
+      />
     </div>
   );
 }

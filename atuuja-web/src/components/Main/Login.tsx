@@ -1,11 +1,44 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
-import LogoDark from '../../images/logo/logo-dark.svg';
 import Logo from '../../images/logo/logo.png';
 import Banner from '../../images/banner/wayuuADMIN.jpg';
+import { API_URL } from './../../config/config'
 
 const Login: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+
+  // Función para manejar el envío del formulario
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Objeto con los datos del usuario
+    const loginData = { email, password };
+
+    try {
+      // Realizar la solicitud POST al backend
+      const response = await fetch(`${API_URL}/Auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(loginData),
+      });
+
+      // Verificar si la solicitud fue exitosa
+      if (response.ok) {
+        // Si el login es exitoso, redirigir a la página '/dast'
+        navigate('/admin');
+      } else {
+        // Manejar el error (por ejemplo, credenciales incorrectas)
+        console.error('Error en el inicio de sesión');
+      }
+    } catch (error) {
+      console.error('Error en la solicitud:', error);
+    }
+  };
   return (
     <>
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -35,7 +68,7 @@ const Login: React.FC = () => {
                 Inicia sesión con tu cuenta
               </h2>
 
-              <form>
+              <form onSubmit={handleLogin}>
                 <div className="mb-6">
                   <div className="relative">
                     <span className="absolute left-0 top-0 h-full w-12 flex items-center justify-center bg-thirdAtuuja text-primaryAtuuja rounded-l-lg">
@@ -59,6 +92,8 @@ const Login: React.FC = () => {
                       type="email"
                       placeholder="Correo electrónico"
                       className="w-full pl-14 rounded-lg custom-placeholder border border-white bg-while py-2 pr-10 text-black outline-none focus:border-while focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-subTitleAtuuja-xs dark:focus:border-primaryAtuuja"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                     />
                   </div>
                 </div>
@@ -90,6 +125,8 @@ const Login: React.FC = () => {
                       type="password"
                       placeholder="Contraseña"
                       className="w-full pl-14 custom-placeholder rounded-lg border-white bg-white py-2 pr-10 text-subTitleAtuuja-xs outline-none focus:border-while focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primaryAtuuja"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                     />
                   </div>
                 </div>
@@ -107,6 +144,7 @@ const Login: React.FC = () => {
                     type="submit"
                     value="Iniciar sesión"
                     className="w-full cursor-pointer font-bold border-radius-atuuja border-primaryAtuuja  bg-primaryAtuuja p-3 text-white transition hover:bg-opacity-90"
+                    onSubmit={handleLogin}
                   />
                 </div>
               </form>

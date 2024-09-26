@@ -107,9 +107,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               {/* <!-- Menu Item story --> */}
               <li>
                 <NavLink
-                  to="/Story"
+                  to="/users"
                   className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out hover:text-primaryAtuuja dark:hover:bg-meta-4 ${
-                    pathname.includes('story') && 'bg-graydark dark:bg-meta-4'
+                    pathname.includes('user') ? 'text-primaryAtuuja-500' : 'text-gray-500'
                   }`}
                 >
                   <UserIcon className="h-6 w-6 text-gray-500 group-hover:text-primaryAtuuja" />{' '}
@@ -119,9 +119,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
               <li>
                 <NavLink
-                  to="/Story"
+                  to="/story"
                   className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out hover:text-primaryAtuuja dark:hover:bg-meta-4 ${
-                    pathname.includes('story') && 'bg-graydark dark:bg-meta-4'
+                    pathname.includes('story') && 'text-primaryAtuuja-500 :text-gray-500'
                   }`}
                 >
                   <DocumentTextIcon className="h-6 w-6 text-gray-500 group-hover:text-primatyAtuuja" />
@@ -130,9 +130,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               </li>
               <li>
                 <NavLink
-                  to="/Story"
+                  to="/"
                   className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out hover:text-primaryAtuuja dark:hover:bg-meta-4 ${
-                    pathname.includes('story') && 'bg-graydark dark:bg-meta-4'
+                    pathname.includes('story') && 'text-primaryAtuuja-500 :text-gray-500'
                   }`}
                 >
                   <BookOpenIcon className="h-6 w-6 text-gray-500 text-secondaryAtuuja group-hover:text-primaryAtuuja" />
@@ -141,9 +141,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               </li>
               <li>
                 <NavLink
-                  to="/Story"
+                  to="/"
                   className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out hover:text-primaryAtuuja dark:hover:bg-meta-4 ${
-                    pathname.includes('story') && 'bg-graydark dark:bg-meta-4'
+                    pathname.includes('story') && 'text-primaryAtuuja-500 :text-gray-500'
                   }`}
                 >
                   <GiftIcon className="h-6 w-6 text-gray-500 group-hover:text-primary-atuuja" />
