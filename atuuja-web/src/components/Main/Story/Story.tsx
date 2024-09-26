@@ -1,5 +1,5 @@
 import React from 'react';
-import TableThree from '../Tables/TableThree';
+import TableThree from '../../Tables/TableThree';
 
 export default function Story() {
   return (

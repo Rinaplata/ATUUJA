@@ -3,7 +3,7 @@ import { Route, Routes, useLocation } from 'react-router-dom';
 
 import Loader from './common/Loader';
 import DefaultLayout from './layout/DefaultLayout';
-import Story from './components/Main/Story';
+import Story from './components/Main/Story/Story.tsx';
 import Users from './components/Main/User/User.tsx';
 import Login from './components/Main/Login';
 

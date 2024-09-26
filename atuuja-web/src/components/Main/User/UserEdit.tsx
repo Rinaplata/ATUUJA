@@ -97,7 +97,7 @@ const UserEdit: React.FC<EditUserProps> = ({ isOpen, onClose, userData, onSucces
         <div>
           <label className="mb-2 block">Contraseña:</label>
           <input
-            type="password"
+            type="text"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="border p-2 mb-4 rounded w-full"
