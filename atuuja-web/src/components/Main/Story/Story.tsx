@@ -1,7 +1,45 @@
-import React from 'react';
-import TableThree from '../../Tables/TableThree';
+import React, { useState, useEffect } from 'react';
+import StoryTable from './StoryTable';
+import { API_URL } from '../../../config/config';
+import StoryRegister from './StoryRegister'
 
 export default function Story() {
+  const [stories, setStories] = useState([]);
+  const [isRegisterOpen, setRegisterOpen] = useState(false);
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${API_URL}/Stories/list`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        setStories(await response.json());
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleRegisterStory = (data: { 
+    relatoId: string; 
+    titulo: string; 
+    contenido: string; 
+    palabrasResaltadas: string[]; 
+    audioUrl: string; 
+  }) => {
+    console.log('Registrar relato:', data);
+    // Aquí puedes manejar la lógica para almacenar los datos o actualizar la lista de relatos
+    setRegisterOpen(false); // Cerrar el modal después de registrar el relato
+  };
+  
+
   return (
     <div>
       {/* Buscador */}
@@ -40,17 +78,25 @@ export default function Story() {
           </div>
         </form>
       </div>
+
       <div className="p-20 pr-[20rem]">
         {/* Botón Nuevo */}
         <div className="mb-3">
-          <button className="bg-primaryAtuuja text-white py-2 px-8 rounded ml-4">
+          <button className="bg-primaryAtuuja text-white py-2 px-8 rounded ml-4" 
+           onClick={() => setRegisterOpen(true)} >
             Nuevo
           </button>
         </div>
 
         {/* Tabla */}
-        <TableThree />
+        <StoryTable story={stories} />
       </div>
+      {/* Modal de Registro */}
+      <StoryRegister
+        isOpen={isRegisterOpen}
+        onClose={() => setRegisterOpen(false)}
+        onSuccess={handleRegisterStory}
+      />
     </div>
   );
 }
