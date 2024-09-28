@@ -10,6 +10,7 @@ using System.Text;
 using Google.Apis.Auth.OAuth2;
 using Newtonsoft.Json;
 using FirebaseAdmin;
+using Microsoft.AspNetCore.Authorization;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -38,7 +39,8 @@ public class AuthController : ControllerBase
         {
             { "Email", model.Email },
             { "Username", model.Username },
-            { "Password", model.Password }
+            { "Password", model.Password },
+            { "IsAdmin", false }
         };
 
         await usersCollection.Document(model.Username).SetAsync(newUser);
@@ -75,7 +77,8 @@ public class AuthController : ControllerBase
         var updatedUser = new Dictionary<string, object>
     {
         { "Email", model.Email },
-        { "Password", model.Password }
+        { "Password", model.Password },
+        { "IsAdmin", model.IsAdmin }
     };
 
         await usersCollection.Document(username).UpdateAsync(updatedUser);
@@ -101,6 +104,7 @@ public class AuthController : ControllerBase
     }
 
 
+    [AllowAnonymous]
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] UserLogin model)
     {
@@ -114,6 +118,28 @@ public class AuthController : ControllerBase
         var userData = userDoc.ToDictionary();
 
         if (userData["Password"].ToString() == model.Password) 
+        {
+            var token = GenerateJwtToken(model.Email);
+            return Ok(new { Token = token });
+        }
+        return Unauthorized();
+    }
+
+    [AllowAnonymous]
+    [HttpPost("loginAdmin")]
+    public async Task<IActionResult> LoginAdmin([FromBody] UserLogin model)
+    {
+         var usersCollection = _firestoreDb.Collection("users");
+         var query = usersCollection.WhereEqualTo("Email", model.Email);
+        var querySnapshot = await query.GetSnapshotAsync();
+
+        if(querySnapshot.Count == 0) return Unauthorized();
+
+        var userDoc = querySnapshot.Documents[0];
+        var userData = userDoc.ToDictionary();
+
+        if (userData["Password"].ToString() == model.Password
+        && bool.Parse(userData["IsAdmin"].ToString()) == true)
         {
             var token = GenerateJwtToken(model.Email);
             return Ok(new { Token = token });
@@ -229,6 +255,7 @@ public class UserRegister
     public string Username { get; set; }
     public string Email { get; set; }
     public string Password { get; set; }
+    public bool IsAdmin { get; set; }
 }
 
 public class UserLogin

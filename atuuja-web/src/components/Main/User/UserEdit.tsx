@@ -10,6 +10,7 @@ interface EditUserProps {
     username: string;
     email: string;
     password: string;
+    isAdmin: boolean;
   };
   onSuccess: () => void;
 }
@@ -18,6 +19,7 @@ const UserEdit: React.FC<EditUserProps> = ({ isOpen, onClose, userData, onSucces
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState<'success' | 'error' | undefined>(undefined);
 
@@ -26,6 +28,7 @@ const UserEdit: React.FC<EditUserProps> = ({ isOpen, onClose, userData, onSucces
       setUsername(userData.username);
       setEmail(userData.email);
       setPassword(userData.password);
+      setIsAdmin(userData.isAdmin);
     }
   }, [userData]);
 
@@ -40,6 +43,7 @@ const UserEdit: React.FC<EditUserProps> = ({ isOpen, onClose, userData, onSucces
           username,
           email,
           password,
+          isAdmin,
         }),
       });
 
@@ -97,12 +101,51 @@ const UserEdit: React.FC<EditUserProps> = ({ isOpen, onClose, userData, onSucces
         <div>
           <label className="mb-2 block">Contraseña:</label>
           <input
-            type="text"
+            type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="border p-2 mb-4 rounded w-full"
             placeholder="Ingrese la nueva contraseña"
           />
+        </div>
+        <div>
+          <label className="mb-2 block">Es Admin:
+            <div className="relative">
+              <input
+                type="checkbox"
+                id="checkboxLabelThree"
+                className="sr-only"
+                onChange={() => {
+                  setIsAdmin(!isAdmin);
+                }}
+              />
+              <div
+                className={`box mr-4 flex h-5 w-5 items-center justify-center rounded border ${
+                  isAdmin && 'border-primary bg-gray dark:bg-transparent'
+                }`}
+              >
+                <span
+                  className={`text-primary opacity-0 ${
+                    isAdmin && '!opacity-100'
+                  }`}
+                >
+                  <svg
+                    className="h-3.5 w-3.5 stroke-current"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    ></path>
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </label>
         </div>
       </div>
       <div className="flex justify-end space-x-4 mt-4">

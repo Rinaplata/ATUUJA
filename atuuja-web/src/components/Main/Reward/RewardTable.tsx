@@ -1,23 +1,22 @@
 import React, { useState } from 'react';
 import {
   PencilIcon,
-  ChartBarIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';
-import { User } from '../../../types/user';
 import Modal from '../../Tables/Modal';
 import { API_URL } from '../../../config/config';
 import Alert from '../../Tables/Alertas';
-import UserEditModal from './UserEdit';
+import { Reward } from '../../../types/Reward';
+import RewardEdit from './RewardEdit';
 
-interface IUserTable {
-  users: User[];
+interface IRewardTable {
+  Reward: Reward[];
 }
 
-const TableThree: React.FC<IUserTable> = ({ users }) => {
+const TableThree: React.FC<IRewardTable> = ({ Reward }) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
   const [isDeleteAction, setDeleteAction] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
@@ -25,37 +24,41 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
     'success' | 'error' | 'info' | undefined
   >(undefined);
 
-  const handleEditClick = (user: User) => {
-    setSelectedUser(user);
+  const handleEditClick = (Reward: Reward) => {
+    setSelectedReward(Reward);
     setEditModalOpen(true); // Abre el modal de edición
   };
 
-  const handleOpenModal = (title: string, user: User, deleteAction = false) => {
+  const handleOpenModal = (
+    title: string,
+    Reward: Reward,
+    deleteAction = false,
+  ) => {
     setModalTitle(title);
-    setSelectedUser(user);
+    setSelectedReward(Reward);
     setDeleteAction(deleteAction);
     setModalOpen(true); // Abre el modal de eliminación
   };
 
   const handleCloseModal = () => {
     setModalOpen(false);
-    setSelectedUser(null);
+    setSelectedReward(null);
     setDeleteAction(false);
   };
 
   const handleUpdateSuccess = () => {
-    setAlertMessage('Usuario actualizado correctamente.');
+    setAlertMessage('Reward actualizado correctamente.');
     setAlertType('success');
     setEditModalOpen(false);
-    window.location.reload(); // Opcional, si quieres recargar la página o refrescar la lista de usuarios
+    window.location.reload(); // Opcional, si quieres recargar la página o refrescar la lista de Rewards
   };
 
-  const handleDeleteUser = async () => {
-    if (!selectedUser) return;
-    const userId = selectedUser.Username;
+  const handleDeleteReward = async () => {
+    if (!selectedReward) return;
+    const RewardId = selectedReward.PremioId;
 
     try {
-      const response = await fetch(`${API_URL}/Auth/delete/${userId}`, {
+      const response = await fetch(`${API_URL}/reward/delete/${RewardId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -63,12 +66,12 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
       });
 
       if (!response.ok) {
-        throw new Error('Error al eliminar el usuario');
+        throw new Error('Error al eliminar el premio');
       }
 
       // Muestra alerta de éxito
       setAlertMessage(
-        `Usuario ${selectedUser.Username} eliminado correctamente.`,
+        `premio ${selectedReward.PremioId} eliminado correctamente.`,
       );
       setAlertType('success');
       window.location.reload();
@@ -76,8 +79,8 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
       // Cerrar el modal después de eliminar
       handleCloseModal();
     } catch (error) {
-      console.error('Error al eliminar el usuario:', error);
-      setAlertMessage('Error al eliminar el usuario. Inténtalo nuevamente.');
+      console.error('Error al eliminar el premio:', error);
+      setAlertMessage('Error al eliminar el premio. Inténtalo nuevamente.');
       setAlertType('error');
     }
   };
@@ -97,19 +100,16 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
           <thead>
             <tr className="bg-primaryAtuuja text-left dark:bg-white">
               <th className="min-w-[220px] py-4 px-4 font-medium text-white dark:text-white xl:pl-11">
-                Usuario
+                Nombre del Premio
               </th>
               <th className="min-w-[150px] py-4 px-4 font-medium text-white dark:text-white">
-                Correo
+                Descripcion
               </th>
               <th className="min-w-[120px] py-4 px-4 font-medium text-white dark:text-white">
-                Es Admin
+                Puntos
               </th>
               <th className="min-w-[120px] py-4 px-4 font-medium text-white dark:text-white">
-                Progreso
-              </th>
-              <th className="min-w-[120px] py-4 px-4 font-medium text-white dark:text-white">
-                Puntos Acumulados
+                Imagen
               </th>
               <th className="py-4 px-4 font-medium text-white dark:text-white">
                 Acciones
@@ -117,46 +117,43 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
             </tr>
           </thead>
           <tbody>
-            {users.map((user, key) => (
+            {Reward.map((RewardItem, key) => (
               <tr key={key} className="bg-white">
                 <td className="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
                   <h5 className="font-medium text-black dark:text-white">
-                    {user.Username}
+                    {RewardItem.Nombre}
                   </h5>
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                  <p className="text-black dark:text-white">{user.Email}</p>
-                </td>
-                <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                   <p className="text-black dark:text-white">
-                  <p className="text-black dark:text-white">{user.IsAdmin ? "Si" : "No"}</p>
+                    {RewardItem.Descripcion}
                   </p>
                 </td>
-                <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                  <p className="text-black dark:text-white">{/* Progreso */}</p>
-                </td>
+
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                   <p className="text-black dark:text-white">
-                    {/* Puntos Acumulados */}
+                    {RewardItem.Puntos}
                   </p>
                 </td>
+
+                <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                  <img src={RewardItem.ImagenUrl} height={40} width={40}></img>
+                </td>
+
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                   <div className="flex items-center space-x-3.5">
                     <button className="hover:text-primaryAtuuja">
                       <PencilIcon
                         className="h-5 w-5"
-                        onClick={() => handleEditClick(user)}
+                        onClick={() => handleEditClick(RewardItem)}
                       />
-                    </button>
-                    <button className="hover:text-primaryAtuuja">
-                      <ChartBarIcon className="h-5 w-5" />
                     </button>
                     <button
                       className="hover:text-primaryAtuuja"
                       onClick={() =>
                         handleOpenModal(
-                          `Eliminar Usuario: ${user.Username}`,
-                          user,
+                          `Eliminar Reward: ${RewardItem.Nombre}`,
+                          RewardItem,
                           true,
                         )
                       }
@@ -171,11 +168,11 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
         </table>
       </div>
 
-      {/* Modal para eliminación de usuario */}
+      {/* Modal para eliminación de Reward */}
       <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={modalTitle}>
         {isDeleteAction ? (
           <div>
-            <p>¿Estás seguro que deseas eliminar este usuario?</p>
+            <p>¿Estás seguro que deseas eliminar este premio?</p>
             <div className="flex justify-end space-x-4 mt-4">
               <button
                 onClick={handleCloseModal}
@@ -184,8 +181,8 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
                 Cancelar
               </button>
               <button
-                onClick={handleDeleteUser}
                 className="bg-primaryAtuuja text-white px-4 py-2 rounded-lg hover:bg-primaryAtuuja-700"
+                onClick={handleDeleteReward}
               >
                 Sí, estoy seguro
               </button>
@@ -193,21 +190,16 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
           </div>
         ) : (
           <div>
-            <p>Acción para el usuario: {selectedUser?.Username}</p>
+            <p>Acción para el premio: {selectedReward?.Nombre}</p>
           </div>
         )}
       </Modal>
 
       {/* Modal para editar usuario */}
-      <UserEditModal
+      <RewardEdit
         isOpen={isEditModalOpen}
         onClose={() => setEditModalOpen(false)}
-        userData={{
-          username: selectedUser?.Username ?? '',
-          email: selectedUser?.Email ?? '',
-          password:selectedUser?.Password ?? '',
-          isAdmin: selectedUser?.IsAdmin ?? false,
-        }}
+        RewardData={selectedReward}
         onSuccess={handleUpdateSuccess}
       />
     </div>

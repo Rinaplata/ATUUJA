@@ -21,6 +21,7 @@ const UserRegister: React.FC<RegisterOwnerProps> = ({
   const [ownerUsername, setUsername] = useState('');
   const [ownerEmail, setOwnerEmail] = useState('');
   const [ownerPassword, setOwnerPassword] = useState('');
+  const [ownerIsAdmin, setOwnerIsAdmin] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState<'success' | 'error' | undefined>(
     undefined,
@@ -124,15 +125,45 @@ const UserRegister: React.FC<RegisterOwnerProps> = ({
         placeholder="Ingrese la contraseña"
       />
     </div>
-    <div className="col-span-2">
-      <label className="mb-2 block font-bold">Rol:</label>
-      <input
-        type="text"
-        onChange={(e) => setOwnerPassword(e.target.value)}
-        className="border p-2 mb-4 rounded w-full"
-        placeholder="Ingrese el Rol de usuario"
-      />
-    </div>
+    <div>
+          <label className="mb-2 block">Es Admin:
+            <div className="relative">
+              <input
+                type="checkbox"
+                id="checkboxLabelThree"
+                className="sr-only"
+                onChange={() => {
+                  setOwnerIsAdmin(!ownerIsAdmin);
+                }}
+              />
+              <div
+                className={`box mr-4 flex h-5 w-5 items-center justify-center rounded border ${
+                  ownerIsAdmin && 'border-primary bg-gray dark:bg-transparent'
+                }`}
+              >
+                <span
+                  className={`text-primary opacity-0 ${
+                    ownerIsAdmin && '!opacity-100'
+                  }`}
+                >
+                  <svg
+                    className="h-3.5 w-3.5 stroke-current"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    ></path>
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </label>
+        </div>
   </div>
   <div className="flex justify-end space-x-4 mt-4">
     <button

@@ -3,12 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import Logo from '../../images/logo/logo.png';
 import Banner from '../../images/banner/wayuuADMIN.jpg';
-import { API_URL } from './../../config/config'
+import { API_URL } from './../../config/config';
+import Alert from '../Tables/Alertas';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState<'success' | 'error' | undefined>(undefined);
+
 
   // Función para manejar el envío del formulario
   const handleLogin = async (e: React.FormEvent) => {
@@ -19,7 +23,7 @@ const Login: React.FC = () => {
 
     try {
       // Realizar la solicitud POST al backend
-      const response = await fetch(`${API_URL}/Auth/login`, {
+      const response = await fetch(`${API_URL}/Auth/loginAdmin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -29,18 +33,31 @@ const Login: React.FC = () => {
 
       // Verificar si la solicitud fue exitosa
       if (response.ok) {
+        const tokeResult =  (await response.json());
+        localStorage.setItem('token', tokeResult.token);
         // Si el login es exitoso, redirigir a la página '/dast'
         navigate('/admin');
       } else {
         // Manejar el error (por ejemplo, credenciales incorrectas)
         console.error('Error en el inicio de sesión');
+        setAlertMessage('Usuario o contraseña incorrecto, intente de nuevo');
+        setAlertType('error');
       }
     } catch (error) {
       console.error('Error en la solicitud:', error);
+      setAlertMessage('Error durante la autenticación, intente de nuevo');
+      setAlertType('error');
     }
   };
   return (
     <>
+     {alertMessage && (
+        <Alert
+          message={alertMessage}
+          type={alertType}
+          onClose={() => setAlertMessage('')}
+        />
+      )}
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="flex flex-wrap w-full">
           {/* Sección de la izquierda con la imagen */}
