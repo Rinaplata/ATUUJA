@@ -1,4 +1,5 @@
 using Google.Cloud.Firestore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -8,116 +9,102 @@ using System.Threading.Tasks;
 public class RewardController : ControllerBase
 {
     private readonly FirestoreDb _firestoreDb;
+    const string rewardDescription = "premios";
 
     public RewardController()
     {
-         _firestoreDb = FirestoreDb.Create("bd-atuuja");
+        _firestoreDb = FirestoreDb.Create("bd-atuuja");
     }
 
     // POST: api/Reward/create
     [HttpPost("create")]
     public async Task<IActionResult> CreateReward([FromBody] Reward model)
     {
-        var RewardCollection = _firestoreDb.Collection("premios");
-        
-        // Verificar si ya existe un relato con el mismo título
-        if(model.PremioId != string.Empty)
-        {
-            var RewardSnapshot = await RewardCollection.Document(model.PremioId).GetSnapshotAsync();
+        var rewardCollection = _firestoreDb.Collection(rewardDescription);
+        var rewardId = Guid.NewGuid().ToString();
 
-            if (RewardSnapshot.Exists)
-            {
-                return Conflict("Ya existe un premio con el mismo título.");
-            }
-        } 
-
-        // Generar un ID único para el relato
-        var relatoId = RewardCollection.Document().Id;
-
-        // Crear un nuevo relato con los datos proporcionados
         var newReward = new Dictionary<string, object>
         {
-            { "PremioId", Guid.NewGuid().ToString() }, 
-            { "Nombre", model.Nombre },
-            { "Descripcion", model.Descripcion },
-            { "Puntos", model.Puntos },
-            { "ImagenUrl", model.ImagenUrl }
+            { nameof(model.PremioId), rewardId },
+            { nameof(model.Nombre), model.Nombre },
+            { nameof(model.Descripcion), model.Descripcion },
+            { nameof(model.Puntos), model.Puntos },
+            { nameof(model.ImagenUrl), model.ImagenUrl }
         };
 
-        // Guardar el relato en Firestore
-        await RewardCollection.Document(relatoId).SetAsync(newReward);
+        // Guardar el nuevo premio en Firestore
+        await rewardCollection.Document(rewardId).SetAsync(newReward);
 
-        return Ok(new { message = "Premio creado exitosamente.", RelatoId = relatoId });
+        return Ok(new { message = "Premio creado exitosamente.", PremioId = rewardId });
     }
 
-    [HttpDelete("delete/{relatoId}")]
-    public async Task<IActionResult> DeleteReward(string relatoId)
-
+    [HttpDelete("delete/{premioId}")]
+    public async Task<IActionResult> DeleteReward(string premioId)
     {
-    var RewardCollection = _firestoreDb.Collection("premios");
-    var RewardSnapshot = await RewardCollection.Document(relatoId).GetSnapshotAsync();
+        try
+        {
+            var rewardDocument = _firestoreDb.Collection(rewardDescription).Document(premioId);
+            var rewardSnapshot = await rewardDocument.GetSnapshotAsync();
 
-    if (!RewardSnapshot.Exists)
-    {
-        return NotFound("El premio no existe.");
+            if (!rewardSnapshot.Exists)
+                return NotFound("El premio no existe.");
+
+            await rewardDocument.DeleteAsync();
+            return Ok(new { message = "Premio eliminado exitosamente." });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error al eliminar el premio: {ex.Message}");
+        }
     }
 
-    await RewardCollection.Document(relatoId).DeleteAsync();
-    
-    return Ok(new { message = "Premio eliminado exitosamente." });
-}
-
-
-   [HttpGet("list")]
+    [HttpGet("list")]
     public async Task<IActionResult> ListReward()
     {
-    var RewardCollection = _firestoreDb.Collection("premios");
-    var RewardSnapshot = await RewardCollection.GetSnapshotAsync();
+        var rewardSnapshot = await _firestoreDb.Collection(rewardDescription).GetSnapshotAsync();
 
-    var RewardList = new List<Dictionary<string, object>>();
+        if (!rewardSnapshot.Documents.Any())
+            return Ok(new List<Dictionary<string, object>>());
 
-    foreach (var document in RewardSnapshot.Documents)
-    {
-        var Reward = document.ToDictionary();
-        Reward["PremioId"] = document.Id; // Añadir el ID del documento al diccionario
-        RewardList.Add(Reward);
+        var rewardList = rewardSnapshot.Documents
+            .Select(document =>
+            {
+                var reward = document.ToDictionary();
+                reward["PremioId"] = document.Id;
+                return reward;
+            }).ToList();
+
+        return Ok(rewardList);
     }
 
-    return Ok(RewardList);
-}
 
-[HttpPut("update/{premioId}")]
-public async Task<IActionResult> UpdateReward(string premioId, [FromBody] Reward model)
-{
-    var RewardCollection = _firestoreDb.Collection("premios");
-    var RewardSnapshot = await RewardCollection.Document(premioId).GetSnapshotAsync();
-
-    if (!RewardSnapshot.Exists)
+    [HttpPut("update/{premioId}")]
+    public async Task<IActionResult> UpdateReward(string premioId, [FromBody] Reward model)
     {
-        return NotFound("El premio no existe.");
+        try
+        {
+            var documentRef = _firestoreDb.Collection(rewardDescription).Document(premioId);
+            var rewardSnapshot = await documentRef.GetSnapshotAsync();
+
+            if (!rewardSnapshot.Exists)
+                return NotFound("El premio no existe.");
+
+            var updatedReward = new Dictionary<string, object>
+            {
+                { nameof(model.Nombre), model.Nombre },
+                { nameof(model.Descripcion), model.Descripcion },
+                { nameof(model.Puntos), model.Puntos },
+                { nameof(model.ImagenUrl), model.ImagenUrl }
+            };
+
+            await documentRef.UpdateAsync(updatedReward);
+
+            return Ok(new { message = "Premio actualizado exitosamente." });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error al actualizar el premio: {ex.Message}");
+        }
     }
 
-    var updatedReward = new Dictionary<string, object>
-    {
-        { "Nombre", model.Nombre },
-        { "Descripcion", model.Descripcion },
-        { "Puntos", model.Puntos },
-        { "ImagenUrl", model.ImagenUrl }
-    };
-
-    await RewardCollection.Document(premioId).UpdateAsync(updatedReward);
-
-    return Ok(new { message = "Premio actualizado exitosamente." });
 }
-
-}
-
-public class Reward
-{
-    public string PremioId { get; set; }  
-    public string Nombre { get; set; }    
-    public string Descripcion { get; set; } 
-    public int Puntos { get; set; } 
-    public string ImagenUrl { get; set; } 
-}
-
