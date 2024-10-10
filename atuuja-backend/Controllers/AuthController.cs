@@ -18,6 +18,9 @@ public class AuthController : ControllerBase
 {
     private readonly IConfiguration _config;
     private readonly FirestoreDb _firestoreDb;
+    const string usersyKeyDescripcion = "users";
+    const string userDescripcion = "Usuario";
+
 
     public AuthController(IConfiguration config)
     {
@@ -28,79 +31,81 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] UserRegister model)
     {
-        var usersCollection = _firestoreDb.Collection("users");
-        var userSnapshot = await usersCollection.Document(model.Username).GetSnapshotAsync();
-
-        if (userSnapshot.Exists)
-        {
-            return Conflict("El usuario ya existe!.");
-        }
+        var usersCollection = _firestoreDb.Collection(usersyKeyDescripcion);
         var newUser = new Dictionary<string, object>
         {
-            { "Email", model.Email },
-            { "Username", model.Username },
-            { "Password", model.Password },
-            { "IsAdmin", false }
+            { nameof(model.Email), model.Email },
+            { nameof(model.Username), model.Username },
+            { nameof(model.Password), model.Password },
+            { nameof(model.IsAdmin),  model.IsAdmin }
         };
 
         await usersCollection.Document(model.Username).SetAsync(newUser);
 
-        return Ok("Registro exitoso.");
+        return Ok(MessageTemplates.Format(MessageTemplates.RegisterInserted, userDescripcion));
     }
 
     [HttpGet("get/{username}")]
     public async Task<IActionResult> GetUser(string username)
     {
-        var usersCollection = _firestoreDb.Collection("users");
-        var userSnapshot = await usersCollection.Document(username).GetSnapshotAsync();
-
-        if (!userSnapshot.Exists)
+        try
         {
-            return NotFound("El usuario no existe.");
-        }
+            var usersCollection = _firestoreDb.Collection(usersyKeyDescripcion);
+            var userSnapshot = await usersCollection.Document(username).GetSnapshotAsync();
 
-        var userData = userSnapshot.ToDictionary();
-        return Ok(userData);
+            if (!userSnapshot.Exists)
+                return NotFound(MessageTemplates.Format(MessageTemplates.RegisterNotFound, userDescripcion));
+
+            var userData = userSnapshot.ToDictionary();
+            return Ok(userData);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"{MessageTemplates.Format(MessageTemplates.ErrorGettingRegister, userDescripcion)}: {ex.Message}");
+        }
     }
+
 
     [HttpPut("update/{username}")]
     public async Task<IActionResult> UpdateUser(string username, [FromBody] UserRegister model)
     {
-        var usersCollection = _firestoreDb.Collection("users");
+        var usersCollection = _firestoreDb.Collection(usersyKeyDescripcion);
         var userSnapshot = await usersCollection.Document(username).GetSnapshotAsync();
 
         if (!userSnapshot.Exists)
-        {
-            return NotFound("El usuario no existe.");
-        }
+            return NotFound(MessageTemplates.Format(MessageTemplates.RegisterNotFound, userDescripcion));
 
         var updatedUser = new Dictionary<string, object>
-    {
-        { "Email", model.Email },
-        { "Password", model.Password },
-        { "IsAdmin", model.IsAdmin }
-    };
+        {
+            { nameof(model.Email), model.Email },
+            { nameof(model.Password), model.Password },
+            { nameof(model.IsAdmin), model.IsAdmin }
+        };
 
         await usersCollection.Document(username).UpdateAsync(updatedUser);
 
-        return Ok("Usuario actualizado exitosamente.");
+        return Ok(MessageTemplates.Format(MessageTemplates.RegisterUpdated, userDescripcion));
     }
 
     [HttpDelete("delete/{username}")]
 
     public async Task<IActionResult> DeleteUser(string username)
     {
-        var usersCollection = _firestoreDb.Collection("users");
-        var userSnapshot = await usersCollection.Document(username).GetSnapshotAsync();
+        try{
+        var usersCollection = _firestoreDb.Collection(usersyKeyDescripcion).Document(username);
+        var userSnapshot = await usersCollection.GetSnapshotAsync();
 
         if (!userSnapshot.Exists)
-        {
-            return NotFound("El usuario no existe.");
+            return NotFound( MessageTemplates.Format(MessageTemplates.RegisterNotFound, userDescripcion));
+
+        await usersCollection.DeleteAsync();
+
+        return Ok(MessageTemplates.Format(MessageTemplates.RegisterDeleted, userDescripcion));
         }
-
-        await usersCollection.Document(username).DeleteAsync();
-
-        return Ok("Usuario eliminado exitosamente.");
+         catch (Exception ex)
+        {
+            return StatusCode(500, $"{MessageTemplates.Format(MessageTemplates.ErrorDeletingRegister, userDescripcion)}: {ex.Message}");
+        }
     }
 
 
@@ -108,16 +113,16 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] UserLogin model)
     {
-         var usersCollection = _firestoreDb.Collection("users");
-         var query = usersCollection.WhereEqualTo("Email", model.Email);
+        var usersCollection = _firestoreDb.Collection("users");
+        var query = usersCollection.WhereEqualTo("Email", model.Email);
         var querySnapshot = await query.GetSnapshotAsync();
 
-        if(querySnapshot.Count == 0) return Unauthorized();
+        if (querySnapshot.Count == 0) return Unauthorized();
 
         var userDoc = querySnapshot.Documents[0];
         var userData = userDoc.ToDictionary();
 
-        if (userData["Password"].ToString() == model.Password) 
+        if (userData["Password"].ToString() == model.Password)
         {
             var token = GenerateJwtToken(model.Email);
             return Ok(new { Token = token });
@@ -129,11 +134,11 @@ public class AuthController : ControllerBase
     [HttpPost("loginAdmin")]
     public async Task<IActionResult> LoginAdmin([FromBody] UserLogin model)
     {
-         var usersCollection = _firestoreDb.Collection("users");
-         var query = usersCollection.WhereEqualTo("Email", model.Email);
+        var usersCollection = _firestoreDb.Collection("users");
+        var query = usersCollection.WhereEqualTo("Email", model.Email);
         var querySnapshot = await query.GetSnapshotAsync();
 
-        if(querySnapshot.Count == 0) return Unauthorized();
+        if (querySnapshot.Count == 0) return Unauthorized();
 
         var userDoc = querySnapshot.Documents[0];
         var userData = userDoc.ToDictionary();
@@ -150,20 +155,23 @@ public class AuthController : ControllerBase
     [HttpGet("list")]
     public async Task<IActionResult> ListUsers()
     {
-        var usersCollection = _firestoreDb.Collection("users");
-        var usersSnapshot = await usersCollection.GetSnapshotAsync();
+        var usersSnapshot = await _firestoreDb.Collection(usersyKeyDescripcion).GetSnapshotAsync(); 
 
-        var usersList = new List<Dictionary<string, object>>();
+        if (!usersSnapshot.Documents.Any())
+            return Ok(new List<Dictionary<string, object>>()); 
 
-        foreach (var document in usersSnapshot.Documents)
-        {
-            var user = document.ToDictionary();
-            user["Username"] = document.Id; // Incluye el Username como parte de los datos
-            usersList.Add(user);
-        }
+        var usersList = usersSnapshot.Documents
+        .Select(document =>
+            {
+                var user = document.ToDictionary();
+                user["Username"] = document.Id;
+                return user;
+            }
+        ).ToList();
 
         return Ok(usersList);
     }
+    
 
     [HttpPost("forgot-password")]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest model)
