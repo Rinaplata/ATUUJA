@@ -4,7 +4,6 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../services/firebaseConfig'; 
 
-
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -12,7 +11,8 @@ const LoginScreen = ({ navigation }) => {
   const [errorMessage, setErrorMessage] = useState(''); 
 
   const handleLogin = () => {
-    
+    // Descomentar para habilitar inicio de sesión con Firebase
+    /*
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Inicio de sesión exitoso
@@ -21,13 +21,31 @@ const LoginScreen = ({ navigation }) => {
         setErrorMessage('');  // Limpiar el mensaje de error
         // Navegar a la pantalla de Home al iniciar sesión correctamente
         navigation.navigate('MainTabs', { screen: 'Home' });
- 
       })
       .catch((error) => {
         // Si el inicio de sesión falla, muestra el error
         setError(true);
         setErrorMessage(error.message);
       });
+    */
+
+    // Definir credenciales "quemadas"
+    const validEmail = 'rina123@gmail.com'; // Correo electrónico válido
+    const validPassword = '123'; // Contraseña válida
+  
+    // Verificar las credenciales ingresadas
+    if (email === validEmail && password === validPassword) {
+      // Inicio de sesión exitoso
+      console.log('Inicio de sesión exitoso:', email);
+      setError(false);  // Restablecer el error en caso de éxito
+      setErrorMessage('');  // Limpiar el mensaje de error
+      // Navegar a la pantalla de Home al iniciar sesión correctamente
+      navigation.navigate('MainTabs', { screen: 'Home' });
+    } else {
+      // Si el inicio de sesión falla, muestra el error
+      setError(true);
+      setErrorMessage('Correo electrónico o contraseña incorrectos.'); // Mensaje de error
+    }
   };
 
   return (
