@@ -27,6 +27,7 @@ public class AuthController : ControllerBase
         _firestoreDb = FirestoreDb.Create("bd-atuuja");
         _config = config;
     }
+    
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] UserRegister model)
@@ -171,7 +172,7 @@ public class AuthController : ControllerBase
 
         return Ok(usersList);
     }
-    
+
 
     [HttpPost("forgot-password")]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest model)
