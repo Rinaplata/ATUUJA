@@ -35,9 +35,10 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddCors(p=> 
-p.AddDefaultPolicy(p=> {
-    p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();   
+builder.Services.AddCors(p =>
+p.AddDefaultPolicy(p =>
+{
+    p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
 }));
 
 var firebaseCredentials = builder.Configuration.GetSection("FireBase").Get<Dictionary<string, string>>();
@@ -54,11 +55,8 @@ FirebaseApp.Create(new AppOptions()
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
