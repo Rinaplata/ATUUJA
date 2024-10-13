@@ -1,31 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import QuizTable from '../../Tables/QuizTable'; // Importa la tabla para los quizzes
-import { API_URL } from '../../../config/config';
+import React from 'react';
+import QuizTable from '../../Tables/QuizTable';
 
 export default function Quiz() {
-  const [quizzes, setQuizzes] = useState([]);
-  const [isRegisterOpen, setRegisterOpen] = useState(false);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`${API_URL}/quiz/list`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        setQuizzes(await response.json());
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-
   return (
     <div>
       {/* Buscador */}
@@ -68,16 +44,13 @@ export default function Quiz() {
       <div className="p-20 pr-[20rem]">
         {/* Botón Nuevo */}
         <div className="mb-3">
-          <button
-            className="bg-primaryAtuuja text-white py-2 px-8 rounded ml-4"
-            onClick={() => setRegisterOpen(true)}
-          >
+          <button className="bg-primaryAtuuja text-white py-2 px-8 rounded ml-4">
             Nuevo Quiz
           </button>
         </div>
 
         {/* Tabla */}
-        <QuizTable quizzes={quizzes} />
+        <QuizTable />
       </div>
     </div>
   );
