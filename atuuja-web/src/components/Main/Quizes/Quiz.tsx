@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import QuizTable from './QuizTable'; // Importa la tabla para los quizzes
+import QuizTable from '../../Tables/QuizTable'; // Importa la tabla para los quizzes
 import { API_URL } from '../../../config/config';
 
 export default function Quiz() {

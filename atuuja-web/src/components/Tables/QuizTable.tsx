@@ -1,6 +1,6 @@
 import React from 'react';
 import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { Quiz } from '../../../types/quiz';
+import { Quiz } from '../../types/quiz';
 
 interface IQuizTable {
   quizzes: Quiz[];

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import Logo from '../../images/logo/logo.png';
 import Banner from '../../images/banner/wayuuADMIN.jpg';
 import { API_URL } from './../../config/config';
-import Alert from '../Tables/Alertas';
+import Alert from '../Alert/Alertas';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
