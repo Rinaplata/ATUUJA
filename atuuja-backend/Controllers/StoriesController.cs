@@ -29,8 +29,8 @@ public class StoriesController : ControllerBase
             { nameof(model.RelatoId), storiesId },
             { nameof(model.Titulo), model.Titulo },
             { nameof(model.Contenido), model.Contenido },
-            {  nameof(model.PalabrasResaltadas), model.PalabrasResaltadas },
-            {  nameof(model.AudioUrl), model.AudioUrl },
+            { nameof(model.PalabrasResaltadas), model.PalabrasResaltadas },
+            { nameof(model.AudioUrl), model.AudioUrl },
         };
 
         // Guardar el relato en Firestore

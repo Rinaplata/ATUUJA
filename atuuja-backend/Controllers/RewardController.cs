@@ -10,6 +10,8 @@ public class RewardController : ControllerBase
 {
     private readonly FirestoreDb _firestoreDb;
     const string rewardDescription = "premios";
+    const string rewardDescripcion = "Premio";
+
 
     public RewardController()
     {
@@ -35,7 +37,8 @@ public class RewardController : ControllerBase
         // Guardar el nuevo premio en Firestore
         await rewardCollection.Document(rewardId).SetAsync(newReward);
 
-        return Ok(new { message = "Premio creado exitosamente.", PremioId = rewardId });
+        return Ok(new { message =  MessageTemplates.Format(MessageTemplates.RegisterInserted, rewardDescripcion), PremioId = rewardId });
+
     }
 
     [HttpDelete("delete/{premioId}")]
@@ -47,14 +50,14 @@ public class RewardController : ControllerBase
             var rewardSnapshot = await rewardDocument.GetSnapshotAsync();
 
             if (!rewardSnapshot.Exists)
-                return NotFound("El premio no existe.");
+                return NotFound(MessageTemplates.Format(MessageTemplates.RegisterNotFound, rewardDescripcion));
 
             await rewardDocument.DeleteAsync();
-            return Ok(new { message = "Premio eliminado exitosamente." });
+            return Ok(new { message = MessageTemplates.Format(MessageTemplates.RegisterDeleted, rewardDescripcion) });
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"Error al eliminar el premio: {ex.Message}");
+            return StatusCode(500, $"{MessageTemplates.Format(MessageTemplates.ErrorDeletingRegister, rewardDescripcion)}: {ex.Message}");
         }
     }
 
@@ -87,7 +90,7 @@ public class RewardController : ControllerBase
             var rewardSnapshot = await documentRef.GetSnapshotAsync();
 
             if (!rewardSnapshot.Exists)
-                return NotFound("El premio no existe.");
+                return NotFound(MessageTemplates.Format(MessageTemplates.RegisterNotFound, rewardDescripcion));
 
             var updatedReward = new Dictionary<string, object>
             {
@@ -99,11 +102,11 @@ public class RewardController : ControllerBase
 
             await documentRef.UpdateAsync(updatedReward);
 
-            return Ok(new { message = "Premio actualizado exitosamente." });
+            return Ok(new { message = MessageTemplates.Format(MessageTemplates.RegisterUpdated, rewardDescripcion) });
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"Error al actualizar el premio: {ex.Message}");
+            return StatusCode(500, $"{MessageTemplates.Format(MessageTemplates.ErrorUpdatingRegister, rewardDescripcion)}: {ex.Message}");
         }
     }
 
