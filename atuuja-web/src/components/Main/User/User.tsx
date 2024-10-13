@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import UserTable from './UserTable'
+import UserTable from '../../Tables/UserTable'
 import { API_URL } from '../../../config/config'
 import UserRegister from './UserRegister'
 
