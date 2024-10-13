@@ -3,11 +3,11 @@ import {
   PencilIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';
-import Modal from '../../Modal/Modal';
-import { API_URL } from '../../../config/config';
-import Alert from '../../Alert/Alertas';
-import { Reward } from '../../../types/Reward';
-import RewardEdit from './RewardEdit';
+import Modal from '../Modal/Modal';
+import { API_URL } from '../../config/config';
+import Alert from '../Alert/Alertas';
+import { Reward } from '../../types/reward';
+import RewardEdit from '../Main/Reward/RewardEdit';
 
 interface IRewardTable {
   Reward: Reward[];

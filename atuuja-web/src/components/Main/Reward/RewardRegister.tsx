@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Modal from '../../Modal/Modal';
 import { API_URL } from '../../../config/config';
 import Alert from '../../Alert/Alertas';
-import { Reward } from '../../../types/Reward';
+import { Reward } from '../../../types/reward';
 
 interface RegisterStoryProps {
   isOpen: boolean;
