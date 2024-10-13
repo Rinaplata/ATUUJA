@@ -2,18 +2,18 @@ export type Quiz = {
     RelatoId: string;
     ExamenId: string;
     Preguntas: Pregunta[];
-    Estado: Estado[];
+    Estado: Estado;
   };
   
   export type Pregunta = {
     Respuestas: Respuesta[];
     ArchivoPregunta: string;
-    TipoRespuesta: TipoRespuesta[];
+    TipoRespuesta: TipoRespuesta;
     EnunciadoRespuesta: string;
     Orden: number;
     Puntos: number;
     EnunciadoPregunta: string;
-    TipoPregunta: TipoPregunta[];
+    TipoPregunta: TipoPregunta;
     Pista: string;
   };
   
@@ -35,7 +35,7 @@ export type Quiz = {
   }
   
   export enum Estado {
-    Inactivo = 0,
-    Activo = 1,
+    Activo = 0,
+    Inactivo = 1,
   }
   

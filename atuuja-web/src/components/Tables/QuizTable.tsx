@@ -1,7 +1,7 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { Quiz } from "../../types/quiz";
-import { getListQuiz } from "../../service/Quiz/quiz"
+import { Estado, Quiz, TipoPregunta } from "../../types/quiz";
+import { getListQuiz } from "../../service/Quiz/quiz";
 
 const QuizTable: React.FC = () => {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
@@ -23,6 +23,22 @@ const QuizTable: React.FC = () => {
     fetchQuizzes();
   }, []);
 
+  const GetTipoPreguntaText = (tipoPregunta: TipoPregunta) => {
+    switch(tipoPregunta) {
+      case 0:
+        return "Texto";
+        break; 
+        case 1:
+          return "Audio";
+        break; 
+        case 2:
+          return "Imagen";
+        break; 
+    }
+
+    return "";
+    
+  }
 
   return (
     <div className="rounded-sm bg-transparent px-5 pt-6 pb-2.5">
@@ -37,7 +53,7 @@ const QuizTable: React.FC = () => {
                 Relato
               </th>
               <th className="py-4 px-4 font-medium text-white dark:text-white">
-                Número de Preguntas
+               Tipo Pregunta
               </th>
               <th className="py-4 px-4 font-medium text-white dark:text-white">
                 Respuesta correcta
@@ -51,50 +67,53 @@ const QuizTable: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {quizzes.map(
-              (
-                quiz,
-                index
-              ) => (
-                <tr key={index} className="bg-white">
-                  <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                    <p className="text-black dark:text-white">
-                      {quiz.ExamenId}
+            {quizzes.map((quiz, index) => (
+              <tr key={index} className="bg-white">
+                <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                  <p className="text-black dark:text-white">{quiz.ExamenId}</p>
+                </td>
+                <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                  <p className="text-black dark:text-white">{quiz.RelatoId}</p>
+                </td>
+                <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                  {quiz.Preguntas.map((pregunta, index) => (
+                    <p key={index} className="text-black dark:text-white">
+                      {GetTipoPreguntaText(pregunta.TipoPregunta)}
                     </p>
-                  </td>
-                  <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                    <p className="text-black dark:text-white">
-                      {quiz.RelatoId}
-                    </p>
-                  </td>
-                  <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                    <p className="text-black dark:text-white">
-                      {quiz.Preguntas.length}
-                    </p>
-                  </td>
-                  <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                    <p className="text-black dark:text-white">
-                      {quiz.Preguntas.length > 0
-                        ? quiz.Preguntas[0].EnunciadoPregunta
-                        : "N/A"}
-                    </p>
-                  </td>
-                  <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                    <p className="text-black dark:text-white">{quiz.Estado}</p>
-                  </td>
-                  <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                    <div className="flex items-center space-x-3.5">
-                      <button className="hover:text-primaryAtuuja">
-                        <PencilIcon className="h-5 w-5" />
-                      </button>
-                      <button className="hover:text-primaryAtuuja">
-                        <TrashIcon className="h-5 w-5" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              )
-            )}
+                  ))}
+                </td>
+                <td>
+                  {quiz.Preguntas.map((pregunta) =>
+                    pregunta.Respuestas.map(
+                      (respuesta) =>
+                        respuesta.EsCorrecta && (
+                          <p
+                            key={respuesta.Valor}
+                            className="border-b border-[#eee] py-5 px-4 dark:border-strokedark"
+                          >
+                            <span className="text-black dark:text-white">
+                              {respuesta.Valor}
+                            </span>
+                          </p>
+                        )
+                    )
+                  )}
+                </td>
+                <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                  <p className="text-black dark:text-white">{quiz.Estado === Estado.Activo ? "Activo" : "Inactivo"}</p>
+                </td>
+                <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                  <div className="flex items-center space-x-3.5">
+                    <button className="hover:text-primaryAtuuja">
+                      <PencilIcon className="h-5 w-5" />
+                    </button>
+                    <button className="hover:text-primaryAtuuja">
+                      <TrashIcon className="h-5 w-5" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
