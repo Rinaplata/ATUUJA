@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { Estado, Quiz, TipoPregunta } from "../../types/quiz";
-import { getListQuiz } from "../../service/Quiz/quiz";
+import { getListQuiz, deleteQuiz } from "../../service/Quiz/quiz";
+import Modal from "../Modal/Modal";
 
 const QuizTable: React.FC = () => {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
 
   useEffect(() => {
     const fetchQuizzes = async () => {
@@ -24,21 +27,39 @@ const QuizTable: React.FC = () => {
   }, []);
 
   const GetTipoPreguntaText = (tipoPregunta: TipoPregunta) => {
-    switch(tipoPregunta) {
+    switch (tipoPregunta) {
       case 0:
         return "Texto";
-        break; 
-        case 1:
-          return "Audio";
-        break; 
-        case 2:
-          return "Imagen";
-        break; 
+      case 1:
+        return "Audio";
+      case 2:
+        return "Imagen";
+      default:
+        return "";
     }
+  };
 
-    return "";
-    
-  }
+  const openDeleteModal = (quiz: Quiz) => {
+    setSelectedQuiz(quiz);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedQuiz(null);
+  };
+
+  const handleDeleteQuiz = async () => {
+    if (selectedQuiz) {
+      try {
+        await deleteQuiz(selectedQuiz.ExamenId);
+        setQuizzes(quizzes.filter((quiz) => quiz.ExamenId !== selectedQuiz.ExamenId));
+        handleCloseModal();
+      } catch (error) {
+        setError("Error eliminando el quiz");
+      }
+    }
+  };
 
   return (
     <div className="rounded-sm bg-transparent px-5 pt-6 pb-2.5">
@@ -53,7 +74,7 @@ const QuizTable: React.FC = () => {
                 Relato
               </th>
               <th className="py-4 px-4 font-medium text-white dark:text-white">
-               Tipo Pregunta
+                Tipo Pregunta
               </th>
               <th className="py-4 px-4 font-medium text-white dark:text-white">
                 Respuesta correcta
@@ -100,14 +121,16 @@ const QuizTable: React.FC = () => {
                   )}
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                  <p className="text-black dark:text-white">{quiz.Estado === Estado.Activo ? "Activo" : "Inactivo"}</p>
+                  <p className="text-black dark:text-white">
+                    {quiz.Estado === Estado.Activo ? "Activo" : "Inactivo"}
+                  </p>
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                   <div className="flex items-center space-x-3.5">
-                    <button className="hover:text-primaryAtuuja">
-                      <PencilIcon className="h-5 w-5" />
-                    </button>
-                    <button className="hover:text-primaryAtuuja">
+                    <button
+                      className="hover:text-primaryAtuuja"
+                      onClick={() => openDeleteModal(quiz)}
+                    >
                       <TrashIcon className="h-5 w-5" />
                     </button>
                   </div>
@@ -117,6 +140,26 @@ const QuizTable: React.FC = () => {
           </tbody>
         </table>
       </div>
+      {/* Modal para eliminar */}
+      <Modal isOpen={isModalOpen} onClose={handleCloseModal} title="Confirmar eliminación">
+        <div>
+          <p>¿Estás seguro que deseas eliminar el quiz seleccionado?</p>
+          <div className="flex justify-end space-x-4 mt-4">
+            <button
+              onClick={handleCloseModal}
+              className="bg-gray-200 text-black px-4 py-2 rounded-lg hover:bg-gray-300"
+            >
+              Cancelar
+            </button>
+            <button
+              className="bg-primaryAtuuja text-white px-4 py-2 rounded-lg hover:bg-primaryAtuuja-700"
+              onClick={handleDeleteQuiz}
+            >
+              Sí, eliminar
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

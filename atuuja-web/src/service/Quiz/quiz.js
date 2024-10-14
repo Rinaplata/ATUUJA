@@ -1,4 +1,4 @@
-import {fetchData} from "../../api";
+import { fetchData,postData,updateData, deleteData } from "../../api";
 
 const getListQuiz = async () => {
   try {
@@ -13,46 +13,44 @@ const getListQuiz = async () => {
   }
 };
 
-/* const postCourses = async (bodyData) => {
+const postCreateQuiz = async (bodyData) => {
   try {
-    const response = await api.post("courses/", bodyData);
-
-    return response.data;
+    const data = await postData("Quiz/create", bodyData);
+    return data;
   } catch (error) {
     console.error(
-      "Error al crear el curso",
+      "Error al crear quiz",
       error.response ? error.response.data : error.message
     );
     throw error;
   }
 };
 
-const putCourses = async (bodyData) => {
+const updateQuiz = async (bodyData) => {
   try {
     const { id, ...bodyPut } = bodyData;
-    const response = await api.put(`courses/${id}/`, bodyPut);
-
-    return response.data;
+    const data = await updateData("Quiz/update${id}/", bodyPut);
+    return data;
   } catch (error) {
     console.error(
-      "Error al actualizar el curso",
+      "Error al actualizar quiz",
       error.response ? error.response.data : error.message
     );
     throw error;
   }
 };
 
-const deleteCourses = async (id) => {
+const deleteQuiz = async (quizId) => {
   try {
-    const response = await api.delete(`courses/${id}/`);
-    return response.data;
+    const data = await deleteData(`Quiz/delete/${quizId}/`);
+    return data;
   } catch (error) {
     console.error(
-      "Error al actualizar el curso",
+      "Error al eliminar el quiz",
       error.response ? error.response.data : error.message
     );
     throw error;
   }
-}; */
+};
 
-export {getListQuiz};
+export { getListQuiz, postCreateQuiz, updateQuiz, deleteQuiz };

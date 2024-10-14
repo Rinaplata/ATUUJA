@@ -27,9 +27,9 @@ export const postData = async (endpoint, data) => {
 };
 
 
-export const deleteData = async (endpoint) => {
+export const deleteData = async (endpoint, id) => {
   try {
-    const response = await api.delete(endpoint);
+    const response = await api.delete(endpoint, id);
     return response.data;
   } catch (error) {
     console.error("Error deleting data:", error);
