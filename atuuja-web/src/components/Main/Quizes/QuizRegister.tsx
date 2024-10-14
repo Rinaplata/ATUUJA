@@ -7,9 +7,14 @@ import {
   TipoPregunta,
   Estado,
 } from "../../../types/quiz";
-import { getStorieslist } from "../../../service/Story/story";
+import { getStorieslist} from "../../../service/Story/story";
+import { postCreateQuiz } from "../../../service/Quiz/quiz";
 
-const QuizRegister: React.FC = () => {
+interface QuizRegisterProps {
+  closeModal: () => void; // Prop para cerrar el modal
+}
+
+const QuizRegister: React.FC<QuizRegisterProps> = ({ closeModal }) => {
   const [examenId, setExamenId] = useState<string>("");
   const [relatoId, setRelatoId] = useState<string>("");
   const [preguntas, setPreguntas] = useState<Pregunta[]>([]);
@@ -71,7 +76,7 @@ const QuizRegister: React.FC = () => {
     setPreguntas(newPreguntas);
   };
 
-  /*   const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const quizData: Quiz = {
       RelatoId: relatoId,
@@ -81,12 +86,15 @@ const QuizRegister: React.FC = () => {
     };
 
     try {
-      /* await sendQuiz(quizData); 
-      // Manejar la respuesta y mostrar mensajes al usuario
+      await postCreateQuiz(quizData);
+      setRelatoId("");
+      setEstado(null);
+      setPreguntas([]);
+      closeModal();
     } catch (error) {
       console.error("Error al registrar el cuestionario:", error);
     }
-  }; */
+  };
 
   const tipoPreguntaNombres = Object.keys(TipoPregunta).filter((key) =>
     isNaN(Number(key))
@@ -94,7 +102,7 @@ const QuizRegister: React.FC = () => {
 
   return (
     <form
-      /* onSubmit={handleSubmit} */
+      onSubmit={handleSubmit}
       className="max-w-2xl mx-auto p-4 bg-white rounded shadow-md"
     >
       <h1 className="text-2xl font-bold mb-4">Registrar Cuestionario</h1>
@@ -116,7 +124,7 @@ const QuizRegister: React.FC = () => {
           <option value="-1"></option>
           {relatos.map((relato) => (
             <option key={relato.RelatoId} value={relato.RelatoId}>
-              {relato.RelatoId}
+              {relato.Contenido}
             </option>
           ))}
         </select>

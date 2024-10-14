@@ -2,7 +2,7 @@ export type Quiz = {
     RelatoId: string;
     ExamenId: string;
     Preguntas: Pregunta[];
-    Estado: Estado;
+    Estado: Estado | null;
   };
   
   export type Pregunta = {

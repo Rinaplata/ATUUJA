@@ -61,7 +61,7 @@ export default function Quiz() {
         {/* Tabla */}
         <QuizTable />
         <Modal isOpen={isModalOpen} onClose={closeModal} title="Registrar Nuevo Quiz">
-          <QuizRegister />
+          <QuizRegister closeModal={closeModal} />
         </Modal>
       </div>
     </div>
