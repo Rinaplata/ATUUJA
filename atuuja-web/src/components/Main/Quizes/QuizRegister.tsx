@@ -92,8 +92,8 @@ const QuizRegister: React.FC = () => {
     }
   };
 
-  const tipoPreguntaNombres = Object.keys(TipoPregunta).filter(
-    (key) => isNaN(Number(key))
+  const tipoPreguntaNombres = Object.keys(TipoPregunta).filter((key) =>
+    isNaN(Number(key))
   );
 
   return (
@@ -125,32 +125,48 @@ const QuizRegister: React.FC = () => {
           ))}
         </select>
       </div>
-      {/* seleccion tipo de pregunta */}
-      <div>
-        <label
-          htmlFor="tipo-pregunta-select"
-          className="block mt-4 mb-2 text-sm font-medium text-gray-700"
-        >
-          Selección Tipo pregunta
-        </label>
-        <select
-          id="tipo-pregunta-select"
-          value={tipoSeleccionado}
-          onChange={(e) => setTipoSeleccionado(e.target.value)}
-          className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
-          required
-        >
-          <option value="-1"></option>
-          {Object.entries(tipoPreguntaNombres).map(([key, value]) => (
-            <option key={key} value={value}>
-              {value}
-            </option>
-          ))}
-        </select>
-      </div>
       {preguntas.map((pregunta, index) => (
         <div key={index} className="mt-6 border p-4 rounded-md shadow-sm">
           <h3 className="text-lg font-semibold mb-2">Pregunta {index + 1}</h3>
+          {/* seleccion tipo de pregunta */}
+          <div className="mb-2">
+            <label
+              htmlFor="tipo-pregunta-select"
+              className="block mt-4 mb-2 text-sm font-medium text-gray-700"
+            >
+              Selección Tipo pregunta
+            </label>
+            <select
+              id="tipo-pregunta-select"
+              value={tipoSeleccionado}
+              onChange={(e) => setTipoSeleccionado(e.target.value)}
+              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+              required
+            >
+              <option value="-1"></option>
+              {Object.entries(tipoPreguntaNombres).map(([key, value]) => (
+                <option key={key} value={value}>
+                  {value}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            {/* Selección del orden */}
+            <input
+              type="number"
+              placeholder="Agregar orden"
+              value={pregunta.Orden}
+              onChange={(e) => {
+                const newPreguntas = [...preguntas];
+                newPreguntas[index].Orden = parseInt(e.target.value, 10); // Actualizar el campo Orden
+                setPreguntas(newPreguntas);
+              }}
+              className="block w-full p-2 mb-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+            />
+          </div>
+          {/* selección de enunciado pregunta */}
           <input
             type="text"
             placeholder="Enunciado de la pregunta"
