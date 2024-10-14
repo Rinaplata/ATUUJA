@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import RewardTable from './RewardTable';
+import RewardTable from '../../Tables/RewardTable';
 import { API_URL } from '../../../config/config';
 import RewardRegister from './RewardRegister'
 
@@ -28,15 +28,14 @@ export default function Reward() {
   }, []);
 
   const handleRegisterReward = (data: { 
-    relatoId: string; 
-    titulo: string; 
-    contenido: string; 
-    palabrasResaltadas: string[]; 
-    audioUrl: string; 
+    PremioId : string,
+    Nombre : string,
+    Descripcion : string,
+    Puntos : number,
+    ImagenUrl : string,
   }) => {
     console.log('Registrar relato:', data);
-    // Aquí puedes manejar la lógica para almacenar los datos o actualizar la lista de relatos
-    setRegisterOpen(false); // Cerrar el modal después de registrar el relato
+    setRegisterOpen(false);
   };
   
 

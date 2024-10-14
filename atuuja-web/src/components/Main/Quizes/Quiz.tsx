@@ -1,45 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import UserTable from '../../Tables/UserTable'
-import { API_URL } from '../../../config/config'
-import UserRegister from './UserRegister'
+import React, { useState } from "react";
+import QuizTable from "../../Tables/QuizTable";
+import QuizRegister from "./QuizRegister";
+import Modal from "../../Modal/Modal";
 
-export default function User() {
-  const [users, setUsers] = useState([]);
-  const [isRegisterOpen, setRegisterOpen] = useState(false);
+export default function Quiz() {
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  useEffect(() => {
-
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`${API_URL}/Auth/list`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        
-      setUsers(await response.json());
-      } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-
-  };
-
-    fetchData();
-
-  }, []);
-
-  const handleRegister = (data: { Username: string; email: string; password: string }) => {
-    console.log('Registrar usuario:', data);
-    // Aquí puedes manejar la lógica para almacenar los datos o actualizar la lista de usuarios
-    setRegisterOpen(false); // Cerrar el modal después de registrar
-  };
-
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
   return (
     <div>
-            {/* Buscador */}
-            <div className="w-screen">
-        <form action="https://formbold.com/s/unique_form_id" method="POST">
+      {/* Buscador */}
+      <div className="w-screen">
+        <form>
           <div className="relative">
             <button className="absolute pl-15 left-0 top-1/2 -translate-y-1/2">
               <svg
@@ -67,28 +40,30 @@ export default function User() {
 
             <input
               type="text"
-              placeholder="Nombre..."
+              placeholder="Buscar..."
               className="w-full bg-white py-3 pl-25 pr-4 text-black focus:outline-none dark:text-white rounded-md"
             />
           </div>
         </form>
       </div>
-        <div className="p-20 pr-[20rem]">
+
+      <div className="p-20 pr-[20rem]">
         {/* Botón Nuevo */}
         <div className="mb-3">
-          <button className="bg-primaryAtuuja text-white py-2 px-8 rounded ml-4" 
-           onClick={() => setRegisterOpen(true)} >
-            Nuevo
+          <button
+            className="bg-primaryAtuuja text-white py-2 px-8 rounded ml-4"
+            onClick={openModal}
+          >
+            Nuevo Quiz
           </button>
         </div>
-       <UserTable users={users} />
-       </div>
-        {/* Modal de Registro */}
-      <UserRegister 
-        isOpen={isRegisterOpen} 
-        onClose={() => setRegisterOpen(false)} 
-        onSuccess={handleRegister}
-      />
+
+        {/* Tabla */}
+        <QuizTable />
+        <Modal isOpen={isModalOpen} onClose={closeModal} title="Registrar Nuevo Quiz">
+          <QuizRegister closeModal={closeModal} />
+        </Modal>
+      </div>
     </div>
   );
 }
