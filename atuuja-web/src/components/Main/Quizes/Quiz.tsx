@@ -1,7 +1,13 @@
-import React from 'react';
-import QuizTable from '../../Tables/QuizTable';
+import React, { useState } from "react";
+import QuizTable from "../../Tables/QuizTable";
+import QuizRegister from "./QuizRegister";
+import Modal from "../../Modal/Modal";
 
 export default function Quiz() {
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
   return (
     <div>
       {/* Buscador */}
@@ -44,13 +50,19 @@ export default function Quiz() {
       <div className="p-20 pr-[20rem]">
         {/* Botón Nuevo */}
         <div className="mb-3">
-          <button className="bg-primaryAtuuja text-white py-2 px-8 rounded ml-4">
+          <button
+            className="bg-primaryAtuuja text-white py-2 px-8 rounded ml-4"
+            onClick={openModal}
+          >
             Nuevo Quiz
           </button>
         </div>
 
         {/* Tabla */}
         <QuizTable />
+        <Modal isOpen={isModalOpen} onClose={closeModal} title="Registrar Nuevo Quiz">
+          <QuizRegister />
+        </Modal>
       </div>
     </div>
   );
