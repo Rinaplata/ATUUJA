@@ -137,11 +137,13 @@ const QuizRegister: React.FC = () => {
           required
         >
           <option value=""></option>
-          {Object.entries(Estado).filter(([key, value]) => isNaN(Number(key))).map(([key, value]) => (
-            <option key={key} value={value}>
-              {key}
-            </option>
-          ))}
+          {Object.entries(Estado)
+            .filter(([key, value]) => isNaN(Number(key)))
+            .map(([key, value]) => (
+              <option key={key} value={value}>
+                {key}
+              </option>
+            ))}
         </select>
       </div>
 
