@@ -13,7 +13,7 @@ const QuizRegister: React.FC = () => {
   const [examenId, setExamenId] = useState<string>("");
   const [relatoId, setRelatoId] = useState<string>("");
   const [preguntas, setPreguntas] = useState<Pregunta[]>([]);
-  const [estado, setEstado] = useState<Estado>(Estado.Activo);
+  const [estado, setEstado] = useState<Estado | null>(null);
   const [relatos, setRelatos] = useState<
     { RelatoId: string; Contenido: string }[]
   >([]);
@@ -47,13 +47,6 @@ const QuizRegister: React.FC = () => {
     setPreguntas([...preguntas, newPregunta]);
   };
 
-  const handleAddRespuesta = (preguntaIndex: number) => {
-    const newPreguntas = [...preguntas];
-    const newRespuesta: Respuesta = { Valor: "", EsCorrecta: false };
-    newPreguntas[preguntaIndex].Respuestas.push(newRespuesta);
-    setPreguntas(newPreguntas);
-  };
-
   const handleRespuestaChange = (
     preguntaIndex: number,
     respuestaIndex: number,
@@ -69,13 +62,16 @@ const QuizRegister: React.FC = () => {
     respuestaIndex: number
   ) => {
     const newPreguntas = [...preguntas];
-    newPreguntas[preguntaIndex].Respuestas.forEach((respuesta, index) => {
-      respuesta.EsCorrecta = index === respuestaIndex;
-    });
+    newPreguntas[preguntaIndex].Respuestas = newPreguntas[
+      preguntaIndex
+    ].Respuestas.map((respuesta, index) => ({
+      ...respuesta,
+      EsCorrecta: index === respuestaIndex,
+    }));
     setPreguntas(newPreguntas);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  /*   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const quizData: Quiz = {
       RelatoId: relatoId,
@@ -85,12 +81,12 @@ const QuizRegister: React.FC = () => {
     };
 
     try {
-      /* await sendQuiz(quizData); */
+      /* await sendQuiz(quizData); 
       // Manejar la respuesta y mostrar mensajes al usuario
     } catch (error) {
       console.error("Error al registrar el cuestionario:", error);
     }
-  };
+  }; */
 
   const tipoPreguntaNombres = Object.keys(TipoPregunta).filter((key) =>
     isNaN(Number(key))
@@ -98,7 +94,7 @@ const QuizRegister: React.FC = () => {
 
   return (
     <form
-      onSubmit={handleSubmit}
+      /* onSubmit={handleSubmit} */
       className="max-w-2xl mx-auto p-4 bg-white rounded shadow-md"
     >
       <h1 className="text-2xl font-bold mb-4">Registrar Cuestionario</h1>
@@ -125,6 +121,30 @@ const QuizRegister: React.FC = () => {
           ))}
         </select>
       </div>
+      {/* Selección de estado */}
+      <div>
+        <label
+          htmlFor="estado-select"
+          className="block mt-4 mb-2 text-sm font-medium text-gray-700"
+        >
+          Selección de estado
+        </label>
+        <select
+          id="estado-select"
+          value={estado ?? ""}
+          onChange={(e) => setEstado(Number(e.target.value) as Estado)}
+          className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+          required
+        >
+          <option value=""></option>
+          {Object.entries(Estado).filter(([key, value]) => isNaN(Number(key))).map(([key, value]) => (
+            <option key={key} value={value}>
+              {key}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {preguntas.map((pregunta, index) => (
         <div key={index} className="mt-6 border p-4 rounded-md shadow-sm">
           <h3 className="text-lg font-semibold mb-2">Pregunta {index + 1}</h3>
@@ -157,7 +177,7 @@ const QuizRegister: React.FC = () => {
             <input
               type="number"
               placeholder="Agregar orden"
-              value={pregunta.Orden}
+              value={pregunta.Orden || ""} // Mostrar una cadena vacía si el valor es cero o indefinido
               onChange={(e) => {
                 const newPreguntas = [...preguntas];
                 newPreguntas[index].Orden = parseInt(e.target.value, 10); // Actualizar el campo Orden
@@ -189,32 +209,58 @@ const QuizRegister: React.FC = () => {
             }}
             className="block w-full p-2 mb-4 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
           />
-          {pregunta.Respuestas.map((respuesta, respuestaIndex) => (
+          <div>
+            {/* Campo para puntos por respuesta correcta */}
+            <input
+              type="number"
+              placeholder="Puntos por respuesta correcta"
+              value={pregunta.Puntos || ""}
+              onChange={(e) => {
+                const newPreguntas = [...preguntas];
+                newPreguntas[index].Puntos = parseInt(e.target.value, 10) || 0;
+                setPreguntas(newPreguntas);
+              }}
+              className="block w-full p-2 mb-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+            />
+          </div>
+          {/*Agregar preguntas */}
+          <p className="text-sm text-gray-500 mb-2">
+            Debe seleccionar la respuesta correcta utilizando el radio button.
+          </p>
+
+          {/* Agregar preguntas */}
+          {[...Array(4)].map((_, respuestaIndex) => (
             <div key={respuestaIndex} className="flex items-center mb-2">
               <input
                 type="text"
-                placeholder="Respuesta"
-                value={respuesta.Valor}
-                onChange={(e) =>
-                  handleRespuestaChange(index, respuestaIndex, e.target.value)
-                }
+                placeholder={`Respuesta ${respuestaIndex + 1}`}
+                value={pregunta.Respuestas[respuestaIndex]?.Valor || ""}
+                onChange={(e) => {
+                  const newPreguntas = [...preguntas];
+                  // Inicializa la respuesta si no existe
+                  if (!newPreguntas[index].Respuestas[respuestaIndex]) {
+                    newPreguntas[index].Respuestas[respuestaIndex] = {
+                      Valor: "",
+                      EsCorrecta: false,
+                    };
+                  }
+                  newPreguntas[index].Respuestas[respuestaIndex].Valor =
+                    e.target.value;
+                  setPreguntas(newPreguntas);
+                }}
                 className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
               />
               <input
                 type="radio"
-                checked={respuesta.EsCorrecta}
+                name={`respuesta-correcta-${index}`}
+                checked={
+                  pregunta.Respuestas[respuestaIndex]?.EsCorrecta || false
+                }
                 onChange={() => handleEsCorrectaChange(index, respuestaIndex)}
                 className="ml-2"
               />
             </div>
           ))}
-          <button
-            type="button"
-            onClick={() => handleAddRespuesta(index)}
-            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Agregar Respuesta
-          </button>
         </div>
       ))}
       <div className="flex space-x-6">
