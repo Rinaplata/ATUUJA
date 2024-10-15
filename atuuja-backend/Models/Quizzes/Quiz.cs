@@ -7,4 +7,3 @@ public class Quiz
     public QuizState Estado { get; set; }
 
 }
-

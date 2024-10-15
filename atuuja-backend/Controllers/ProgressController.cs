@@ -61,14 +61,11 @@ public class ProgressController : ControllerBase
     {
         var progressDocument = _firestoreDb.Collection(progressKeyDescripcion).Document(progressId);
 
-        // Verificar si el documento existe
         var snapshot = await progressDocument.GetSnapshotAsync();
         if (!snapshot.Exists)
         {
             return NotFound(MessageTemplates.Format(MessageTemplates.RegisterNotFound, progressDescripcion));
         }
-
-        // Crear un diccionario con los datos actualizados
         var updatedProgress = new Dictionary<string, object>
         { 
             { nameof(model.ExamenId), model.ExamenId },
@@ -77,7 +74,6 @@ public class ProgressController : ControllerBase
             { nameof(model.PuntosAcumulados), model.PuntosAcumulados }
         };
 
-        // Actualizar el documento en Firestore
         await progressDocument.UpdateAsync(updatedProgress);
 
         return Ok(MessageTemplates.Format(MessageTemplates.RegisterUpdated, progressDescripcion));
