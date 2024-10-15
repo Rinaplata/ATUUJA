@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { Estado, Quiz, TipoPregunta } from "../../types/quiz";
 import { getListQuiz, deleteQuiz } from "../../service/Quiz/quiz";
+import { getStorieslist} from "../../service/Story/story";
 import Modal from "../Modal/Modal";
 
 const QuizTable: React.FC = () => {
@@ -10,10 +11,15 @@ const QuizTable: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
+  const [relatos, setRelatos] = useState<
+    { RelatoId: string; Titulo: string }[]
+  >([]);
 
   useEffect(() => {
     const fetchQuizzes = async () => {
       try {
+        const response = await getStorieslist(); // Obtiene la lista de relatos
+        setRelatos(response); // Almacena los relatos en el estado
         const data = await getListQuiz();
         setQuizzes(data);
       } catch {
@@ -26,7 +32,7 @@ const QuizTable: React.FC = () => {
     fetchQuizzes();
   }, []);
 
-  const GetTipoPreguntaText = (tipoPregunta: TipoPregunta) => {
+  const getTipoPreguntaText = (tipoPregunta: TipoPregunta) => {
     switch (tipoPregunta) {
       case 0:
         return "Texto";
@@ -38,6 +44,11 @@ const QuizTable: React.FC = () => {
         return "";
     }
   };
+
+  const getRelatoText = (idRelato: string) => {
+    const relato = relatos.find((relato) => relato.RelatoId === idRelato);
+    return relato ? relato.Titulo : "";
+  }
 
   const openDeleteModal = (quiz: Quiz) => {
     setSelectedQuiz(quiz);
@@ -64,7 +75,7 @@ const QuizTable: React.FC = () => {
   return (
     <div className="rounded-sm bg-transparent px-5 pt-6 pb-2.5">
       <div className="max-w-full overflow-x-auto">
-        <table className="w-full table-auto">
+        <table className="w-full table-auto border border-gray-300">
           <thead>
             <tr className="bg-primaryAtuuja text-left dark:bg-white">
               <th className="min-w-[220px] py-4 px-4 font-medium text-white dark:text-white xl:pl-11">
@@ -76,7 +87,7 @@ const QuizTable: React.FC = () => {
               <th className="py-4 px-4 font-medium text-white dark:text-white">
                 Tipo Pregunta
               </th>
-              <th className="py-4 px-4 font-medium text-white dark:text-white">
+              <th className="py-4 px-4 font-medium text-white dark:text-white w-50">
                 Respuesta correcta
               </th>
               <th className="min-w-[150px] py-4 px-4 font-medium text-white dark:text-white">
@@ -94,12 +105,12 @@ const QuizTable: React.FC = () => {
                   <p className="text-black dark:text-white">{quiz.ExamenId}</p>
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                  <p className="text-black dark:text-white">{quiz.RelatoId}</p>
+                  <p className="text-black dark:text-white">{getRelatoText(quiz.RelatoId)}</p>
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                   {quiz.Preguntas.map((pregunta, index) => (
                     <p key={index} className="text-black dark:text-white">
-                      {GetTipoPreguntaText(pregunta.TipoPregunta)}
+                      {getTipoPreguntaText(pregunta.TipoPregunta)}
                     </p>
                   ))}
                 </td>
@@ -113,7 +124,7 @@ const QuizTable: React.FC = () => {
                             className="border-b border-[#eee] py-5 px-4 dark:border-strokedark"
                           >
                             <span className="text-black dark:text-white">
-                              {respuesta.Valor}
+                              {respuesta.Valor} - <span className="text-blue-500">{pregunta.Puntos} puntos</span>
                             </span>
                           </p>
                         )
