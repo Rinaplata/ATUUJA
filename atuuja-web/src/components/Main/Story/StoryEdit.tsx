@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import Modal from '../../Modal/Modal'; 
-import Alert from '../../Alert/Alertas';
+import Modal from '../../Tables/Modal'; 
+import Alert from '../../Tables/Alertas';
 import { API_URL } from '../../../config/config';
 
 interface RegisterStoryProps {

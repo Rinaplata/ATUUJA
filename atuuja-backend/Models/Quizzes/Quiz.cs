@@ -5,4 +5,5 @@ public class Quiz
     public required string RelatoId { get; set; }
     public required List<Pregunta> Preguntas {get; set; }
     public QuizState Estado { get; set; }
+
 }

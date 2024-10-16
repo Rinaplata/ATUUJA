@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import StoryTable from '../../Tables/StoryTable';
+import StoryTable from './StoryTable';
 import { API_URL } from '../../../config/config';
 import StoryRegister from './StoryRegister'
 
