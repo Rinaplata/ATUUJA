@@ -97,7 +97,7 @@ const TableThree: React.FC<IStoryTable> = ({ story }) => {
         />
       )}
       <div className="max-w-full overflow-x-auto">
-        <table className="w-full table-auto">
+        <table className="w-full table-auto border-gray-600">
           <thead>
             <tr className="bg-primaryAtuuja text-left dark:bg-white">
               <th className="min-w-[220px] py-4 px-4 font-medium text-white dark:text-white xl:pl-11">
