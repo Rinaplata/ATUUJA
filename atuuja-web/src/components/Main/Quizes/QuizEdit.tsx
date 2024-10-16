@@ -23,7 +23,6 @@ const EditQuiz: React.FC<EditQuizProps> = ({ quiz, closeModal }) => {
   >([]);
 
   useEffect(() => {
-
     const fetchRelatos = async () => {
       try {
         const fetchedRelatos = await getStorieslist();
@@ -34,11 +33,10 @@ const EditQuiz: React.FC<EditQuizProps> = ({ quiz, closeModal }) => {
     };
     fetchRelatos();
 
-    const { Preguntas, RelatoId, Estado} = quiz;
+    const { Preguntas, RelatoId, Estado } = quiz;
     setPreguntas(Preguntas);
     setRelatoId(RelatoId);
-    setEstado(Estado)
-
+    setEstado(Estado);
   }, []);
 
   const handlePreguntaChange = (index: number, field: string, value: any) => {
@@ -59,6 +57,7 @@ const EditQuiz: React.FC<EditQuizProps> = ({ quiz, closeModal }) => {
       console.error("Error al guardar cambios:", error);
     }
   };
+  type TipoPreguntaKeys = keyof typeof TipoPregunta;
 
   return (
     <form
@@ -143,22 +142,27 @@ const EditQuiz: React.FC<EditQuizProps> = ({ quiz, closeModal }) => {
               Tipo de pregunta
             </label>
             <select
-              value={pregunta.TipoPregunta}
+              value={pregunta.TipoPregunta || ""} // Manejar el valor seleccionado actual
               onChange={(e) =>
                 handlePreguntaChange(
                   index,
-                  "tipoPregunta",
+                  "TipoPregunta",
                   Number(e.target.value)
                 )
               }
               className="block w-full p-2 border border-gray-300 rounded-md"
               required
             >
-              {Object.entries(TipoPregunta).map(([key, value]) => (
-                <option key={key} value={value}>
-                  {key}
-                </option>
-              ))}
+              {Object.keys(TipoPregunta)
+                .filter((key) => isNaN(Number(key))) // Filtra solo las claves que son nombres, no los números
+                .map((key) => (
+                  <option
+                    key={key}
+                    value={TipoPregunta[key as TipoPreguntaKeys]}
+                  >
+                    {key}
+                  </option>
+                ))}
             </select>
           </div>
 
@@ -191,9 +195,9 @@ const EditQuiz: React.FC<EditQuizProps> = ({ quiz, closeModal }) => {
                   onChange={(e) => {
                     const updatedRespuestas = [...pregunta.Respuestas];
                     updatedRespuestas[respuestaIndex] = {
-                        ...updatedRespuestas[respuestaIndex],
-                        Valor: e.target.value,
-                      };
+                      ...updatedRespuestas[respuestaIndex],
+                      Valor: e.target.value,
+                    };
                     handlePreguntaChange(
                       index,
                       "Respuestas",
