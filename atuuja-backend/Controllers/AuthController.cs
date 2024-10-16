@@ -136,7 +136,6 @@ public class AuthController : ControllerBase
         }
     }
 
-
     [AllowAnonymous]
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] UserLogin model)
@@ -209,9 +208,7 @@ public class AuthController : ControllerBase
         var querySnapshot = await query.GetSnapshotAsync();
 
         if (querySnapshot.Count == 0)
-        {
-            return NotFound("No se encontró un usuario con ese correo electrónico.");
-        }
+          return NotFound(MessageTemplates.Format(MessageTemplates.RegisterNotFound, userDescripcion)); 
 
         // Asumimos que el email es único, por lo que tomamos el primer resultado
         var userDoc = querySnapshot.Documents[0];
@@ -219,16 +216,16 @@ public class AuthController : ControllerBase
 
         // Guardar el token de restablecimiento en Firestore (con un tiempo de expiración opcional)
         var tokenData = new Dictionary<string, object>
-    {
-        { "ResetToken", resetToken },
-        { "TokenExpiration", DateTime.UtcNow.AddHours(1) } // Expira en 1 hora
-    };
+        {
+            { "ResetToken", resetToken },
+            { "TokenExpiration", DateTime.UtcNow.AddHours(1) } // Expira en 1 hora
+        };
         await userDoc.Reference.UpdateAsync(tokenData);
 
         // Aquí puedes enviar el email con el token al usuario (no implementado en este ejemplo)
-
-        return Ok(new { message = "Instrucciones para restablecer la contraseña enviadas al correo electrónico." });
+        return Ok(new { message = MessageTemplates.Format(MessageTemplates.InstructionsSends) });
     }
+    
 
     [HttpPost("reset-password")]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest model)
@@ -239,7 +236,7 @@ public class AuthController : ControllerBase
 
         if (querySnapshot.Count == 0)
         {
-            return BadRequest("Token inválido o expirado.");
+            return BadRequest(MessageTemplates.Format(MessageTemplates.InvalidateToken));
         }
 
         var userDoc = querySnapshot.Documents[0];
@@ -248,21 +245,19 @@ public class AuthController : ControllerBase
         // Verificar si el token ha expirado
         if (userData.ContainsKey("TokenExpiration") && DateTime.UtcNow > (DateTime)userData["TokenExpiration"])
         {
-            return BadRequest("El token de restablecimiento ha expirado.");
+            return BadRequest(MessageTemplates.Format(MessageTemplates.ExpiredToken));
         }
 
         // Actualizar la contraseña
         await userDoc.Reference.UpdateAsync(new Dictionary<string, object>
     {
-        { "Password", model.NewPassword },
+        { nameof(model.NewPassword), model.NewPassword },
         { "ResetToken", null }, // Limpiar el token de restablecimiento
         { "TokenExpiration", null }
     });
 
-        return Ok("Contraseña restablecida exitosamente.");
+        return Ok(MessageTemplates.Format(MessageTemplates.Expiredpassword));
     }
-
-
 
     private string GenerateJwtToken(string username)
     {
