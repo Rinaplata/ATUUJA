@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import Modal from '../../Tables/Modal'; 
-import Alert from '../../Tables/Alertas';
+import Modal from '../../Modal/Modal'; 
+import Alert from '../../Alert/Alertas';
 import { API_URL } from '../../../config/config';
-import { Reward } from '../../../types/Reward';
+import { Reward } from '../../../types/reward';
 
 interface RegisterRewardProps {
   isOpen: boolean;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import Modal from '../../Tables/Modal';
+import Modal from '../../Modal/Modal';
 import { API_URL } from '../../../config/config';
-import Alert from '../../Tables/Alertas';
+import Alert from '../../Alert/Alertas';
 
 interface RegisterOwnerProps {
   isOpen: boolean;
