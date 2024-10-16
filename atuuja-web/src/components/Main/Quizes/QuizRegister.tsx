@@ -10,10 +10,10 @@ import { getStorieslist } from "../../../service/Story/story";
 import { postCreateQuiz } from "../../../service/Quiz/quiz";
 
 interface QuizRegisterProps {
-  closeModal: () => void; // Prop para cerrar el modal
+  closeModal: () => void;
 }
 
-const QuizRegister: React.FC<QuizRegisterProps> = ({ closeModal }) => {
+const QuizRegister: React.FC<QuizRegisterProps> = ({closeModal }) => {
   const [examenId, setExamenId] = useState<string>("");
   const [relatoId, setRelatoId] = useState<string>("");
   const [preguntas, setPreguntas] = useState<Pregunta[]>([]);

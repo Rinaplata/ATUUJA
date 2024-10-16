@@ -4,6 +4,7 @@ import { Estado, Quiz, TipoPregunta } from "../../types/quiz";
 import { getListQuiz, deleteQuiz } from "../../service/Quiz/quiz";
 import { getStorieslist } from "../../service/Story/story";
 import Modal from "../Modal/Modal";
+import EditQuiz from "../Main/Quizes/QuizEdit"
 
 const QuizTable: React.FC = () => {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
@@ -11,6 +12,7 @@ const QuizTable: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [relatos, setRelatos] = useState<
     { RelatoId: string; Titulo: string }[]
   >([]);
@@ -55,9 +57,15 @@ const QuizTable: React.FC = () => {
     setIsModalOpen(true);
   };
 
+  const openEditModal = (quiz: Quiz) => {
+    setSelectedQuiz(quiz);
+    setIsEditModalOpen(true);
+  };
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedQuiz(null);
+    setIsEditModalOpen(false);
   };
 
   const handleDeleteQuiz = async () => {
@@ -158,6 +166,12 @@ const QuizTable: React.FC = () => {
                     >
                       <TrashIcon className="h-5 w-5" />
                     </button>
+                    <button
+                      className="hover:text-primaryAtuuja"
+                      onClick={() => openEditModal(quiz)}
+                    >
+                      <PencilIcon className="h-5 w-5" />
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -189,6 +203,12 @@ const QuizTable: React.FC = () => {
           </div>
         </div>
       </Modal>
+      {/* Modal para editar */}
+      {isEditModalOpen && selectedQuiz && (
+        <Modal isOpen={isEditModalOpen} onClose={handleCloseModal} title="Editar Quiz">
+          <EditQuiz quiz={selectedQuiz} closeModal={handleCloseModal} />
+        </Modal>
+      )}
     </div>
   );
 };
