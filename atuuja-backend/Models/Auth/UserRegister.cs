@@ -1,7 +1,12 @@
 public class UserRegister
 {
-    public string Username { get; set; }
-    public string Email { get; set; }
-    public string Password { get; set; }
-    public bool IsAdmin { get; set; }
+    public string Id { get; set; } =string.Empty;
+    public required string Username { get; set; }
+    public required string Email { get; set; }
+    public required string Password { get; set; }
+    public required bool IsAdmin { get; set; }
+    public required int Edad { get; set; }
+    public required string Cuidad { get; set; }
+    public required IdentificationType TipoDocumento { get; set; }
+    public required string NumeroDocumento { get; set; }
 }
