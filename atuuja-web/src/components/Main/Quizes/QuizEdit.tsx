@@ -187,10 +187,13 @@ const EditQuiz: React.FC<EditQuizProps> = ({ quiz, closeModal }) => {
                 </label>
                 <input
                   type="text"
-                  value={respuesta.Valor}
+                  value={respuesta.Valor || ""}
                   onChange={(e) => {
                     const updatedRespuestas = [...pregunta.Respuestas];
-                    updatedRespuestas[respuestaIndex].Valor = e.target.value;
+                    updatedRespuestas[respuestaIndex] = {
+                        ...updatedRespuestas[respuestaIndex],
+                        Valor: e.target.value,
+                      };
                     handlePreguntaChange(
                       index,
                       "Respuestas",
