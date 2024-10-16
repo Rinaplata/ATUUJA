@@ -2,19 +2,18 @@ import React, { useEffect, useState } from "react";
 import {
   Quiz,
   Pregunta,
-  Respuesta,
   TipoRespuesta,
   TipoPregunta,
   Estado,
 } from "../../../types/quiz";
-import { getStorieslist} from "../../../service/Story/story";
+import { getStorieslist } from "../../../service/Story/story";
 import { postCreateQuiz } from "../../../service/Quiz/quiz";
 
 interface QuizRegisterProps {
-  closeModal: () => void; // Prop para cerrar el modal
+  closeModal: () => void;
 }
 
-const QuizRegister: React.FC<QuizRegisterProps> = ({ closeModal }) => {
+const QuizRegister: React.FC<QuizRegisterProps> = ({closeModal }) => {
   const [examenId, setExamenId] = useState<string>("");
   const [relatoId, setRelatoId] = useState<string>("");
   const [preguntas, setPreguntas] = useState<Pregunta[]>([]);
@@ -52,16 +51,6 @@ const QuizRegister: React.FC<QuizRegisterProps> = ({ closeModal }) => {
     setPreguntas([...preguntas, newPregunta]);
   };
 
-  const handleRespuestaChange = (
-    preguntaIndex: number,
-    respuestaIndex: number,
-    value: string
-  ) => {
-    const newPreguntas = [...preguntas];
-    newPreguntas[preguntaIndex].Respuestas[respuestaIndex].Valor = value;
-    setPreguntas(newPreguntas);
-  };
-
   const handleEsCorrectaChange = (
     preguntaIndex: number,
     respuestaIndex: number
@@ -91,6 +80,7 @@ const QuizRegister: React.FC<QuizRegisterProps> = ({ closeModal }) => {
       setEstado(null);
       setPreguntas([]);
       closeModal();
+      window.location.reload();
     } catch (error) {
       console.error("Error al registrar el cuestionario:", error);
     }
@@ -204,6 +194,21 @@ const QuizRegister: React.FC<QuizRegisterProps> = ({ closeModal }) => {
             onChange={(e) => {
               const newPreguntas = [...preguntas];
               newPreguntas[index].EnunciadoPregunta = e.target.value;
+              setPreguntas(newPreguntas);
+            }}
+            className="block w-full p-2 mb-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+          />
+          {/* selección de archivoPregunta */}
+          <p className="text-sm text-gray-500 mb-2">
+            Debes agregar el link de imagen o audio...
+          </p>
+          <input
+            type="text"
+            placeholder="Link..."
+            value={pregunta.ArchivoPregunta}
+            onChange={(e) => {
+              const newPreguntas = [...preguntas];
+              newPreguntas[index].ArchivoPregunta = e.target.value;
               setPreguntas(newPreguntas);
             }}
             className="block w-full p-2 mb-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"

@@ -1,4 +1,4 @@
-import { fetchData,postData,updateData, deleteData } from "../../api";
+import { fetchData, postData, updateData, deleteData } from "../../api";
 
 const getListQuiz = async () => {
   try {
@@ -26,14 +26,13 @@ const postCreateQuiz = async (bodyData) => {
   }
 };
 
-const updateQuiz = async (bodyData) => {
+const updateQuiz = async (quizId, bodyData) => {
   try {
-    const { id, ...bodyPut } = bodyData;
-    const data = await updateData("Quiz/update${id}/", bodyPut);
+    const data = await updateData(`Quiz/update/${quizId}/`, bodyData);
     return data;
   } catch (error) {
     console.error(
-      "Error al actualizar quiz",
+      "Error al actualizar el quiz:",
       error.response ? error.response.data : error.message
     );
     throw error;
