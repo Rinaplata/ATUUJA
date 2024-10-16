@@ -50,10 +50,11 @@ const EditQuiz: React.FC<EditQuizProps> = ({ quiz, closeModal }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const examenId = quiz.ExamenId;
-    const updatedQuiz = { examenId, relatoId, preguntas, estado };
+    const body = { examenId, relatoId, preguntas, estado };
     try {
-      await updateQuiz(examenId, updatedQuiz);
+      await updateQuiz(examenId, body);
       closeModal();
+      window.location.reload();
     } catch (error) {
       console.error("Error al guardar cambios:", error);
     }
