@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { createUserWithEmailAndPassword, updateProfile} from 'firebase/auth';
-import { auth } from '../services/firebaseConfig'; 
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState('');
@@ -13,7 +12,7 @@ const RegisterScreen = ({ navigation }) => {
 
   const handleRegister = () => {
     
-    createUserWithEmailAndPassword(auth, email, password)
+/*     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
 
@@ -33,7 +32,7 @@ const RegisterScreen = ({ navigation }) => {
         // Si el registro falla, muestra el error
         setError(true);
         setErrorMessage(error.message);
-      });
+      }); */
   };
 
   return (
@@ -82,7 +81,7 @@ const RegisterScreen = ({ navigation }) => {
         </Text>
       )}
 
-      <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
+      <TouchableOpacity style={styles.registerButton}>
         <Text style={styles.registerButtonText}>Crear cuenta</Text>
       </TouchableOpacity>
 

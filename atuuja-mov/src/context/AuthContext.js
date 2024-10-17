@@ -1,24 +1,32 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../services/firebaseConfig'; 
+import React, { createContext, useState, useContext } from "react";
+import {loginService } from "../api/services/auth";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-    });
-    return unsubscribe;
-  }, []);
+  const [error, setError] = useState(null);
+
+  const login = async (email, password) => {
+    try {
+      const userData = await loginService({ email, password });
+      setUser(userData);
+      setError(null);
+    } catch (err) {
+      setError(err.response?.data?.message || "Error en el inicio de sesión");
+    }
+  };
+
+  const logout = () => {
+    setUser(null);
+  };
 
   return (
-    <AuthContext.Provider value={{ user }}>
+    <AuthContext.Provider value={{ user, login, logout, error }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => useContext(AuthContext);
+
