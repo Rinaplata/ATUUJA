@@ -7,7 +7,7 @@ export default function User() {
   const [users, setUsers] = useState([]);
   const [isRegisterOpen, setRegisterOpen] = useState(false);
 
-  useEffect(() => {
+  useEffect(() => { 
 
     const fetchData = async () => {
       try {

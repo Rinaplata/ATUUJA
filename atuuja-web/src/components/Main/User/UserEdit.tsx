@@ -7,6 +7,7 @@ interface EditUserProps {
   isOpen: boolean;
   onClose: () => void;
   userData: {
+    userid: string,
     username: string;
     email: string;
     password: string;
@@ -16,6 +17,7 @@ interface EditUserProps {
 }
 
 const UserEdit: React.FC<EditUserProps> = ({ isOpen, onClose, userData, onSuccess }) => {
+  const [userId,setUserId] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -25,6 +27,7 @@ const UserEdit: React.FC<EditUserProps> = ({ isOpen, onClose, userData, onSucces
 
   useEffect(() => {
     if (userData) {
+      setUserId(userData.userid);
       setUsername(userData.username);
       setEmail(userData.email);
       setPassword(userData.password);
@@ -34,12 +37,13 @@ const UserEdit: React.FC<EditUserProps> = ({ isOpen, onClose, userData, onSucces
 
   const handleUpdate = async () => {
     try {
-      const response = await fetch(`${API_URL}/Auth/update/${username}`, {
+      const response = await fetch(`${API_URL}/Auth/update/${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          userId,
           username,
           email,
           password,
@@ -47,7 +51,7 @@ const UserEdit: React.FC<EditUserProps> = ({ isOpen, onClose, userData, onSucces
         }),
       });
 
-      if (!response.ok) {
+      if (!response.ok) { 
         throw new Error('Error al actualizar el usuario');
       }
 

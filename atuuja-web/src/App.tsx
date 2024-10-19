@@ -22,7 +22,7 @@ function App() {
     setTimeout(() => setLoading(false), 1000);
 
     if (!pathname.includes('auth')) {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token'); 
 
       if (!token || token == undefined) {
         localStorage.removeItem('token');

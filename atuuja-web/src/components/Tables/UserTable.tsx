@@ -52,8 +52,7 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
 
   const handleDeleteUser = async () => {
     if (!selectedUser) return;
-    const userId = selectedUser.Username;
-
+    const userId = selectedUser.Id;
     try {
       const response = await fetch(`${API_URL}/Auth/delete/${userId}`, {
         method: 'DELETE',
@@ -203,6 +202,7 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
         isOpen={isEditModalOpen}
         onClose={() => setEditModalOpen(false)}
         userData={{
+          userid: selectedUser?.Id ?? '',
           username: selectedUser?.Username ?? '',
           email: selectedUser?.Email ?? '',
           password:selectedUser?.Password ?? '',
