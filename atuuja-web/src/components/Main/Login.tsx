@@ -13,16 +13,12 @@ const Login: React.FC = () => {
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState<'success' | 'error' | undefined>(undefined);
 
-
-  // Función para manejar el envío del formulario
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Objeto con los datos del usuario
     const loginData = { email, password };
 
     try {
-      // Realizar la solicitud POST al backend
       const response = await fetch(`${API_URL}/Auth/loginAdmin`, {
         method: 'POST',
         headers: {
@@ -30,15 +26,11 @@ const Login: React.FC = () => {
         },
         body: JSON.stringify(loginData),
       });
-
-      // Verificar si la solicitud fue exitosa
       if (response.ok) {
         const tokeResult =  (await response.json());
         localStorage.setItem('token', tokeResult.token);
-        // Si el login es exitoso, redirigir a la página '/dast'
         navigate('/admin');
       } else {
-        // Manejar el error (por ejemplo, credenciales incorrectas)
         console.error('Error en el inicio de sesión');
         setAlertMessage('Usuario o contraseña incorrecto, intente de nuevo');
         setAlertType('error');
@@ -60,12 +52,10 @@ const Login: React.FC = () => {
       )}
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="flex flex-wrap w-full">
-          {/* Sección de la izquierda con la imagen */}
           <div className="hidden w-full xl:flex xl:w-1/2">
             <div className="w-full h-screen">
-              {/* Imagen de fondo que cubre todo */}
               <img
-                src={Banner} // Utiliza la imagen importada
+                src={Banner} 
                 alt="Imagen de login"
                 className="h-full w-full object-cover"
               />
@@ -76,7 +66,7 @@ const Login: React.FC = () => {
             <div className="w-full p-4 sm:p-12.5 xl:p-17.5 relative flex flex-col items-center bg-bodyAtuuja h-screen">
               <div className="p-4">
                 <img
-                  src={Logo} // logo
+                  src={Logo}
                   alt="Logo"
                   className="logo-custom-atuuja"
                 />

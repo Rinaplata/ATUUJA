@@ -1,56 +1,98 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { createUserWithEmailAndPassword, updateProfile} from 'firebase/auth';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+} from "react-native";
+import { Picker } from '@react-native-picker/picker';
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 
 const RegisterScreen = ({ navigation }) => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [name, setName] = useState("");
+  const [age, setAge] = useState("");
+  const [documentType, setDocumentType] = useState("");
+  const [email, setEmail] = useState("");
+  const [city, setCity] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
+  const [documentNumber, setDocumentNumber] = useState("");
 
   const handleRegister = () => {
-    
-/*     createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-
-        // Actualiza el perfil del usuario con el nombre
-        updateProfile(user, {
-          displayName: name, // Asocia el nombre con el perfil
-        }).then(() => {
-          console.log('Usuario registrado con nombre:', user.displayName);
-          navigation.navigate('Login',{screen:'LoginScreen'}); // Navegar a la pantalla de Login si el registro es exitoso
-        }).catch((error) => {
-          setError(true);
-          setErrorMessage(error.message);
-        });
-
-      })
-      .catch((error) => {
-        // Si el registro falla, muestra el error
-        setError(true);
-        setErrorMessage(error.message);
-      }); */
   };
 
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../assets/icons/isologo.png')}  
+        source={require("../../assets/icons/isologo.png")}
         style={styles.logo}
       />
 
       <Text style={styles.title}>Crea una cuenta</Text>
 
       <View style={styles.inputContainer}>
-        <Icon name="account-outline" size={24} color="#F28C85" style={styles.icon} />
+        <Icon
+          name="account-outline"
+          size={24}
+          color="#F28C85"
+          style={styles.icon}
+        />
         <TextInput
           style={styles.input}
           placeholder="nombre"
           value={name}
           onChangeText={setName}
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Icon name="calendar" size={24} color="#F28C85" style={styles.icon} />
+        <TextInput
+          style={styles.input}
+          placeholder="Edad"
+          keyboardType="numeric"
+          value={age}
+          onChangeText={setAge}
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Icon name="city" size={24} color="#F28C85" style={styles.icon} />
+        <TextInput
+          style={styles.input}
+          placeholder="Ciudad"
+          value={city}
+          onChangeText={setCity}
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Icon name="file-document-outline" size={24} color="#F28C85" style={styles.icon} />
+        <Picker
+          selectedValue={documentType}
+          style={styles.input}
+          onValueChange={(itemValue) => setDocumentType(itemValue)}
+        >
+          <Picker.Item label="Selecciona el tipo de documento" value="" />
+          <Picker.Item label="Cédula de ciudadanía" value="cedula" />
+          <Picker.Item label="Pasaporte" value="pasaporte" />
+          <Picker.Item label="Tarjeta de identidad" value="tarjeta_identidad" />
+          <Picker.Item label="Cédula de extranjería" value="cedula_extranjeria" />
+        </Picker>
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Icon name="card-account-details-outline" size={24} color="#F28C85" style={styles.icon} />
+        <TextInput
+          style={styles.input}
+          placeholder="Número de documento"
+          keyboardType="numeric"
+          value={documentNumber}
+          onChangeText={setDocumentNumber}
         />
       </View>
 
@@ -75,19 +117,15 @@ const RegisterScreen = ({ navigation }) => {
         />
       </View>
 
-      {error && (
-        <Text style={styles.errorMessage}>
-          {errorMessage}
-        </Text>
-      )}
+      {error && <Text style={styles.errorMessage}>{errorMessage}</Text>}
 
-      <TouchableOpacity style={styles.registerButton}>
+      <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
         <Text style={styles.registerButtonText}>Crear cuenta</Text>
       </TouchableOpacity>
 
       <View style={styles.loginContainer}>
         <Text style={styles.loginText}>¿Ya tienes una cuenta? </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
           <Text style={styles.loginLink}>Iniciar sesión</Text>
         </TouchableOpacity>
       </View>

@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext } from "react";
-import {loginService } from "../api/services/auth";
+import {loginService, Register } from "../api/services/authService";
 
 const AuthContext = createContext();
 
@@ -17,12 +17,22 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
+ const logout = () => {
     setUser(null);
   };
 
+  const registerUser = async (userData) => {
+    try {
+      const registeredUser = await Register(userData);
+      setUser(registeredUser);
+      setError(null);
+    } catch (err) {
+      setError(err.response?.data?.message || "Error en el registro");
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, error }}>
+    <AuthContext.Provider value={{ user, login, error, registerUser,logout }}>
       {children}
     </AuthContext.Provider>
   );
