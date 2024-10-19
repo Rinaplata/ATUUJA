@@ -28,12 +28,14 @@ const TabNavigator = () => (
     screenOptions={{
       tabBarStyle: { backgroundColor: colors.principal }, // Color de la barra inferior
       tabBarActiveTintColor: colors.luminous, // Íconos activos
-      tabBarInactiveTintColor: colors.variante3, // Íconos inactivos
+      tabBarInactiveTintColor: colors.variante3,// Íconos inactivos
+      headerShown: false, 
     }}>
     <Tab.Screen name="Home" component={HomeScreen} options={{
         tabBarIcon: ({ color, size }) => (
           <MaterialIcons name="home" color={color} size={size} />
         ),
+        headerShown: false,
       }} />
     <Tab.Screen name="Learn" component={LearnScreen} options={{
         tabBarIcon: ({ color, size }) => (
