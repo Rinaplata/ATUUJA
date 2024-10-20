@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
-  Text,Image,
+  Text,
+  Image,
   StyleSheet,
   ImageBackground,
   TouchableOpacity,
@@ -9,6 +10,7 @@ import {
 } from "react-native";
 import CircularProgress from "react-native-circular-progress-indicator";
 import Carousel from "react-native-reanimated-carousel";
+import { MaterialIcons } from '@expo/vector-icons';
 
 const { width: viewportWidth } = Dimensions.get("window");
 
@@ -19,12 +21,12 @@ const HomeScreen = ({ navigation }) => {
     {
       title: "El viaje al pozo de agua",
       description: "Un fascinante relato sobre la vida en la naturaleza.",
-      image: require("../../assets/images/DALL·E-el_viaje_al_pozo_de_agua.png"),
+      image: require("../../assets/icons/images/DALL·E-la_fiezta_de_la_yonna.png"),
     },
     {
       title: "La Fiesta de la Yonna",
       description: "Una celebración llena de cultura y tradición.",
-      image: require("../../assets/images/DALL·E-la_fiezta_de_la_yonna.png"),
+      image: require("../../assets/icons/images/DALL·E-el_viaje_al_pozo_de_agua.png"),
     },
   ];
 
@@ -37,7 +39,10 @@ const HomeScreen = ({ navigation }) => {
       <View style={styles.overlay}>
         <Text style={styles.relatoTitle}>{item.title}</Text>
         <Text style={styles.relatoSubtitle}>{item.description}</Text>
-        <TouchableOpacity style={styles.startButton} onPress={() => navigation.navigate("Learn")}>
+        <TouchableOpacity
+          style={styles.startButton}
+          onPress={() => navigation.navigate("Learn")}
+        >
           <Text style={styles.startButtonText}>Comenzar</Text>
         </TouchableOpacity>
       </View>
@@ -63,10 +68,10 @@ const HomeScreen = ({ navigation }) => {
         <View style={styles.progressContainer}>
           <CircularProgress
             value={percentage}
-            radius={20}
+            radius={16}
             titleFontSize={16}
             progressValueColor={"#9A2C2B"}
-            progressValueStyle={{ fontSize: 18, color: "#9A2C2B" }}
+            progressValueStyle={{ fontSize: 16, color: "#9A2C2B" }}
             activeStrokeColor={"#E97C71"}
             strokeWidth={8}
             backgroundWidth={8}
@@ -78,25 +83,29 @@ const HomeScreen = ({ navigation }) => {
         </View>
       </View>
 
-      <View style={styles.welcomeContainer}>
-        <Text style={styles.welcomeText}>Bienvenido de vuelta, Rina</Text>
-      </View>
-
-      <TouchableOpacity
-        style={styles.card}
-        onPress={() => navigation.navigate("Rewards")}
-      >
-        <View style={styles.cardContent}>
-          <Text style={styles.cardTitle}>Premios</Text>
-          <Text style={styles.cardSubtitle}>
-            Comienza a aprender ahora y podrás ganar fabulosas recompensas
-          </Text>
+      <View style={styles.containerBody}>
+        <View style={styles.welcomeContainer}>
+          <Text style={styles.cardSubtitle}>Bienvenido de vuelta,</Text>
+          <Text style={styles.welcomeText}> Rina</Text>
         </View>
-        <Text style={styles.cardAction}>Ver todos</Text>
-      </TouchableOpacity>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Relatos</Text>
+        <View style={styles.card}>
+          <View style={styles.cardContent}>
+            <Text style={styles.cardTitle}>Premios</Text>
+            <Text style={styles.cardSubtitle}>
+              Comienza a aprender ahora y podrás ganar fabulosas recompensas
+            </Text>
+          </View>
+          <View style={styles.containerPremiosBotton}>
+          <TouchableOpacity onPress={() => navigation.navigate("Rewards")} style={styles.button}>
+            <Text style={styles.cardAction}>Ver todos</Text>
+            <MaterialIcons name="chevron-right" color="#FFF" size={20}/>
+          </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Relatos</Text>
           <View style={styles.carouselContainer}>
             <Carousel
               width={viewportWidth}
@@ -106,6 +115,7 @@ const HomeScreen = ({ navigation }) => {
               loop={true}
             />
           </View>
+        </View>
       </View>
     </View>
   );
@@ -114,15 +124,25 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#9A2C2B",
+    backgroundColor: "#862C29",
     paddingTop: 50,
-    paddingHorizontal: 20,
+    paddingHorizontal: 0,
+  },
+  containerPremiosBotton:{
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",      
+  },
+  button: {
+    flexDirection: "row",       
+    alignItems: "center",
   },
   topMenu: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 15,
+    paddingHorizontal: 10,
   },
   pointsContainer: {
     flexDirection: "row",
@@ -148,6 +168,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   welcomeContainer: {
+    flexDirection: "column",
+    alignItems: "flex-start",
     marginBottom: 20,
   },
   welcomeText: {
@@ -163,10 +185,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.2,
     shadowRadius: 5,
-    elevation: 5, // Sombra en Android
+    elevation: 5,
   },
   card: {
-    backgroundColor: "#FFD1CA",
+    backgroundColor: "#862C29",
     padding: 20,
     borderRadius: 10,
     marginBottom: 10,
@@ -178,20 +200,21 @@ const styles = StyleSheet.create({
     maxWidth: "70%",
   },
   cardTitle: {
-    fontSize: 18,
-    color: "#9A2C2B",
+    fontSize: 25,
+    color: "white",
     fontWeight: "bold",
   },
   cardSubtitle: {
     fontSize: 14,
-    color: "#9A2C2B",
+    color: "white",
   },
   cardAction: {
-    color: "#9A2C2B",
+    color: "white",
     fontSize: 16,
   },
   section: {
     marginTop: 20,
+    backgroundColor: "#6E1E1E",
   },
   sectionTitle: {
     fontSize: 18,
@@ -235,6 +258,14 @@ const styles = StyleSheet.create({
   startButtonText: {
     color: "#FFF",
     fontSize: 16,
+  },
+  containerBody: {
+    flex: 1,
+    backgroundColor: "#A43B36",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingTop: 20,
+    paddingHorizontal: 20,
   },
 });
 

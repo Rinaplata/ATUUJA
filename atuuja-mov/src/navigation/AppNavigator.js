@@ -26,7 +26,7 @@ const Stack = createStackNavigator();
 const TabNavigator = () => (
   <Tab.Navigator initialRouteName="Home"
     screenOptions={{
-      tabBarStyle: { backgroundColor: colors.principal }, // Color de la barra inferior
+      tabBarStyle: { backgroundColor: colors.variante7 }, // Color de la barra inferior
       tabBarActiveTintColor: colors.luminous, // Íconos activos
       tabBarInactiveTintColor: colors.variante3,// Íconos inactivos
       headerShown: false, 
