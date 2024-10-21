@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import CircularProgress from "react-native-circular-progress-indicator";
 import Carousel from "react-native-reanimated-carousel";
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from "@expo/vector-icons";
 
 const { width: viewportWidth } = Dimensions.get("window");
 
@@ -31,22 +31,24 @@ const HomeScreen = ({ navigation }) => {
   ];
 
   const renderItem = ({ item }) => (
-    <ImageBackground
-      source={item.image}
-      style={styles.relatoCard}
-      imageStyle={styles.cardImage}
-    >
-      <View style={styles.overlay}>
-        <Text style={styles.relatoTitle}>{item.title}</Text>
-        <Text style={styles.relatoSubtitle}>{item.description}</Text>
-        <TouchableOpacity
-          style={styles.startButton}
-          onPress={() => navigation.navigate("Learn")}
-        >
-          <Text style={styles.startButtonText}>Comenzar</Text>
-        </TouchableOpacity>
-      </View>
-    </ImageBackground>
+    <View style={styles.carouselItem}>
+      <ImageBackground
+        source={item.image}
+        imageStyle={styles.cardImage}
+        style={styles.relatoCard}
+      >
+        <View style={styles.overlay}>
+          <Text style={styles.relatoTitle}>{item.title}</Text>
+          <Text style={styles.relatoSubtitle}>{item.description}</Text>
+          <TouchableOpacity
+            style={styles.startButton}
+            onPress={() => navigation.navigate("Learn")}
+          >
+            <Text style={styles.startButtonText}>Comenzar</Text>
+          </TouchableOpacity>
+        </View>
+      </ImageBackground>
+    </View>
   );
 
   return (
@@ -97,24 +99,29 @@ const HomeScreen = ({ navigation }) => {
             </Text>
           </View>
           <View style={styles.containerPremiosBotton}>
-          <TouchableOpacity onPress={() => navigation.navigate("Rewards")} style={styles.button}>
-            <Text style={styles.cardAction}>Ver todos</Text>
-            <MaterialIcons name="chevron-right" color="#FFF" size={20}/>
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Rewards")}
+              style={styles.button}
+            >
+              <Text style={styles.cardAction}>Ver todos</Text>
+              <MaterialIcons name="chevron-right" color="#FFF" size={20} />
+            </TouchableOpacity>
           </View>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Relatos</Text>
-          <View style={styles.carouselContainer}>
-            <Carousel
-              width={viewportWidth}
-              height={viewportWidth * 0.75}
-              data={data}
-              renderItem={renderItem}
-              loop={true}
-            />
-          </View>
+          <Text style={styles.sectionTitleRelato}>Relatos</Text>
+          <Text style={styles.sectionSubtitleRelato}>
+            3 relatos disponibles
+          </Text>
+          {/* {numberOfRelatos} */}
+          <Carousel
+            width={viewportWidth}
+            height={viewportWidth}
+            data={data}
+            renderItem={renderItem}
+            loop={true}
+          />
         </View>
       </View>
     </View>
@@ -128,13 +135,13 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingHorizontal: 0,
   },
-  containerPremiosBotton:{
+  containerPremiosBotton: {
     flexDirection: "row",
     justifyContent: "center",
-    alignItems: "center",      
+    alignItems: "center",
   },
   button: {
-    flexDirection: "row",       
+    flexDirection: "row",
     alignItems: "center",
   },
   topMenu: {
@@ -177,20 +184,16 @@ const styles = StyleSheet.create({
     color: "#FFF",
     fontWeight: "bold",
   },
-  carouselContainer: {
-    backgroundColor: "#6E1E1E", // Tono rojo oscuro
-    paddingVertical: 15,
-    borderRadius: 15,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 5,
+  carouselItem: {
+    width: viewportWidth * 0.8,
+    marginRight: 5,
+    overflow: "hidden",
+    borderRadius: 25,
   },
   card: {
     backgroundColor: "#862C29",
     padding: 20,
-    borderRadius: 10,
+    borderRadius: 25,
     marginBottom: 10,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -213,39 +216,75 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   section: {
-    marginTop: 20,
-    backgroundColor: "#6E1E1E",
+    backgroundColor: "#862C29",
+    borderRadius: 25,
+    padding: 15,
+    marginBottom: 15,
+    alignItems: "center",
+    justifyContent: "flex-start",
+    height: viewportWidth * 1.05,
+    width: "120%",
+    alignItems: "flex-start",
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 24,
     color: "#FFF",
+    fontWeight: "400",
+    marginBottom: 5,
+    textAlign: "left",
+  },
+  sectionSubtitle: {
+    fontSize: 16,
+    color: "#FFF",
+    marginBottom: 30,
+    textAlign: "left",
+  },
+  sectionTitleRelato: {
+    fontSize: 24,
+    color: "#FFF",
+    fontWeight: "400",
     marginBottom: 10,
+    textAlign: "left",
+  },
+  sectionSubtitleRelato: {
+    fontSize: 16,
+    color: "#FFF",
+    marginBottom: 15,
+    textAlign: "left",
   },
   relatoCard: {
-    width: viewportWidth * 0.8,
-    height: viewportWidth * 0.6,
-    borderRadius: 10,
-    overflow: "hidden",
-    marginBottom: 10,
+    width: "110%",
+    height: "92%",
+    borderRadius: 25,
   },
   cardImage: {
-    resizeMode: "cover",
+    borderRadius: 25,
+  },
+  gradientOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.99)',
+    borderRadius: 25,
   },
   overlay: {
     flex: 1,
-    justifyContent: "flex-end",
-    padding: 15,
-    backgroundColor: "rgba(0, 0, 0, 0.3)", // Efecto de oscurecimiento.
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 25,
   },
   relatoTitle: {
-    fontSize: 20,
+    fontSize: 18,
     color: "#FFF",
     fontWeight: "bold",
-    marginBottom: 5,
+    textAlign: "center",
   },
   relatoSubtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#FFF",
+    textAlign: "center",
     marginBottom: 10,
   },
   startButton: {
