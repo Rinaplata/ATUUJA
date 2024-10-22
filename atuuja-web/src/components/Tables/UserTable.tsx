@@ -4,7 +4,7 @@ import {
   ChartBarIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';
-import { User } from '../../types/user';
+import { TipoDocumento, User } from '../../types/user';
 import Modal from '../Modal/Modal';
 import { API_URL } from '../../config/config';
 import Alert from '../Alert/Alertas';
@@ -52,8 +52,7 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
 
   const handleDeleteUser = async () => {
     if (!selectedUser) return;
-    const userId = selectedUser.Username;
-
+    const userId = selectedUser.Id;
     try {
       const response = await fetch(`${API_URL}/Auth/delete/${userId}`, {
         method: 'DELETE',
@@ -103,6 +102,18 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
                 Correo
               </th>
               <th className="min-w-[120px] py-4 px-4 font-medium text-white dark:text-white">
+                Edad
+              </th>
+              <th className="min-w-[120px] py-4 px-4 font-medium text-white dark:text-white">
+                Cuidad
+              </th>
+              <th className="min-w-[120px] py-4 px-4 font-medium text-white dark:text-white">
+                Tipo Documento
+              </th>
+              <th className="min-w-[120px] py-4 px-4 font-medium text-white dark:text-white">
+                Núm Documento
+              </th>
+              <th className="min-w-[120px] py-4 px-4 font-medium text-white dark:text-white">
                 Es Admin
               </th>
               <th className="min-w-[120px] py-4 px-4 font-medium text-white dark:text-white">
@@ -126,6 +137,20 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                   <p className="text-black dark:text-white">{user.Email}</p>
+                </td>
+                <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                  <p className="text-black dark:text-white">{user.Edad}</p>
+                </td>
+                <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                  <p className="text-black dark:text-white">{user.Cuidad}</p>
+                </td>
+                <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                  <p className="text-black dark:text-white">
+                  <p className="text-black dark:text-white">{user.TipoDocumento ? "Pasaporte" : "Cédula"}</p>
+                  </p>
+                </td>
+                <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                  <p className="text-black dark:text-white">{user.NumeroDocumento}</p>
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                   <p className="text-black dark:text-white">
@@ -203,10 +228,15 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
         isOpen={isEditModalOpen}
         onClose={() => setEditModalOpen(false)}
         userData={{
+          userid: selectedUser?.Id ?? '',
           username: selectedUser?.Username ?? '',
           email: selectedUser?.Email ?? '',
           password:selectedUser?.Password ?? '',
           isAdmin: selectedUser?.IsAdmin ?? false,
+          edad: selectedUser?.Edad ?? ' ',
+          cuidad: selectedUser?.Cuidad ?? '',
+          tipoDocumento: selectedUser?.TipoDocumento ?? TipoDocumento.Cedula,
+          numDocumento: selectedUser?.NumeroDocumento ?? ''
         }}
         onSuccess={handleUpdateSuccess}
       />

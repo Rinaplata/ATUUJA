@@ -8,7 +8,7 @@ import Alert from '../Alert/Alertas';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState(''); 
   const navigate = useNavigate();
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState<'success' | 'error' | undefined>(undefined);
@@ -33,9 +33,10 @@ const Login: React.FC = () => {
 
       // Verificar si la solicitud fue exitosa
       if (response.ok) {
-        const tokeResult =  (await response.json());
-        localStorage.setItem('token', tokeResult.token);
-        // Si el login es exitoso, redirigir a la página '/dast'
+        const userResult =  (await response.json());
+        localStorage.setItem('token', userResult.token); 
+        localStorage.setItem('userId',userResult.userId);
+         // Si el login es exitoso, redirigir a la página '/dast'
         navigate('/admin');
       } else {
         // Manejar el error (por ejemplo, credenciales incorrectas)

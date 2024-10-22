@@ -1,14 +1,42 @@
-import { useState } from 'react';
+import React from 'react'; 
+import { useEffect,  } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ClickOutside from '../ClickOutside';
-import UserOne from '../../images/user/user-02.png';
+import UserOne from '../../images/user/user-02.png'; 
+import { API_URL } from './../../config/config';
+
 
 const DropdownUser = () => {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = React.useState(false);
+  const [userInformation, setUserinformation] = React.useState('');
+  const userId = localStorage.getItem('userId');
   const navigate = useNavigate();
 
+  useEffect(() => { 
+
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${API_URL}/Auth/get/${userId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        setUserinformation(await response.json());
+
+      } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+
+  };
+
+    fetchData();
+
+  }, []);
+
+  
   const CloseSession = () => {
-    localStorage.removeItem('token');
+    localStorage.clear();
     navigate('/auth/login');
   }
 
@@ -25,9 +53,9 @@ const DropdownUser = () => {
 
         <span className="hidden text-left lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-            Rina Plata
-          </span>
-          <span className="block text-xs">rina@email.com</span>
+          {userInformation.Username} 
+          </span> 
+          <span className="block text-xs">{userInformation.Email}</span> 
         </span>
 
         <svg
