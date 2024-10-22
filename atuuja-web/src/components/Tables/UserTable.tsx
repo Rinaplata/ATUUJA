@@ -102,6 +102,18 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
                 Correo
               </th>
               <th className="min-w-[120px] py-4 px-4 font-medium text-white dark:text-white">
+                Edad
+              </th>
+              <th className="min-w-[120px] py-4 px-4 font-medium text-white dark:text-white">
+                Cuidad
+              </th>
+              <th className="min-w-[120px] py-4 px-4 font-medium text-white dark:text-white">
+                Tipo Documento
+              </th>
+              <th className="min-w-[120px] py-4 px-4 font-medium text-white dark:text-white">
+                Núm Documento
+              </th>
+              <th className="min-w-[120px] py-4 px-4 font-medium text-white dark:text-white">
                 Es Admin
               </th>
               <th className="min-w-[120px] py-4 px-4 font-medium text-white dark:text-white">
@@ -125,6 +137,20 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                   <p className="text-black dark:text-white">{user.Email}</p>
+                </td>
+                <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                  <p className="text-black dark:text-white">{user.Edad}</p>
+                </td>
+                <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                  <p className="text-black dark:text-white">{user.Cuidad}</p>
+                </td>
+                <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                  <p className="text-black dark:text-white">
+                  <p className="text-black dark:text-white">{user.TipoDocumento ? "Pasaporte" : "Cédula"}</p>
+                  </p>
+                </td>
+                <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                  <p className="text-black dark:text-white">{user.NumeroDocumento}</p>
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                   <p className="text-black dark:text-white">

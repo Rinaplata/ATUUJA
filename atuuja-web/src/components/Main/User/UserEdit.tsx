@@ -12,7 +12,7 @@ interface EditUserProps {
     username: string;
     email: string;
     password: string;
-    edad: string,
+    edad: number,
     cuidad: string,
     tipoDocumento: TipoDocumento,
     numDocumento: string,
@@ -27,7 +27,7 @@ const UserEdit: React.FC<EditUserProps> = ({ isOpen, onClose, userData, onSucces
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
-  const [edad, setEdad] = useState('');
+  const [edad, setEdad] = useState(0);
   const [cuidad, setCuidad] = useState('');
   const [tipoDocumento, setTipoDocumento] = useState(TipoDocumento.Cedula);
   const [numeroDocumento, setNumeroDocumento] = useState('');
@@ -49,9 +49,8 @@ const UserEdit: React.FC<EditUserProps> = ({ isOpen, onClose, userData, onSucces
   }, [userData]);
 
   const handleUpdate = async () => {
-    try {
-      const encodedUserId = encodeURIComponent(userId);
-      const response = await fetch(`${API_URL}/Auth/update/${encodedUserId}`, {
+    try { 
+      const response = await fetch(`${API_URL}/Auth/update/${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -65,7 +64,7 @@ const UserEdit: React.FC<EditUserProps> = ({ isOpen, onClose, userData, onSucces
           edad,
           cuidad,
           tipoDocumento,
-          numeroDocumento
+          numeroDocumento,
         }),
       });
 
@@ -125,7 +124,7 @@ const UserEdit: React.FC<EditUserProps> = ({ isOpen, onClose, userData, onSucces
           <input
             type="edad"
             value={edad}
-            onChange={(e) => setEdad(e.target.value)}
+            onChange={(e) => setEdad(parseInt(e.target.value))}
             className="border p-2 mb-4 rounded w-full"
             placeholder="Ingrese el correo"
           />
@@ -157,7 +156,7 @@ const UserEdit: React.FC<EditUserProps> = ({ isOpen, onClose, userData, onSucces
         <div>
           <label className="mb-2 block">Numero documento:</label>
           <input
-            type="numDocumento"
+            type="number"
             value={numeroDocumento }
             onChange={(e) => setNumeroDocumento(e.target.value)}
             className="border p-2 mb-4 rounded w-full"
