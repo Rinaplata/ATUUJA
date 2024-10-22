@@ -52,6 +52,7 @@ test('Sign off', async ({ page }) => {
     await page.goto(wbeUrlAdminLayout);
     await page.waitForTimeout(3000); 
     await page.click('svg.fill-current.sm\\:block');
+    await page.screenshot({ path: './screenshots/sign-off.png' });
     await page.waitForTimeout(3000);
     // button Sign off
     await page.getByRole('button').click('Cerrar sesión');
@@ -61,4 +62,3 @@ test('Sign off', async ({ page }) => {
 
 
   });
-  
