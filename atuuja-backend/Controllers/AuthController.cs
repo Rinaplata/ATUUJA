@@ -48,7 +48,7 @@ public class AuthController : ControllerBase
             { nameof(model.NumeroDocumento),  model.NumeroDocumento },
         };
 
-        await usersCollection.Document(model.Username).SetAsync(newUser);
+        await usersCollection.Document(userId).SetAsync(newUser);
 
         return Ok(MessageTemplates.Format(MessageTemplates.RegisterInserted, userDescripcion));
     }
@@ -174,7 +174,8 @@ public class AuthController : ControllerBase
         && bool.Parse(userData["IsAdmin"].ToString()) == true)
         {
             var token = GenerateJwtToken(model.Email);
-            return Ok(new { Token = token });
+            var userId = userDoc.Id;
+            return Ok(new { Token = token, UserId = userId  });
         }
         return Unauthorized();
     }
@@ -191,7 +192,7 @@ public class AuthController : ControllerBase
         .Select(document =>
             {
                 var user = document.ToDictionary();
-                user["Username"] = document.Id;
+                user["Id"] = document.Id;
                 return user;
             }
         ).ToList();

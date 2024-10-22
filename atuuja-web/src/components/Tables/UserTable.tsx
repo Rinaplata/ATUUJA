@@ -4,7 +4,7 @@ import {
   ChartBarIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';
-import { User } from '../../types/user';
+import { TipoDocumento, User } from '../../types/user';
 import Modal from '../Modal/Modal';
 import { API_URL } from '../../config/config';
 import Alert from '../Alert/Alertas';
@@ -52,8 +52,7 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
 
   const handleDeleteUser = async () => {
     if (!selectedUser) return;
-    const userId = selectedUser.Username;
-
+    const userId = selectedUser.Id;
     try {
       const response = await fetch(`${API_URL}/Auth/delete/${userId}`, {
         method: 'DELETE',
@@ -203,10 +202,15 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
         isOpen={isEditModalOpen}
         onClose={() => setEditModalOpen(false)}
         userData={{
+          userid: selectedUser?.Id ?? '',
           username: selectedUser?.Username ?? '',
           email: selectedUser?.Email ?? '',
           password:selectedUser?.Password ?? '',
           isAdmin: selectedUser?.IsAdmin ?? false,
+          edad: selectedUser?.Edad ?? ' ',
+          cuidad: selectedUser?.Cuidad ?? '',
+          tipoDocumento: selectedUser?.TipoDocumento ?? TipoDocumento.Cedula,
+          numDocumento: selectedUser?.NumeroDocumento ?? ''
         }}
         onSuccess={handleUpdateSuccess}
       />
