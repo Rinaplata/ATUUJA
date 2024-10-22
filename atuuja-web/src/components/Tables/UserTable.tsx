@@ -4,7 +4,7 @@ import {
   ChartBarIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';
-import { User } from '../../types/user';
+import { TipoDocumento, User } from '../../types/user';
 import Modal from '../Modal/Modal';
 import { API_URL } from '../../config/config';
 import Alert from '../Alert/Alertas';
@@ -207,6 +207,10 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
           email: selectedUser?.Email ?? '',
           password:selectedUser?.Password ?? '',
           isAdmin: selectedUser?.IsAdmin ?? false,
+          edad: selectedUser?.Edad ?? ' ',
+          cuidad: selectedUser?.Cuidad ?? '',
+          tipoDocumento: selectedUser?.TipoDocumento ?? TipoDocumento.Cedula,
+          numDocumento: selectedUser?.NumeroDocumento ?? ''
         }}
         onSuccess={handleUpdateSuccess}
       />
