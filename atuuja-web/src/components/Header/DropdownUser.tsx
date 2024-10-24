@@ -1,6 +1,6 @@
 import React from 'react'; 
 import { useEffect,  } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import ClickOutside from '../ClickOutside';
 import UserOne from '../../images/user/user-02.png'; 
 import { API_URL } from './../../config/config';
@@ -82,7 +82,7 @@ const DropdownUser = () => {
         >
           <ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark">
             <li>
-              <Link
+              <NavLink
                 to="/profile"
                 className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
               >
@@ -104,10 +104,10 @@ const DropdownUser = () => {
                   />
                 </svg>
                 Mi perfil
-              </Link>
+              </NavLink>
             </li>
             <li>
-              <Link
+              <NavLink
                 to="/settings"
                 className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
               >
@@ -129,7 +129,7 @@ const DropdownUser = () => {
                   />
                 </svg>
                 Configuración
-              </Link>
+              </NavLink>
             </li>
           </ul>
           <button 

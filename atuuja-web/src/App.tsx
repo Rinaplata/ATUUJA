@@ -9,6 +9,8 @@ import Login from './components/Main/Login';
 import Reward from './components/Main/Reward/Reward.tsx';
 import Quiz from './components/Main/Quizes/Quiz.tsx';
 import { jwtDecode } from 'jwt-decode';
+import Profile from './pages/Profile.tsx';
+import Settings from './pages/Settings.tsx';
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -51,6 +53,8 @@ function App() {
         <Route path="/users" element={<Users />} />
         <Route path="/reward" element={<Reward />} />
         <Route path="/quiz" element={<Quiz/>} />
+        <Route path="/profile" element={<Profile/>} />
+        <Route path="/settings" element={<Settings/>} />
       </Routes>
     </DefaultLayout>
   ) : (
