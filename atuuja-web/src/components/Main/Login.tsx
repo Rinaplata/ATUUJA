@@ -27,8 +27,10 @@ const Login: React.FC = () => {
         body: JSON.stringify(loginData),
       });
       if (response.ok) {
-        const tokeResult =  (await response.json());
-        localStorage.setItem('token', tokeResult.token);
+        const userResult =  (await response.json());
+        localStorage.setItem('token', userResult.token); 
+        localStorage.setItem('userId',userResult.userId);
+         // Si el login es exitoso, redirigir a la página '/dast'
         navigate('/admin');
       } else {
         console.error('Error en el inicio de sesión');
