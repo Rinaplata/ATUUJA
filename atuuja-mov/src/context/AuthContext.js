@@ -1,42 +1,49 @@
-import React, { createContext, useState, useContext } from "react";
-import {loginService, Register } from "../api/services/authService";
+import React, { createContext, useState, useContext, useMemo } from "react";
+import * as AuthService from "../api/services/authService";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(undefined);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false); // Estado de carga
+
 
   const login = async (email, password) => {
     try {
-      const userData = await loginService({ email, password });
-      setUser(userData);
-      setError(null);
-    } catch (err) {
-      setError(err.response?.data?.message || "Error en el inicio de sesión");
+      setLoading(true)
+      const nextUser = await AuthService.login({ email, password })
+      setUser(nextUser);
+    } catch (nextError) {
+      setError(nextError.message)
+    } finally {
+      setLoading(false)
     }
   };
 
- const logout = () => {
+  const logout = () => {
     setUser(null);
   };
 
-  const registerUser = async (userData) => {
+  const register = async (userData) => {
     try {
-      const registeredUser = await Register(userData);
+      setLoading(true);
+      const registeredUser = await AuthService.register(userData);
       setUser(registeredUser);
-      setError(null);
-    } catch (err) {
-      setError(err.response?.data?.message || "Error en el registro");
+    } catch (nextError) {
+      setError(nextError.message)
+    } finally {
+      setLoading(false);
     }
   };
 
+  const auth = useMemo(() => ({ user, login, error, loading, register, logout }), [user, loading, error, login, register, logout])
+
   return (
-    <AuthContext.Provider value={{ user, login, error, registerUser,logout }}>
+    <AuthContext.Provider value={auth}>
       {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => useContext(AuthContext);
-

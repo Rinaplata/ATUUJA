@@ -1,19 +1,21 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, TextInput, Alert, Pressable, StyleSheet, Image } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useAuth } from "../context/AuthContext";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login, error } = useAuth();
+  const { login, error, loading } = useAuth();
 
   const handleLogin = async () => {
+    // await fetch('http://jsonplaceholder.typicode.com/posts/1')
     await login(email, password);
-    if (!error) {
-      navigation.navigate("MainTabs", { screen: "Home" });
-    }
   };
+
+
+  if (loading) return <View><Text>Loading...</Text></View>
+  if (error) return <View><Text>Error: {error}</Text></View>
 
   return (
     <View style={styles.container}>
@@ -57,15 +59,16 @@ const LoginScreen = ({ navigation }) => {
 
       {error && <Text style={styles.errorMessage}>{error}</Text>}
 
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+      <Pressable style={styles.loginButton} disabled={!email || !password} onPress={handleLogin}>
         <Text style={styles.loginButtonText}>Iniciar sesión</Text>
-      </TouchableOpacity>
+        {error && <Text style={{ color: 'red' }}>{error}</Text>} {/* Mostrar error si existe */}
+      </Pressable>
 
       <View style={styles.registerContainer}>
         <Text style={styles.registerText}>¿Aun no tienes una cuenta? </Text>
-        <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+        <Pressable onPress={() => navigation.navigate("Register")}>
           <Text style={styles.registerLink}>Regístrate aquí</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );
@@ -141,7 +144,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   errorMessage: {
-    color: '#D9534F',  
+    color: '#D9534F',
     fontSize: 14,
     marginBottom: 10,
   },
