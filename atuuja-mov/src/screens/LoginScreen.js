@@ -1,64 +1,36 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../services/firebaseConfig'; 
+import React, { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from "react-native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { useAuth } from "../context/AuthContext";
 
 const LoginScreen = ({ navigation }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(false); 
-  const [errorMessage, setErrorMessage] = useState(''); 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { login, error } = useAuth();
 
-  const handleLogin = () => {
-    // Descomentar para habilitar inicio de sesión con Firebase
-    /*
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Inicio de sesión exitoso
-        console.log('Usuario logueado:', userCredential.user);
-        setError(false);  // Restablecer el error en caso de éxito
-        setErrorMessage('');  // Limpiar el mensaje de error
-        // Navegar a la pantalla de Home al iniciar sesión correctamente
-        navigation.navigate('MainTabs', { screen: 'Home' });
-      })
-      .catch((error) => {
-        // Si el inicio de sesión falla, muestra el error
-        setError(true);
-        setErrorMessage(error.message);
-      });
-    */
-
-    // Definir credenciales "quemadas"
-    const validEmail = 'rina123@gmail.com'; // Correo electrónico válido
-    const validPassword = '123'; // Contraseña válida
-  
-    // Verificar las credenciales ingresadas
-    if (email === validEmail && password === validPassword) {
-      // Inicio de sesión exitoso
-      console.log('Inicio de sesión exitoso:', email);
-      setError(false);  // Restablecer el error en caso de éxito
-      setErrorMessage('');  // Limpiar el mensaje de error
-      // Navegar a la pantalla de Home al iniciar sesión correctamente
-      navigation.navigate('MainTabs', { screen: 'Home' });
-    } else {
-      // Si el inicio de sesión falla, muestra el error
-      setError(true);
-      setErrorMessage('Correo electrónico o contraseña incorrectos.'); // Mensaje de error
+  const handleLogin = async () => {
+    await login(email, password);
+    if (!error) {
+      navigation.navigate("MainTabs", { screen: "Home" });
     }
   };
 
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../assets/icons/isologo.png')}  
+        source={require("../../assets/icons/isologo.png")}
         style={styles.logo}
       />
 
       <Text style={styles.title}>Inicia sesión con tu cuenta</Text>
 
       <View style={styles.inputContainer}>
-        <Icon name="email-outline" size={24} color="#F28C85" style={styles.icon} />
+        <Icon
+          name="email-outline"
+          size={24}
+          color="#F28C85"
+          style={styles.icon}
+        />
         <TextInput
           style={styles.input}
           placeholder="correo electrónico"
@@ -68,7 +40,12 @@ const LoginScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.inputContainer}>
-        <Icon name="lock-outline" size={24} color="#F28C85" style={styles.icon} />
+        <Icon
+          name="lock-outline"
+          size={24}
+          color="#F28C85"
+          style={styles.icon}
+        />
         <TextInput
           style={styles.input}
           placeholder="contraseña"
@@ -78,33 +55,22 @@ const LoginScreen = ({ navigation }) => {
         />
       </View>
 
-      {/* Si hay error, mostrar mensaje de error */}
-      {error && (
-        <Text style={styles.errorMessage}>
-          {errorMessage}
-        </Text>
-      )}
+      {error && <Text style={styles.errorMessage}>{error}</Text>}
 
       <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
         <Text style={styles.loginButtonText}>Iniciar sesión</Text>
       </TouchableOpacity>
 
-      {/* Mostrar enlace de '¿Olvidaste tu contraseña?' solo si hubo un error */}
-      {error && (
-        <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
-          <Text style={styles.forgotPassword}>¿Olvidaste tu contraseña?</Text>
-        </TouchableOpacity>
-      )}
-
       <View style={styles.registerContainer}>
         <Text style={styles.registerText}>¿Aun no tienes una cuenta? </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+        <TouchableOpacity onPress={() => navigation.navigate("Register")}>
           <Text style={styles.registerLink}>Regístrate aquí</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
