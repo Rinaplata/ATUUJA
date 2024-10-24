@@ -130,9 +130,9 @@ const levels = [
 
 // Datos de premios
 const rewards = [
-  { image: require('../../assets/images/DALL·E-amaca_wayuu.jpg'), title: 'Mochila Wayuu', points: '150', claimed: true },
-  { image: require('../../assets/images/DALL·E-sobrero_wayuu.png'), title: 'Sombrero Wayuu', points: '400', claimed: false },
-  { image: require('../../assets/images/DALL·E-sobrero_wayuu.png'), title: 'Sombrero Ejemplo', points: '200', claimed: false },
+  { image: require('../../assets/icons/images/DALL·E-amaca_wayuu.jpg'), title: 'Mochila Wayuu', points: '150', claimed: true },
+  { image: require('../../assets/icons/images/DALL·E-sobrero_wayuu.png'), title: 'Sombrero Wayuu', points: '400', claimed: false },
+  { image: require('../../assets/icons/images/DALL·E-sobrero_wayuu.png'), title: 'Sombrero Ejemplo', points: '200', claimed: false },
 ];
 
 const styles = StyleSheet.create({
