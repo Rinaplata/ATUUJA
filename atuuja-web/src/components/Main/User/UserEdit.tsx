@@ -2,52 +2,73 @@ import React, { useState, useEffect } from 'react';
 import Modal from '../../Modal/Modal'; 
 import Alert from '../../Alert/Alertas';
 import { API_URL } from '../../../config/config';
+import { TipoDocumento } from '../../../types/user';
 
 interface EditUserProps {
   isOpen: boolean;
   onClose: () => void;
   userData: {
+    userid: string,
     username: string;
     email: string;
     password: string;
+    edad: number,
+    cuidad: string,
+    tipoDocumento: TipoDocumento,
+    numDocumento: string,
     isAdmin: boolean;
   };
   onSuccess: () => void;
 }
 
 const UserEdit: React.FC<EditUserProps> = ({ isOpen, onClose, userData, onSuccess }) => {
+  const [userId,setUserId] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
+  const [edad, setEdad] = useState(0);
+  const [cuidad, setCuidad] = useState('');
+  const [tipoDocumento, setTipoDocumento] = useState(TipoDocumento.Cedula);
+  const [numeroDocumento, setNumeroDocumento] = useState('');
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState<'success' | 'error' | undefined>(undefined);
 
   useEffect(() => {
     if (userData) {
+      setUserId(userData.userid);
       setUsername(userData.username);
       setEmail(userData.email);
       setPassword(userData.password);
       setIsAdmin(userData.isAdmin);
+      setEdad(userData.edad);
+      setCuidad(userData.cuidad);
+      setTipoDocumento(userData.tipoDocumento);
+      setNumeroDocumento(userData.numDocumento);
     }
   }, [userData]);
 
   const handleUpdate = async () => {
-    try {
-      const response = await fetch(`${API_URL}/Auth/update/${username}`, {
+    try { 
+      const response = await fetch(`${API_URL}/Auth/update/${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          userId,
           username,
           email,
           password,
           isAdmin,
+          edad,
+          cuidad,
+          tipoDocumento,
+          numeroDocumento,
         }),
       });
 
-      if (!response.ok) {
+      if (!response.ok) { 
         throw new Error('Error al actualizar el usuario');
       }
 
@@ -99,6 +120,16 @@ const UserEdit: React.FC<EditUserProps> = ({ isOpen, onClose, userData, onSucces
           />
         </div>
         <div>
+          <label className="mb-2 block">Edad:</label>
+          <input
+            type="edad"
+            value={edad}
+            onChange={(e) => setEdad(parseInt(e.target.value))}
+            className="border p-2 mb-4 rounded w-full"
+            placeholder="Ingrese el correo"
+          />
+        </div>
+        <div>
           <label className="mb-2 block">Contraseña:</label>
           <input
             type="password"
@@ -107,6 +138,40 @@ const UserEdit: React.FC<EditUserProps> = ({ isOpen, onClose, userData, onSucces
             className="border p-2 mb-4 rounded w-full"
             placeholder="Ingrese la nueva contraseña"
           />
+        </div>
+        <div>
+          <label className="mb-2 block">Tipo documento:</label>
+          <select 
+            value={tipoDocumento}
+            onChange={(e) => setTipoDocumento(parseInt(e.target.value) as TipoDocumento)}
+            className="border p-2 mb-4 rounded w-full"
+          >
+            <option value="" disabled>
+              Selecciona el tipo de documento
+            </option>
+            <option value="0">Cédula</option>
+            <option value="1">Pasaporte</option>
+          </select>
+        </div> 
+        <div>
+          <label className="mb-2 block">Numero documento:</label>
+          <input
+            type="number"
+            value={numeroDocumento }
+            onChange={(e) => setNumeroDocumento(e.target.value)}
+            className="border p-2 mb-4 rounded w-full"
+            placeholder="Ingrese el número de documento"
+          /> 
+        </div>
+        <div>
+          <label className="mb-2 block">Cuidad:</label>
+          <input
+            type="cuidad"
+            value={cuidad}
+            onChange={(e) => setCuidad(e.target.value)}
+            className="border p-2 mb-4 rounded w-full"
+            placeholder="Ingrese la cuidad"
+          /> 
         </div>
         <div>
           <label className="mb-2 block">Es Admin:

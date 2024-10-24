@@ -87,10 +87,7 @@ const QuizTable: React.FC = () => {
       <div className="max-w-full overflow-x-auto">
         <table className="w-full table-auto border-gray-600">
           <thead>
-            <tr className="bg-primaryAtuuja text-left dark:bg-white">
-              <th className="min-w-[220px] py-4 px-4 font-medium text-white dark:text-white xl:pl-11">
-                Quiz ID
-              </th>
+            <tr className="bg-primaryAtuuja text-left dark:bg-white"> 
               <th className="min-w-[120px] py-4 px-4 font-medium text-white dark:text-white">
                 Relato
               </th>
@@ -110,10 +107,7 @@ const QuizTable: React.FC = () => {
           </thead>
           <tbody>
             {quizzes.map((quiz, index) => (
-              <tr key={index} className="bg-white">
-                <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                  <p className="text-black dark:text-white">{quiz.ExamenId}</p>
-                </td>
+              <tr key={index} className="bg-white"> 
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                   <p className="text-black dark:text-white">
                     {getRelatoText(quiz.RelatoId)}

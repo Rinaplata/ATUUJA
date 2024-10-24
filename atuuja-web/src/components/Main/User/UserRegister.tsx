@@ -2,14 +2,20 @@ import React, { useState } from 'react';
 import Modal from '../../Modal/Modal';
 import { API_URL } from '../../../config/config';
 import Alert from '../../Alert/Alertas';
+import { TipoDocumento } from '../../../types/user';
 
 interface RegisterOwnerProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (data: {
     Username: string;
-    email: string;
-    password: string;
+    Email: string;
+    Password: string; 
+    Cuidad: string,
+    Edad: number,
+    TipoDocumento: TipoDocumento,
+    NumeroDocumento: string; 
+    IsAdmin: Boolean,
   }) => void;
 }
 
@@ -23,6 +29,10 @@ const UserRegister: React.FC<RegisterOwnerProps> = ({
   const [ownerPassword, setOwnerPassword] = useState('');
   const [ownerIsAdmin, setOwnerIsAdmin] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
+  const [ownerAge, setOwnerAge] = useState(0);
+  const [ownerCity, setOwnerCity] = useState('');
+  const [ownerTipoDocumento, setOnwerTipoDocumento] = useState(TipoDocumento.Cedula);
+  const [ownerNumeroDocumento, setOwnerNumeroDocumento] = useState('');
   const [alertType, setAlertType] = useState<'success' | 'error' | undefined>(
     undefined,
   );
@@ -37,11 +47,16 @@ const UserRegister: React.FC<RegisterOwnerProps> = ({
         body: JSON.stringify({
           Username: ownerUsername,
           Email: ownerEmail,
-          password: ownerPassword,
-        }),
+          Password: ownerPassword,
+          Edad: ownerAge,
+          Cuidad: ownerCity,
+          TipoDocumento: ownerTipoDocumento, 
+          NumeroDocumento: ownerNumeroDocumento ,
+          IsAdmin: ownerIsAdmin
+        }),        
       });
 
-      if (!response.ok) {
+      if (!response.ok) {  
         throw new Error('Error al registrar Usuarios');
       }
 
@@ -52,8 +67,13 @@ const UserRegister: React.FC<RegisterOwnerProps> = ({
       // Llama a onSuccess para refrescar la lista de usuarios
       onSuccess({
         Username: ownerUsername,
-        email: ownerEmail,
-        password: ownerPassword,
+        Email: ownerEmail,
+        Password: ownerPassword,
+        Edad: ownerAge,
+        TipoDocumento: ownerTipoDocumento,
+        NumeroDocumento: ownerNumeroDocumento, 
+        Cuidad: ownerCity,
+        IsAdmin: ownerIsAdmin
       });
 
       // Cierra el modal después de registrar
@@ -88,24 +108,6 @@ const UserRegister: React.FC<RegisterOwnerProps> = ({
       />
     </div>
     <div className="col-span-2">
-      <label className="mb-2 block font-bold">Edad</label>
-      <input
-        type="number"
-        onChange={(e) => setUsername(e.target.value)}
-        className="border p-2 mb-4 rounded w-full"
-        placeholder="Ingrese la edad del usuario"
-      />
-    </div>
-    <div className="col-span-2">
-      <label className="mb-2 block font-bold">Ciudad</label>
-      <input
-        type="text"
-        onChange={(e) => setUsername(e.target.value)}
-        className="border p-2 mb-4 rounded w-full"
-        placeholder="Ingrese la ciudad del usuario"
-      />
-    </div>
-    <div className="col-span-2">
       <label className="mb-2 block font-bold">Correo:</label>
       <input
         type="email"
@@ -113,6 +115,15 @@ const UserRegister: React.FC<RegisterOwnerProps> = ({
         onChange={(e) => setOwnerEmail(e.target.value)}
         className="border p-2 mb-4 rounded w-full"
         placeholder="Ingrese el correo del usuario"
+      />
+    </div>
+    <div className="col-span-2">
+      <label className="mb-2 block font-bold">Edad</label>
+      <input
+        type="number"
+        onChange={(e) => setOwnerAge(parseInt(e.target.value))}
+        className="border p-2 mb-4 rounded w-full"
+        placeholder="Ingrese la edad del usuario"
       />
     </div>
     <div className="col-span-2">
@@ -125,6 +136,40 @@ const UserRegister: React.FC<RegisterOwnerProps> = ({
         placeholder="Ingrese la contraseña"
       />
     </div>
+    <div className="col-span-2">
+        <label className="mb-2 block font-bold">Tipo documento:</label>
+        <select 
+          value={ownerTipoDocumento}
+          onChange={(e) => setOnwerTipoDocumento(parseInt(e.target.value) as TipoDocumento)}
+          className="border p-2 mb-4 rounded w-full"
+        >
+            <option value="" disabled>
+              Selecciona el tipo de documento
+            </option>
+            <option value="0">Cédula</option>
+            <option value="1">Pasaporte</option>
+        </select>
+        </div> 
+        <div className="col-span-2">
+           <label className="mb-2 block font-bold">Numero documento:</label>
+          <input
+            type="number"
+            value={ownerNumeroDocumento }
+            onChange={(e) => setOwnerNumeroDocumento(e.target.value)}
+            className="border p-2 mb-4 rounded w-full"
+            placeholder="Ingrese el número de documento"
+          /> 
+        </div>
+    <div className="col-span-2">
+      <label className="mb-2 block font-bold">Ciudad</label>
+      <input
+        type="text"
+        onChange={(e) => setOwnerCity(e.target.value)}
+        className="border p-2 mb-4 rounded w-full"
+        placeholder="Ingrese la ciudad del usuario"
+      />
+    </div>
+
     <div>
           <label className="mb-2 block">Es Admin:
             <div className="relative">
