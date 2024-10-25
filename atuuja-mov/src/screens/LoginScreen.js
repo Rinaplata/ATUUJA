@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   TextInput,
-  Alert,
   TouchableOpacity,
   StyleSheet,
   Image,
@@ -14,24 +13,29 @@ import { useAuth } from "../context/AuthContext";
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [localError, setLocalError] = useState(null);
   const { login, error, loading } = useAuth();
 
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleLogin = async () => {
+    if (!isValidEmail(email)) {
+      setLocalError("Por favor, introduce un correo electrónico válido.");
+      return;
+    }
+
     try {
       const success = await login(email, password);
       if (success) {
         navigation.navigate("MainTabs", { screen: "Home" });
       } else {
-        Alert.alert(
-          "Error",
-          "Correo o contraseña incorrectos. Inténtalo nuevamente."
-        );
+        setLocalError("Correo o contraseña incorrectos. Inténtalo nuevamente.");
       }
     } catch (error) {
-      Alert.alert(
-        "Error",
-        "Ocurrió un error durante el inicio de sesión. Inténtalo nuevamente."
-      );
+      setLocalError("Ocurrió un error durante el inicio de sesión. Inténtalo nuevamente.");
     }
   };
 
@@ -39,12 +43,6 @@ const LoginScreen = ({ navigation }) => {
     return (
       <View>
         <Text>Loading...</Text>
-      </View>
-    );
-  if (error)
-    return (
-      <View>
-        <Text>Error: {error}</Text>
       </View>
     );
 
@@ -68,7 +66,10 @@ const LoginScreen = ({ navigation }) => {
           style={styles.input}
           placeholder="correo electrónico"
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(text) => {
+            setEmail(text);
+            setLocalError(null);
+          }}
         />
       </View>
 
@@ -84,10 +85,14 @@ const LoginScreen = ({ navigation }) => {
           placeholder="contraseña"
           secureTextEntry
           value={password}
-          onChangeText={setPassword}
+          onChangeText={(text) => {
+            setPassword(text);
+            setLocalError(null);
+          }}
         />
       </View>
 
+      {localError && <Text style={styles.errorMessage}>{localError}</Text>}
       {error && <Text style={styles.errorMessage}>{error}</Text>}
 
       <TouchableOpacity
@@ -97,7 +102,6 @@ const LoginScreen = ({ navigation }) => {
       >
         <View>
           <Text style={styles.loginButtonText}>Iniciar sesión</Text>
-          {error && <Text style={{ color: "red" }}>{error}</Text>}
         </View>
       </TouchableOpacity>
 
@@ -149,11 +153,6 @@ const styles = StyleSheet.create({
     height: 50,
     fontSize: 16,
     color: "#443E3D",
-  },
-  forgotPassword: {
-    color: "#9A9A9A",
-    fontSize: 14,
-    marginBottom: 20,
   },
   loginButton: {
     backgroundColor: "#8E3A34",
