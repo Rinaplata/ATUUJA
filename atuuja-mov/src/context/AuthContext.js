@@ -9,7 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(false); // Estado de carga
 
 
-  const login = async (email, password) => {
+/*   const login = async (email, password) => {
     try {
       setLoading(true)
       const nextUser = await AuthService.login({ email, password })
@@ -19,7 +19,30 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false)
     }
+  }; */
+
+  const login = async (email, password) => {
+    try {
+      setLoading(true);
+      const nextUser = await AuthService.login({ email, password });
+      console.log("Respuesta del servidor:", nextUser); // Depuración
+
+      
+      if (nextUser.token) {  // Asegúrate de que 'token' existe en los datos recibidos
+        setUser(nextUser);
+        return true;  // Devuelve true si la autenticación fue exitosa
+      } else {
+        setError("Token no recibido");
+        return false; // Devuelve false si no hay token
+      }
+    } catch (nextError) {
+      setError(nextError.message);
+      return false;  // Devuelve false en caso de error
+    } finally {
+      setLoading(false);
+    }
   };
+  
 
   const logout = () => {
     setUser(null);
