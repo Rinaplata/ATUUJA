@@ -41,7 +41,7 @@ public class AuthController : ControllerBase
             { nameof(model.Email), model.Email },
             { nameof(model.Username), model.Username },
             { nameof(model.Password), model.Password },
-            { nameof(model.IsAdmin),  model.IsAdmin },
+            { nameof(model.IsAdmin),  false },
             { nameof(model.Edad),  model.Edad },
             { nameof(model.Cuidad),  model.Cuidad },
             { nameof(model.TipoDocumento),  model.TipoDocumento },

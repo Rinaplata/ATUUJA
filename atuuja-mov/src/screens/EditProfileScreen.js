@@ -14,7 +14,10 @@ const EditProfileScreen = ({ navigation }) => {
   const handleLogout = () => {
     try {
       logout();
-      navigation.replace('Login');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
     } catch (error) {
       alert("Error al cerrar sesión: " + error.message);
     }

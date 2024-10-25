@@ -24,6 +24,7 @@ const LoginScreen = ({ navigation }) => {
   const handleLogin = async () => {
     if (!isValidEmail(email)) {
       setLocalError("Por favor, introduce un correo electrónico válido.");
+      setTimeout(() => setLocalError(""), 3000);
       return;
     }
 
@@ -33,9 +34,11 @@ const LoginScreen = ({ navigation }) => {
         navigation.navigate("MainTabs", { screen: "Home" });
       } else {
         setLocalError("Correo o contraseña incorrectos. Inténtalo nuevamente.");
+        setTimeout(() => setLocalError(""), 3000);
       }
     } catch (error) {
       setLocalError("Ocurrió un error durante el inicio de sesión. Inténtalo nuevamente.");
+      setTimeout(() => setLocalError(""), 3000);
     }
   };
 

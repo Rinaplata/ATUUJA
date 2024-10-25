@@ -17,7 +17,7 @@ export const login = async (credentials) => {
 export const register = async (credentials) => {
   try {
     const response = await api.post("Auth/register", credentials);
-    return response.data;
+    return response.status === 200;
   } catch (error) {
     console.error(
       "Error en el registro",

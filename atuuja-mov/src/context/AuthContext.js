@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useMemo } from "react";
 import * as AuthService from "../api/services/authService";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const AuthContext = createContext();
 
@@ -19,10 +19,12 @@ export const AuthProvider = ({ children }) => {
         return true;
       } else {
         setError("Token no recibido");
+        setTimeout(() => setError(""), 3000);
         return false;
       }
     } catch (nextError) {
       setError(nextError.message);
+      setTimeout(() => setError(""), 3000);
       return false;
     } finally {
       setLoading(false);
@@ -37,14 +39,32 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       setLoading(true);
-      const registeredUser = await AuthService.register(userData);
-      setUser(registeredUser);
+      const response = await AuthService.register(userData);
+        if (response) {
+        setUser({
+          id: userData.id,
+          username: userData.username,
+          email: userData.email,
+          edad: userData.edad,
+          cuidad: userData.cuidad,
+          tipoDocumento: userData.tipoDocumento,
+          numeroDocumento: userData.numeroDocumento,
+        });
+        return true;
+      } else {
+        setError("El registro no fue exitoso. Inténtalo nuevamente.");
+        setTimeout(() => setError(""), 3000);
+        return false;
+      }
     } catch (nextError) {
       setError(nextError.message);
+      setTimeout(() => setError(""), 3000);
+      return false;
     } finally {
       setLoading(false);
     }
   };
+  
 
   const auth = useMemo(
     () => ({ user, login, error, loading, register, logout }),
