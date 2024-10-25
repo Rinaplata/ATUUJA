@@ -6,43 +6,27 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(undefined);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false); // Estado de carga
-
-
-/*   const login = async (email, password) => {
-    try {
-      setLoading(true)
-      const nextUser = await AuthService.login({ email, password })
-      setUser(nextUser);
-    } catch (nextError) {
-      setError(nextError.message)
-    } finally {
-      setLoading(false)
-    }
-  }; */
+  const [loading, setLoading] = useState(false);
 
   const login = async (email, password) => {
     try {
       setLoading(true);
       const nextUser = await AuthService.login({ email, password });
-      console.log("Respuesta del servidor:", nextUser); // Depuración
 
-      
-      if (nextUser.token) {  // Asegúrate de que 'token' existe en los datos recibidos
+      if (nextUser.token) {
         setUser(nextUser);
-        return true;  // Devuelve true si la autenticación fue exitosa
+        return true;
       } else {
         setError("Token no recibido");
-        return false; // Devuelve false si no hay token
+        return false;
       }
     } catch (nextError) {
       setError(nextError.message);
-      return false;  // Devuelve false en caso de error
+      return false;
     } finally {
       setLoading(false);
     }
   };
-  
 
   const logout = () => {
     setUser(null);
@@ -54,19 +38,18 @@ export const AuthProvider = ({ children }) => {
       const registeredUser = await AuthService.register(userData);
       setUser(registeredUser);
     } catch (nextError) {
-      setError(nextError.message)
+      setError(nextError.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const auth = useMemo(() => ({ user, login, error, loading, register, logout }), [user, loading, error, login, register, logout])
-
-  return (
-    <AuthContext.Provider value={auth}>
-      {children}
-    </AuthContext.Provider>
+  const auth = useMemo(
+    () => ({ user, login, error, loading, register, logout }),
+    [user, loading, error, login, register, logout]
   );
+
+  return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => useContext(AuthContext);
