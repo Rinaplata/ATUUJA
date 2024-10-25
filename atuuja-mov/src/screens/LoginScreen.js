@@ -22,14 +22,12 @@ const LoginScreen = ({ navigation }) => {
       if (success) {
         navigation.navigate("MainTabs", { screen: "Home" });
       } else {
-        console.error("Error de navegación:", error);
         Alert.alert(
           "Error",
           "Correo o contraseña incorrectos. Inténtalo nuevamente."
         );
       }
     } catch (error) {
-      console.error("Error en el inicio de sesión:", error);
       Alert.alert(
         "Error",
         "Ocurrió un error durante el inicio de sesión. Inténtalo nuevamente."
