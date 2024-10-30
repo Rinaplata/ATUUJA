@@ -7,17 +7,20 @@ import colors from '../constants/colors';
 const EditProfileScreen = ({ navigation }) => {
   const { user } = useAuth();
   const [newName, setNewName] = useState(user?.displayName || '');
+  const { logout } = useAuth();
 
   
 
   const handleLogout = () => {
-    signOut(auth).then(() => {
-      // La sesión se cerró exitosamente
-      navigation.replace('Login'); // Redirige al usuario a la pantalla de login
-    }).catch((error) => {
-      // Un error ocurrió
+    try {
+      logout();
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
+    } catch (error) {
       alert("Error al cerrar sesión: " + error.message);
-    });
+    }
   };
 
   return (

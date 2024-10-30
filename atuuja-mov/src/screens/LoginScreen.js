@@ -1,19 +1,53 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+} from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useAuth } from "../context/AuthContext";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login, error } = useAuth();
+  const [localError, setLocalError] = useState(null);
+  const { login, error, loading } = useAuth();
+
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   const handleLogin = async () => {
-    await login(email, password);
-    if (!error) {
-      navigation.navigate("MainTabs", { screen: "Home" });
+    if (!isValidEmail(email)) {
+      setLocalError("Por favor, introduce un correo electrónico válido.");
+      setTimeout(() => setLocalError(""), 3000);
+      return;
+    }
+
+    try {
+      const success = await login(email, password);
+      if (success) {
+        navigation.navigate("MainTabs", { screen: "Home" });
+      } else {
+        setLocalError("Correo o contraseña incorrectos. Inténtalo nuevamente.");
+        setTimeout(() => setLocalError(""), 3000);
+      }
+    } catch (error) {
+      setLocalError("Ocurrió un error durante el inicio de sesión. Inténtalo nuevamente.");
+      setTimeout(() => setLocalError(""), 3000);
     }
   };
+
+  if (loading)
+    return (
+      <View>
+        <Text>Loading...</Text>
+      </View>
+    );
 
   return (
     <View style={styles.container}>
@@ -35,7 +69,10 @@ const LoginScreen = ({ navigation }) => {
           style={styles.input}
           placeholder="correo electrónico"
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(text) => {
+            setEmail(text);
+            setLocalError(null);
+          }}
         />
       </View>
 
@@ -51,14 +88,24 @@ const LoginScreen = ({ navigation }) => {
           placeholder="contraseña"
           secureTextEntry
           value={password}
-          onChangeText={setPassword}
+          onChangeText={(text) => {
+            setPassword(text);
+            setLocalError(null);
+          }}
         />
       </View>
 
+      {localError && <Text style={styles.errorMessage}>{localError}</Text>}
       {error && <Text style={styles.errorMessage}>{error}</Text>}
 
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-        <Text style={styles.loginButtonText}>Iniciar sesión</Text>
+      <TouchableOpacity
+        style={styles.loginButton}
+        disabled={!email || !password}
+        onPress={handleLogin}
+      >
+        <View>
+          <Text style={styles.loginButtonText}>Iniciar sesión</Text>
+        </View>
       </TouchableOpacity>
 
       <View style={styles.registerContainer}>
@@ -71,36 +118,35 @@ const LoginScreen = ({ navigation }) => {
   );
 };
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF0ED',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#FFF0ED",
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 30,
   },
   logo: {
     width: 100,
     height: 100,
-    resizeMode: 'contain',
+    resizeMode: "contain",
     marginBottom: 30,
   },
   title: {
     fontSize: 18,
-    color: '#443E3D',
-    fontWeight: '600',
+    color: "#443E3D",
+    fontWeight: "600",
     marginBottom: 20,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
     borderRadius: 10,
     marginBottom: 15,
     paddingHorizontal: 10,
     borderWidth: 1,
-    borderColor: '#F28C85',
+    borderColor: "#F28C85",
   },
   icon: {
     marginRight: 10,
@@ -109,39 +155,34 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 50,
     fontSize: 16,
-    color: '#443E3D',
-  },
-  forgotPassword: {
-    color: '#9A9A9A',
-    fontSize: 14,
-    marginBottom: 20,
+    color: "#443E3D",
   },
   loginButton: {
-    backgroundColor: '#8E3A34',
+    backgroundColor: "#8E3A34",
     paddingVertical: 15,
     paddingHorizontal: 50,
     borderRadius: 30,
     marginBottom: 30,
   },
   loginButtonText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   registerContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   registerText: {
-    color: '#9A9A9A',
+    color: "#9A9A9A",
     fontSize: 14,
   },
   registerLink: {
-    color: '#8E3A34',
+    color: "#8E3A34",
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   errorMessage: {
-    color: '#D9534F',  
+    color: "#D9534F",
     fontSize: 14,
     marginBottom: 10,
   },
