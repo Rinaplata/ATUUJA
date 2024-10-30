@@ -2,6 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
+import { MaterialIcons } from '@expo/vector-icons';
 
 import HomeScreen from '../screens/HomeScreen';
 import LearnScreen from '../screens/LearnScreen';
@@ -16,48 +17,65 @@ import EditEmailScreen from '../screens/EditEmailScreen';
 import ChangePasswordScreen from '../screens/ChangePasswordScreen';
 
 import colors from '../constants/colors';
-import { MaterialIcons } from '@expo/vector-icons';
 import CustomTheme from '../constants/CustomTheme';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-// TabNavigator para las pestañas principales
 const TabNavigator = () => (
-  <Tab.Navigator initialRouteName="Home"
+  <Tab.Navigator
+    initialRouteName="Home"
     screenOptions={{
-      tabBarStyle: { backgroundColor: colors.variante7 }, // Color de la barra inferior
-      tabBarActiveTintColor: colors.luminous, // Íconos activos
-      tabBarInactiveTintColor: colors.variante3,// Íconos inactivos
-      headerShown: false, 
-    }}>
-    <Tab.Screen name="Home" component={HomeScreen} options={{
+      tabBarStyle: { backgroundColor: colors.variante7 },
+      tabBarActiveTintColor: colors.luminous,
+      tabBarInactiveTintColor: colors.variante3,
+      headerShown: false,
+    }}
+  >
+    <Tab.Screen
+      name="Home"
+      component={HomeScreen}
+      options={{
         tabBarIcon: ({ color, size }) => (
           <MaterialIcons name="home" color={color} size={size} />
         ),
-        headerShown: false,
-      }} />
-    <Tab.Screen name="Learn" component={LearnScreen} options={{
+      }}
+    />
+    <Tab.Screen
+      name="Learn"
+      component={LearnScreen}
+      options={{
         tabBarIcon: ({ color, size }) => (
           <MaterialIcons name="school" color={color} size={size} />
         ),
-      }} />
-    <Tab.Screen name="Rewards" component={RewardsScreen} options={{
+        tabBarStyle: { display: 'none' }, // Oculta la barra solo en LearnScreen
+        unmountOnBlur: true, // Desmonta LearnScreen cuando no está en uso
+      }}
+    />
+    <Tab.Screen
+      name="Rewards"
+      component={RewardsScreen}
+      options={{
         tabBarIcon: ({ color, size }) => (
           <MaterialIcons name="emoji-events" color={color} size={size} />
         ),
-      }} />
-    <Tab.Screen name="Profile" component={ProfileScreen} options={{
+      }}
+    />
+    <Tab.Screen
+      name="Profile"
+      component={ProfileScreen}
+      options={{
         tabBarIcon: ({ color, size }) => (
           <MaterialIcons name="person" color={color} size={size} />
         ),
-      }} />
+      }}
+    />
   </Tab.Navigator>
 );
 
 const AppNavigator = () => (
   <NavigationContainer theme={CustomTheme}>
-    <Stack.Navigator initialRouteName="Splash">
+    <Stack.Navigator initialRouteName="MainTabs">
       <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Register" component={RegisterScreen} options={{ headerShown: false }} />
