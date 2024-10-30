@@ -1,104 +1,116 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../services/firebaseConfig'; 
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+} from "react-native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { useAuth } from "../context/AuthContext";
 
 const LoginScreen = ({ navigation }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(false); 
-  const [errorMessage, setErrorMessage] = useState(''); 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [localError, setLocalError] = useState(null);
+  const { login, error, loading } = useAuth();
 
-  const handleLogin = () => {
-    // Descomentar para habilitar inicio de sesión con Firebase
-    /*
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Inicio de sesión exitoso
-        console.log('Usuario logueado:', userCredential.user);
-        setError(false);  // Restablecer el error en caso de éxito
-        setErrorMessage('');  // Limpiar el mensaje de error
-        // Navegar a la pantalla de Home al iniciar sesión correctamente
-        navigation.navigate('MainTabs', { screen: 'Home' });
-      })
-      .catch((error) => {
-        // Si el inicio de sesión falla, muestra el error
-        setError(true);
-        setErrorMessage(error.message);
-      });
-    */
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
-    // Definir credenciales "quemadas"
-    const validEmail = 'rina123@gmail.com'; // Correo electrónico válido
-    const validPassword = '123'; // Contraseña válida
-  
-    // Verificar las credenciales ingresadas
-    if (email === validEmail && password === validPassword) {
-      // Inicio de sesión exitoso
-      console.log('Inicio de sesión exitoso:', email);
-      setError(false);  // Restablecer el error en caso de éxito
-      setErrorMessage('');  // Limpiar el mensaje de error
-      // Navegar a la pantalla de Home al iniciar sesión correctamente
-      navigation.navigate('MainTabs', { screen: 'Home' });
-    } else {
-      // Si el inicio de sesión falla, muestra el error
-      setError(true);
-      setErrorMessage('Correo electrónico o contraseña incorrectos.'); // Mensaje de error
+  const handleLogin = async () => {
+    if (!isValidEmail(email)) {
+      setLocalError("Por favor, introduce un correo electrónico válido.");
+      setTimeout(() => setLocalError(""), 3000);
+      return;
+    }
+
+    try {
+      const success = await login(email, password);
+      if (success) {
+        navigation.navigate("MainTabs", { screen: "Home" });
+      } else {
+        setLocalError("Correo o contraseña incorrectos. Inténtalo nuevamente.");
+        setTimeout(() => setLocalError(""), 3000);
+      }
+    } catch (error) {
+      setLocalError("Ocurrió un error durante el inicio de sesión. Inténtalo nuevamente.");
+      setTimeout(() => setLocalError(""), 3000);
     }
   };
+
+  if (loading)
+    return (
+      <View>
+        <Text>Loading...</Text>
+      </View>
+    );
 
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../assets/icons/isologo.png')}  
+        source={require("../../assets/icons/isologo.png")}
         style={styles.logo}
       />
 
       <Text style={styles.title}>Inicia sesión con tu cuenta</Text>
 
       <View style={styles.inputContainer}>
-        <Icon name="email-outline" size={24} color="#F28C85" style={styles.icon} />
+        <Icon
+          name="email-outline"
+          size={24}
+          color="#F28C85"
+          style={styles.icon}
+        />
         <TextInput
           style={styles.input}
           placeholder="correo electrónico"
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(text) => {
+            setEmail(text);
+            setLocalError(null);
+          }}
         />
       </View>
 
       <View style={styles.inputContainer}>
-        <Icon name="lock-outline" size={24} color="#F28C85" style={styles.icon} />
+        <Icon
+          name="lock-outline"
+          size={24}
+          color="#F28C85"
+          style={styles.icon}
+        />
         <TextInput
           style={styles.input}
           placeholder="contraseña"
           secureTextEntry
           value={password}
-          onChangeText={setPassword}
+          onChangeText={(text) => {
+            setPassword(text);
+            setLocalError(null);
+          }}
         />
       </View>
 
-      {/* Si hay error, mostrar mensaje de error */}
-      {error && (
-        <Text style={styles.errorMessage}>
-          {errorMessage}
-        </Text>
-      )}
+      {localError && <Text style={styles.errorMessage}>{localError}</Text>}
+      {error && <Text style={styles.errorMessage}>{error}</Text>}
 
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-        <Text style={styles.loginButtonText}>Iniciar sesión</Text>
+      <TouchableOpacity
+        style={styles.loginButton}
+        disabled={!email || !password}
+        onPress={handleLogin}
+      >
+        <View>
+          <Text style={styles.loginButtonText}>Iniciar sesión</Text>
+        </View>
       </TouchableOpacity>
-
-      {/* Mostrar enlace de '¿Olvidaste tu contraseña?' solo si hubo un error */}
-      {error && (
-        <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
-          <Text style={styles.forgotPassword}>¿Olvidaste tu contraseña?</Text>
-        </TouchableOpacity>
-      )}
 
       <View style={styles.registerContainer}>
         <Text style={styles.registerText}>¿Aun no tienes una cuenta? </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+        <TouchableOpacity onPress={() => navigation.navigate("Register")}>
           <Text style={styles.registerLink}>Regístrate aquí</Text>
         </TouchableOpacity>
       </View>
@@ -109,32 +121,32 @@ const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF0ED',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#FFF0ED",
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 30,
   },
   logo: {
     width: 100,
     height: 100,
-    resizeMode: 'contain',
+    resizeMode: "contain",
     marginBottom: 30,
   },
   title: {
     fontSize: 18,
-    color: '#443E3D',
-    fontWeight: '600',
+    color: "#443E3D",
+    fontWeight: "600",
     marginBottom: 20,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
     borderRadius: 10,
     marginBottom: 15,
     paddingHorizontal: 10,
     borderWidth: 1,
-    borderColor: '#F28C85',
+    borderColor: "#F28C85",
   },
   icon: {
     marginRight: 10,
@@ -143,39 +155,34 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 50,
     fontSize: 16,
-    color: '#443E3D',
-  },
-  forgotPassword: {
-    color: '#9A9A9A',
-    fontSize: 14,
-    marginBottom: 20,
+    color: "#443E3D",
   },
   loginButton: {
-    backgroundColor: '#8E3A34',
+    backgroundColor: "#8E3A34",
     paddingVertical: 15,
     paddingHorizontal: 50,
     borderRadius: 30,
     marginBottom: 30,
   },
   loginButtonText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   registerContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   registerText: {
-    color: '#9A9A9A',
+    color: "#9A9A9A",
     fontSize: 14,
   },
   registerLink: {
-    color: '#8E3A34',
+    color: "#8E3A34",
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   errorMessage: {
-    color: '#D9534F',  
+    color: "#D9534F",
     fontSize: 14,
     marginBottom: 10,
   },

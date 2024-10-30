@@ -1,62 +1,178 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { createUserWithEmailAndPassword, updateProfile} from 'firebase/auth';
-import { auth } from '../services/firebaseConfig'; 
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+} from "react-native";
+import { Picker } from "@react-native-picker/picker";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { useAuth } from "../context/AuthContext";
 
 const RegisterScreen = ({ navigation }) => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setName] = useState("");
+  const [edad, setAge] = useState("");
+  const [tipoDocumento, setDocumentType] = useState(-1);
+  const [email, setEmail] = useState("");
+  const [cuidad, setCity] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [numeroDocumento, setDocumentNumber] = useState("");
+  const { register } = useAuth();
+  const [localError, setLocalError] = useState(null);
 
-  const handleRegister = () => {
-    
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
+  const generateId = () => {
+    return `${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+  };
 
-        // Actualiza el perfil del usuario con el nombre
-        updateProfile(user, {
-          displayName: name, // Asocia el nombre con el perfil
-        }).then(() => {
-          console.log('Usuario registrado con nombre:', user.displayName);
-          navigation.navigate('Login',{screen:'LoginScreen'}); // Navegar a la pantalla de Login si el registro es exitoso
-        }).catch((error) => {
-          setError(true);
-          setErrorMessage(error.message);
-        });
+  const handleRegister = async () => {
+    try {
+      const userId = generateId();
+      const userData = {
+        id: userId,
+        username,
+        email,
+        password,
+        isAdmin: false,
+        edad: Number(edad),
+        cuidad,
+        tipoDocumento: Number(tipoDocumento),
+        numeroDocumento,
+      };
 
-      })
-      .catch((error) => {
-        // Si el registro falla, muestra el error
+      if (
+        !username ||
+        !email ||
+        !password ||
+        !edad ||
+        !cuidad ||
+        tipoDocumento === null ||
+        !numeroDocumento
+      ) {
+        setErrorMessage("Por favor, completa todos los campos requeridos.");
         setError(true);
-        setErrorMessage(error.message);
-      });
+        return;
+      }
+
+      const success = await register(userData);
+      if (success) {
+        setSuccessMessage("¡Registro exitoso!");
+        setTimeout(() => {
+          setSuccessMessage("");
+          navigation.navigate("Login");
+        }, 3000);
+
+        setName("");
+        setEmail("");
+        setPassword("");
+        setAge("");
+        setCity("");
+        setDocumentType(0);
+        setDocumentNumber("");
+      } else {
+        setLocalError("Correo o contraseña incorrectos. Inténtalo nuevamente.");
+        setTimeout(() => setLocalError(""), 3000);
+      }
+    } catch (error) {
+      setLocalError(
+        "Ocurrió un error durante el inicio de sesión. Inténtalo nuevamente."
+      );
+      setTimeout(() => setLocalError(""), 3000);
+    }
   };
 
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../assets/icons/isologo.png')}  
+        source={require("../../assets/icons/isologo.png")}
         style={styles.logo}
       />
 
-      <Text style={styles.title}>Crea una cuenta</Text>
+      <View>
+        <Text style={styles.title}>Crea una cuenta</Text>
+      </View>
 
       <View style={styles.inputContainer}>
-        <Icon name="account-outline" size={24} color="#F28C85" style={styles.icon} />
+        <Icon
+          name="account-outline"
+          size={24}
+          color="#F28C85"
+          style={styles.icon}
+        />
         <TextInput
           style={styles.input}
           placeholder="nombre"
-          value={name}
+          value={username}
           onChangeText={setName}
         />
       </View>
 
       <View style={styles.inputContainer}>
-        <Icon name="email-outline" size={24} color="#F28C85" style={styles.icon} />
+        <Icon name="calendar" size={24} color="#F28C85" style={styles.icon} />
+        <TextInput
+          style={styles.input}
+          placeholder="Edad"
+          keyboardType="numeric"
+          value={edad}
+          onChangeText={setAge}
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Icon name="city" size={24} color="#F28C85" style={styles.icon} />
+        <TextInput
+          style={styles.input}
+          placeholder="Ciudad"
+          value={cuidad}
+          onChangeText={setCity}
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Icon
+          name="file-document-outline"
+          size={24}
+          color="#F28C85"
+          style={styles.icon}
+        />
+        <Picker
+          selectedValue={tipoDocumento}
+          style={[styles.input, {height: 50, width: '100%'}]}
+          onValueChange={(itemValue) => setDocumentType(itemValue)}
+        >
+          <Picker.Item label="Seleccione Tipo documento" value={-1} />
+          <Picker.Item label="Cédula" value={0} />
+          <Picker.Item label="Pasaporte" value={1} />
+        </Picker>
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Icon
+          name="card-account-details-outline"
+          size={24}
+          color="#F28C85"
+          style={styles.icon}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Número de documento"
+          keyboardType="numeric"
+          value={numeroDocumento}
+          onChangeText={setDocumentNumber}
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Icon
+          name="email-outline"
+          size={24}
+          color="#F28C85"
+          style={styles.icon}
+        />
         <TextInput
           style={styles.input}
           placeholder="correo electrónico"
@@ -66,7 +182,12 @@ const RegisterScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.inputContainer}>
-        <Icon name="lock-outline" size={24} color="#F28C85" style={styles.icon} />
+        <Icon
+          name="lock-outline"
+          size={24}
+          color="#F28C85"
+          style={styles.icon}
+        />
         <TextInput
           style={styles.input}
           placeholder="contraseña"
@@ -76,20 +197,26 @@ const RegisterScreen = ({ navigation }) => {
         />
       </View>
 
-      {error && (
-        <Text style={styles.errorMessage}>
-          {errorMessage}
-        </Text>
-      )}
+      {error && errorMessage ? (
+        <Text style={styles.errorMessage}>{errorMessage}</Text>
+      ) : null}
+
+      {successMessage ? (
+        <Text style={styles.successMessage}>{successMessage}</Text>
+      ) : null}
 
       <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
-        <Text style={styles.registerButtonText}>Crear cuenta</Text>
+        <View>
+          <Text style={styles.registerButtonText}>Crear cuenta</Text>
+        </View>
       </TouchableOpacity>
 
       <View style={styles.loginContainer}>
         <Text style={styles.loginText}>¿Ya tienes una cuenta? </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-          <Text style={styles.loginLink}>Iniciar sesión</Text>
+        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+          <View>
+            <Text style={styles.loginLink}>Iniciar sesión</Text>
+          </View>
         </TouchableOpacity>
       </View>
     </View>
@@ -99,32 +226,32 @@ const RegisterScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF0ED',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#FFF0ED",
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 30,
   },
   logo: {
     width: 100,
     height: 100,
-    resizeMode: 'contain',
+    resizeMode: "contain",
     marginBottom: 30,
   },
   title: {
     fontSize: 18,
-    color: '#443E3D',
-    fontWeight: '600',
+    color: "#443E3D",
+    fontWeight: "600",
     marginBottom: 20,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
     borderRadius: 10,
     marginBottom: 15,
     paddingHorizontal: 10,
     borderWidth: 1,
-    borderColor: '#F28C85',
+    borderColor: "#F28C85",
   },
   icon: {
     marginRight: 10,
@@ -133,34 +260,39 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 50,
     fontSize: 16,
-    color: '#443E3D',
+    color: "#443E3D",
   },
   registerButton: {
-    backgroundColor: '#8E3A34',
+    backgroundColor: "#8E3A34",
     paddingVertical: 15,
     paddingHorizontal: 50,
     borderRadius: 30,
     marginBottom: 30,
   },
   registerButtonText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   loginContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   loginText: {
-    color: '#9A9A9A',
+    color: "#9A9A9A",
     fontSize: 14,
   },
   loginLink: {
-    color: '#8E3A34',
+    color: "#8E3A34",
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   errorMessage: {
-    color: '#D9534F',
+    color: "#D9534F",
+    fontSize: 14,
+    marginBottom: 10,
+  },
+  successMessage: {
+    color: "#5CB85C",
     fontSize: 14,
     marginBottom: 10,
   },
