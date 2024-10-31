@@ -15,6 +15,7 @@ import EditProfileScreen from '../screens/EditProfileScreen';
 import EditNameScreen from '../screens/EditNameScreen';
 import EditEmailScreen from '../screens/EditEmailScreen';
 import ChangePasswordScreen from '../screens/ChangePasswordScreen';
+import LearnStartScreen from '../screens/LearnStartScreen'
 
 import colors from '../constants/colors';
 import CustomTheme from '../constants/CustomTheme';
@@ -43,7 +44,7 @@ const TabNavigator = () => (
     />
     <Tab.Screen
       name="Learn"
-      component={LearnScreen}
+      component={LearnStartScreen}
       options={{
         tabBarIcon: ({ color, size }) => (
           <MaterialIcons name="school" color={color} size={size} />

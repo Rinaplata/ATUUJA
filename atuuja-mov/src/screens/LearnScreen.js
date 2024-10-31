@@ -98,8 +98,8 @@ const styles = StyleSheet.create({
     marginTop: height * 0.02,
   },
   storyText: {
-    fontSize: scaleFontSize(20), // Aumenta el tamaño de la fuente
-    lineHeight: scaleFontSize(28), // Ajusta la altura de línea para el nuevo tamaño de fuente
+    fontSize: scaleFontSize(20),
+    lineHeight: scaleFontSize(28),
     color: '#333',
   },
   highlighted: {
