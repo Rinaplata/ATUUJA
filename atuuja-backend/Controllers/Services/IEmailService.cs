@@ -16,7 +16,7 @@ public class EmailService : IEmailService
 
     public async Task SendEmailAsync(string toEmail, string subject, string message)
     {
-        var mailMessage = new MailMessage(configuration["EmailSettings:SenderEmail"], toEmail, subject, message);
+        var mailMessage = new MailMessage("attuja-noReply@gmail.com", toEmail, subject, message);
         mailMessage.IsBodyHtml = false;
         
         await _smtpClient.SendMailAsync(mailMessage);

@@ -10,7 +10,8 @@ using Newtonsoft.Json;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+var jwtSettings = builder.Configuration.GetSection("JwtSettings"); 
+var emailSettings = builder.Configuration.GetSection("EmailSettings");
 
 builder.Services.AddAuthentication(options =>
 {
@@ -31,12 +32,12 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddSingleton(new SmtpClient("smtp.gmail.com")
-{
-    Credentials = new NetworkCredential(configuration["EmailSettings:SenderEmail"], configuration["EmailSettings:SenderKey"]),
-    EnableSsl = true,
-    Port = 587 
-});
+ builder.Services.AddSingleton(new SmtpClient("smtp.gmail.com")
+ {
+     Credentials = new NetworkCredential(emailSettings["SenderEmail"], emailSettings["SenderKey"]),
+     EnableSsl = true,
+     Port = 587 
+ });
 
 // Add services to the container.
 
