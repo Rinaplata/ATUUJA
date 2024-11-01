@@ -65,7 +65,7 @@ const EditQuiz: React.FC<EditQuizProps> = ({ quiz, closeModal }) => {
       className="max-w-2xl mx-auto p-4 bg-white rounded shadow-md"
     >
       <h1 className="text-4ml font-bold mb-4">
-        Editar Cuestionario (ID: {quiz.ExamenId})
+        Editar Cuestionario
       </h1>
 
       {/* Selección de relato */}
