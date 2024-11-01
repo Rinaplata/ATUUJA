@@ -18,13 +18,15 @@ public class AuthController : ControllerBase
 {
     private readonly IConfiguration _config;
     private readonly FirestoreDb _firestoreDb;
+    private readonly IEmailService _emailService;
     const string usersyKeyDescripcion = "users";
     const string userDescripcion = "Usuario";
 
 
-    public AuthController(IConfiguration config)
+    public AuthController(IConfiguration config, IEmailService emailService)
     {
         _firestoreDb = FirestoreDb.Create("bd-atuuja");
+        _emailService = emailService;
         _config = config;
     }
 
@@ -118,13 +120,13 @@ public class AuthController : ControllerBase
         try
         {
             var usersCollection = _firestoreDb.Collection(usersyKeyDescripcion);
- 
+
             var query = usersCollection.WhereEqualTo("Id", userId);
             var querySnapshot = await query.GetSnapshotAsync();
- 
+
             if (querySnapshot.Count == 0)
                 return NotFound(MessageTemplates.Format(MessageTemplates.RegisterNotFound, userDescripcion));
- 
+
             var userDocument = querySnapshot.Documents.First();
             await userDocument.Reference.DeleteAsync();
 
@@ -175,7 +177,7 @@ public class AuthController : ControllerBase
         {
             var token = GenerateJwtToken(model.Email);
             var userId = userDoc.Id;
-            return Ok(new { Token = token, UserId = userId  });
+            return Ok(new { Token = token, UserId = userId });
         }
         return Unauthorized();
     }
@@ -201,15 +203,15 @@ public class AuthController : ControllerBase
     }
 
 
-    [HttpPost("forgot-password")]
-    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest model)
+    [HttpGet("forgot-password/{userEmail}")]
+    public async Task<IActionResult> ForgotPassword(string userEmail)
     {
         var usersCollection = _firestoreDb.Collection("users");
-        var query = usersCollection.WhereEqualTo("Email", model.Email);
+        var query = usersCollection.WhereEqualTo("Email", userEmail);
         var querySnapshot = await query.GetSnapshotAsync();
 
         if (querySnapshot.Count == 0)
-          return NotFound(MessageTemplates.Format(MessageTemplates.RegisterNotFound, userDescripcion)); 
+            return NotFound(MessageTemplates.Format(MessageTemplates.RegisterNotFound, userEmail)); // Cambié 'userDescripcion' por 'email' si es más relevante aquí.
 
         // Asumimos que el email es único, por lo que tomamos el primer resultado
         var userDoc = querySnapshot.Documents[0];
@@ -217,16 +219,34 @@ public class AuthController : ControllerBase
 
         // Guardar el token de restablecimiento en Firestore (con un tiempo de expiración opcional)
         var tokenData = new Dictionary<string, object>
-        {
-            { "ResetToken", resetToken },
-            { "TokenExpiration", DateTime.UtcNow.AddHours(1) } // Expira en 1 hora
-        };
+    {
+        { "ResetToken", resetToken },
+        { "TokenExpiration", DateTime.UtcNow.AddHours(1) }
+    };
         await userDoc.Reference.UpdateAsync(tokenData);
 
-        // Aquí puedes enviar el email con el token al usuario (no implementado en este ejemplo)
-        return Ok(new { message = MessageTemplates.Format(MessageTemplates.InstructionsSends) });
+        string baseUrl = _config["AppSettings:FrontendUrl"];
+        if (_config["ASPNETCORE_ENVIRONMENT"] == "Development")
+        {
+            baseUrl = _config["AppSettings:LocalFrontendUrl"];
+        }
+
+        var resetLink = $"{baseUrl}/auth/userrecoverypassword?token={resetToken}";
+        var emailSubject = "Restablecimiento de Contraseña";
+        var emailBody = $"Hola, \n\nRecibimos una solicitud para restablecer tu contraseña. Haz clic en el enlace de abajo para continuar: \n\n{resetLink} \n\nEste enlace expirará en 1 hora.";
+
+        try
+        {
+            await _emailService.SendEmailAsync(userEmail, emailSubject, emailBody);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "Ocurrió un error al intentar enviar el correo." + ex.Message);
+        }
+
+        return Ok(new { message = "Instrucciones para restablecer la contraseña enviadas al correo electrónico." });
     }
-    
+
 
     [HttpPost("reset-password")]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest model)

@@ -1,3 +1,5 @@
+using System.Net;
+using System.Net.Mail;
 using System.Text;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
@@ -29,10 +31,18 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddSingleton(new SmtpClient("smtp.gmail.com")
+{
+    Credentials = new NetworkCredential(configuration["EmailSettings:SenderEmail"], configuration["EmailSettings:SenderKey"]),
+    EnableSsl = true,
+    Port = 587 
+});
+
 // Add services to the container.
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddTransient<IEmailService, EmailService>(); 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors(p =>
