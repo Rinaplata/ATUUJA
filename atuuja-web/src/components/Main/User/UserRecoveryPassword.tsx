@@ -43,7 +43,7 @@ const UserRecoveryPassword: React.FC = () => {
                 message: 'Error al intentar recuperar contraseña.',
                 type: 'error'
             });
-             
+
         }
     };
 
@@ -52,7 +52,7 @@ const UserRecoveryPassword: React.FC = () => {
             message: 'Fueron enviadas a su correo las instrucciones para recuperar contraseña.',
             type: 'success'
         });
- 
+
         setTimeout(() => {
             localStorage.clear(); 
             sessionStorage.clear();

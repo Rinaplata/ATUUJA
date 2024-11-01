@@ -203,49 +203,48 @@ public class AuthController : ControllerBase
     }
 
 
-    [HttpGet("forgot-password/{userEmail}")]
-    public async Task<IActionResult> ForgotPassword(string userEmail)
-    {
-        var usersCollection = _firestoreDb.Collection("users");
-        var query = usersCollection.WhereEqualTo("Email", userEmail);
-        var querySnapshot = await query.GetSnapshotAsync();
+ [HttpPost("forgot-password")]
+public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+{
+    var userEmail = request.Email;  
+    var usersCollection = _firestoreDb.Collection("users");
+    var query = usersCollection.WhereEqualTo("Email", userEmail);
+    var querySnapshot = await query.GetSnapshotAsync();
 
-        if (querySnapshot.Count == 0)
-            return NotFound(MessageTemplates.Format(MessageTemplates.RegisterNotFound, userEmail)); // Cambié 'userDescripcion' por 'email' si es más relevante aquí.
+    if (querySnapshot.Count == 0)
+        return NotFound(MessageTemplates.Format(MessageTemplates.RegisterNotFound, userEmail));
 
-        // Asumimos que el email es único, por lo que tomamos el primer resultado
-        var userDoc = querySnapshot.Documents[0];
-        var resetToken = Guid.NewGuid().ToString();
+    var userDoc = querySnapshot.Documents[0];
+    var resetToken = Guid.NewGuid().ToString();
 
-        // Guardar el token de restablecimiento en Firestore (con un tiempo de expiración opcional)
-        var tokenData = new Dictionary<string, object>
+     var tokenData = new Dictionary<string, object>
     {
         { "ResetToken", resetToken },
         { "TokenExpiration", DateTime.UtcNow.AddHours(1) }
     };
-        await userDoc.Reference.UpdateAsync(tokenData);
+    await userDoc.Reference.UpdateAsync(tokenData);
 
-        string baseUrl = _config["AppSettings:FrontendUrl"];
-        if (_config["ASPNETCORE_ENVIRONMENT"] == "Development")
-        {
-            baseUrl = _config["AppSettings:LocalFrontendUrl"];
-        }
-
-        var resetLink = $"{baseUrl}/auth/userrecoverypassword?token={resetToken}";
-        var emailSubject = "Restablecimiento de Contraseña";
-        var emailBody = $"Hola, \n\nRecibimos una solicitud para restablecer tu contraseña. Haz clic en el enlace de abajo para continuar: \n\n{resetLink} \n\nEste enlace expirará en 1 hora.";
-
-        try
-        {
-            await _emailService.SendEmailAsync(userEmail, emailSubject, emailBody);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, "Ocurrió un error al intentar enviar el correo." + ex.Message);
-        }
-
-        return Ok(new { message = "Instrucciones para restablecer la contraseña enviadas al correo electrónico." });
+    string baseUrl = _config["AppSettings:FrontendUrl"];
+    if (_config["ASPNETCORE_ENVIRONMENT"] == "Development")
+    {
+        baseUrl = _config["AppSettings:LocalFrontendUrl"];
     }
+
+    var resetLink = $"{baseUrl}/auth/userresetpassword?token={resetToken}";
+    var emailSubject = "Restablecimiento de Contraseña";
+    var emailBody = $"Hola, \n\nRecibimos una solicitud para restablecer tu contraseña. Haz clic en el enlace de abajo para continuar: \n\n{resetLink} \n\nEste enlace expirará en 1 hora.";
+
+    try
+    {
+        await _emailService.SendEmailAsync(userEmail, emailSubject, emailBody);
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, "Ocurrió un error al intentar enviar el correo." + ex.Message);
+    }
+
+    return Ok(new { message = "Instrucciones para restablecer la contraseña enviadas al correo electrónico." });
+}
 
 
     [HttpPost("reset-password")]
@@ -264,18 +263,18 @@ public class AuthController : ControllerBase
         var userData = userDoc.ToDictionary();
 
         // Verificar si el token ha expirado
-        if (userData.ContainsKey("TokenExpiration") && DateTime.UtcNow > (DateTime)userData["TokenExpiration"])
+        if (userData.ContainsKey("TokenExpiration") && userData["TokenExpiration"] is Google.Cloud.Firestore.Timestamp tokenExpirationTimestamp && DateTime.UtcNow > tokenExpirationTimestamp.ToDateTime())
         {
             return BadRequest(MessageTemplates.Format(MessageTemplates.ExpiredToken));
         }
 
         // Actualizar la contraseña
         await userDoc.Reference.UpdateAsync(new Dictionary<string, object>
-    {
-        { nameof(model.NewPassword), model.NewPassword },
-        { "ResetToken", null }, // Limpiar el token de restablecimiento
-        { "TokenExpiration", null }
-    });
+        {
+            { "Password", model.NewPassword },
+            { "ResetToken", null },  
+            { "TokenExpiration", null }
+        });
 
         return Ok(MessageTemplates.Format(MessageTemplates.Expiredpassword));
     }
