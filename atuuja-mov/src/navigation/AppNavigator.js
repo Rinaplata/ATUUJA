@@ -94,7 +94,9 @@ const AppNavigator = () => (
       <Stack.Screen name="Learn" component={LearnStartScreen} options={{ headerShown: false }} />
        
       <Stack.Screen name="QuizImagen" component={QuizImagenScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="QuizAudio" component={QuizImageAudioScreen} options={{ headerShown: false }} />
 
+      
       
 
     </Stack.Navigator>

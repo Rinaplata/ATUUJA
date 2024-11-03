@@ -3,9 +3,9 @@ import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image } from 'rea
 import { Ionicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
-const progressPercentage = 60; // Progreso de ejemplo
+const progressPercentage = 60;
 
-const QuizImagenScreen = () => {
+const QuizImagenScreen = ({ navigation }) => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [isAnswerChecked, setIsAnswerChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
@@ -13,13 +13,24 @@ const QuizImagenScreen = () => {
   const correctOption = 'Jarara';
 
   const handleOptionSelect = (option) => {
-    setSelectedOption(option);
-    setIsAnswerChecked(false); // Reiniciar el estado de verificación
+    if (!isAnswerChecked) {
+      setSelectedOption(option);
+      setIsAnswerChecked(false);
+    }
   };
 
   const handleCheckButtonPress = () => {
-    setIsAnswerChecked(true);
-    setIsCorrect(selectedOption === correctOption);
+    if (selectedOption) {
+      setIsAnswerChecked(true);
+      setIsCorrect(selectedOption === correctOption);
+    }
+  };
+
+  const handleContinue = () => {
+    if (isAnswerChecked) {
+      navigation.navigate("QuizAudio");
+    } else {
+    }
   };
 
   return (
@@ -55,6 +66,7 @@ const QuizImagenScreen = () => {
               (option === correctOption ? styles.correctOptionButton : styles.incorrectOptionButton)
             ]}
             onPress={() => handleOptionSelect(option)}
+            disabled={isAnswerChecked}
           >
             <Text style={[
               styles.optionText,
@@ -99,8 +111,8 @@ const QuizImagenScreen = () => {
 
       {/* Botón de acción */}
       <TouchableOpacity
-        style={[styles.checkButton, isAnswerChecked && isCorrect && styles.continueButton]}
-        onPress={handleCheckButtonPress}
+        style={[styles.checkButton, isAnswerChecked && styles.continueButton]}
+        onPress={isAnswerChecked ? handleContinue : handleCheckButtonPress}
       >
         <Text style={styles.checkButtonText}>{isAnswerChecked ? "Continuar" : "Comprobar"}</Text>
       </TouchableOpacity>
@@ -241,7 +253,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRadius: 20,
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 50,
   },
   continueButton: {
     backgroundColor: '#862C29',
