@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import Logo from '../../images/logo/logo.png';
 import Banner from '../../images/banner/wayuuADMIN.jpg';
@@ -80,7 +80,7 @@ const Login: React.FC = () => {
               <form onSubmit={handleLogin}>
                 <div className="mb-6">
                   <div className="relative">
-                    <span className="absolute left-0 top-0 h-full w-12 flex items-center justify-center bg-thirdAtuuja text-primaryAtuuja rounded-l-lg">
+                  <span className="absolute left-0 top-0 h-full w-12 flex items-center justify-center bg-thirdAtuuja text-primaryAtuuja rounded-l-lg">
                       <svg
                         className="fill-current"
                         width="22"
@@ -142,9 +142,9 @@ const Login: React.FC = () => {
 
                 <div className="mt-6 text-right  ">
                   <p>
-                    <Link to="" className="text-sm secondaryAtuuja">
+                    <NavLink to="/auth/userrecoverypassword" className="text-sm secondaryAtuuja">
                       ¿Olvidaste tu contraseña?
-                    </Link>
+                    </NavLink>
                   </p>
                 </div>
 

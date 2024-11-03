@@ -6,8 +6,7 @@ import Alert from '../../Alert/Alertas';
 interface RegisterStoryProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (data: {
-    relatoId: string;
+  onSuccess: (data: { 
     titulo: string;
     contenido: string;
     palabrasResaltadas: string[];
@@ -19,8 +18,7 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({
   isOpen,
   onClose,
   onSuccess,
-}) => {
-  const [relatoId, setRelatoId] = useState('');
+}) => { 
   const [titulo, setTitulo] = useState('');
   const [contenido, setContenido] = useState('');
   const [palabrasResaltadas, setPalabrasResaltadas] = useState('');
@@ -30,8 +28,7 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({
 
   const handleRegisterStory = async () => {
     try {
-      const storyData = {
-        relatoId,
+      const storyData = { 
         titulo,
         contenido,
         palabrasResaltadas: palabrasResaltadas.split(',').map((word) => word.trim()),
@@ -77,17 +74,7 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({
         />
       )}
       <div className="w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-6">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="col-span-2">
-            <label className="mb-2 block font-bold">Relato ID:</label>
-            <input
-              type="text"
-              value={relatoId}
-              onChange={(e) => setRelatoId(e.target.value)}
-              className="border p-2 mb-4 rounded w-full"
-              placeholder="Ingrese el ID del relato"
-            />
-          </div>
+        <div className="grid grid-cols-2 gap-4"> 
           <div className="col-span-2">
             <label className="mb-2 block font-bold">Título:</label>
             <input
