@@ -1,14 +1,30 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
-const progressPercentage = 60; // Ejemplo de progreso, puedes ajustarlo según sea necesario
+const progressPercentage = 60; // Progreso de ejemplo
 
 const QuizImagenScreen = () => {
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [isAnswerChecked, setIsAnswerChecked] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
+
+  const correctOption = 'Jarara';
+
+  const handleOptionSelect = (option) => {
+    setSelectedOption(option);
+    setIsAnswerChecked(false); // Reiniciar el estado de verificación
+  };
+
+  const handleCheckButtonPress = () => {
+    setIsAnswerChecked(true);
+    setIsCorrect(selectedOption === correctOption);
+  };
+
   return (
     <View style={styles.container}>
-      {/* Header */}
+      {/* Encabezado */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.closeButton}>
           <Ionicons name="close-outline" size={24} color="#BF2D2C" />
@@ -18,30 +34,75 @@ const QuizImagenScreen = () => {
         </View>
       </View>
 
-      {/* Image */}
+      {/* Imagen */}
       <Image 
         source={require("../../../assets/icons/images/DALL·E-amaca_wayuu.jpg")}
         style={styles.imagePlaceholder}
       />
 
-      {/* Instruction */}
+      {/* Instrucción */}
       <Text style={styles.instructionText}>Escoge la opción correcta</Text>
 
-      {/* Options */}
+      {/* Opciones */}
       <View style={styles.optionsContainer}>
         {['Jarara', 'Erra', 'Süyaa'].map((option, index) => (
-          <TouchableOpacity key={index} style={styles.optionButton}>
-            <Text style={styles.optionText}>{option}</Text>
-            <View style={styles.iconContainer}>
-              <Ionicons name="volume-high-outline" size={18} color="#862C29" />
+          <TouchableOpacity
+            key={index}
+            style={[
+              styles.optionButton,
+              selectedOption === option && styles.selectedOptionButton,
+              isAnswerChecked && selectedOption === option && 
+              (option === correctOption ? styles.correctOptionButton : styles.incorrectOptionButton)
+            ]}
+            onPress={() => handleOptionSelect(option)}
+          >
+            <Text style={[
+              styles.optionText,
+              selectedOption === option && styles.selectedOptionText,
+              isAnswerChecked && selectedOption === option && 
+              (option === correctOption ? styles.correctOptionText : styles.incorrectOptionText)
+            ]}>
+              {option}
+            </Text>
+            <View style={[
+              styles.iconContainer,
+              selectedOption === option && styles.selectedIconContainer,
+              isAnswerChecked && selectedOption === option && 
+              (option === correctOption ? styles.correctIconContainer : styles.incorrectIconContainer)
+            ]}>
+              <Ionicons
+                name="volume-high-outline"
+                size={18}
+                color={selectedOption === option && isAnswerChecked ? "#862C29" : "#333"}
+              />
             </View>
           </TouchableOpacity>
         ))}
       </View>
 
-      {/* Check Button */}
-      <TouchableOpacity style={styles.checkButton}>
-        <Text style={styles.checkButtonText}>Comprobar</Text>
+      {/* Mensaje de retroalimentación */}
+      {isAnswerChecked && (
+        <View style={[styles.feedbackMessage, isCorrect ? styles.successMessage : styles.errorMessage]}>
+          <Ionicons
+            name={isCorrect ? "checkmark-circle" : "close-circle"}
+            size={24}
+            color="#BF2D2C"
+          />
+          <Text style={styles.feedbackText}>
+            {isCorrect ? "¡Bien hecho! Has elegido bien" : "Incorrecto"}
+          </Text>
+          {!isCorrect && (
+            <Text style={styles.correctAnswerText}>Respuesta correcta: <Text style={{ fontWeight: 'bold' }}>{correctOption}</Text></Text>
+          )}
+        </View>
+      )}
+
+      {/* Botón de acción */}
+      <TouchableOpacity
+        style={[styles.checkButton, isAnswerChecked && isCorrect && styles.continueButton]}
+        onPress={handleCheckButtonPress}
+      >
+        <Text style={styles.checkButtonText}>{isAnswerChecked ? "Continuar" : "Comprobar"}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -110,9 +171,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 15,
   },
+  selectedOptionButton: {
+    backgroundColor: '#E97C71',
+    borderWidth: 2,
+    borderColor: '#862C29',
+  },
+  correctOptionButton: {
+    backgroundColor: '#E97C71',
+    borderColor: '#862C29',
+  },
+  incorrectOptionButton: {
+    backgroundColor: '#FFD1CA',
+    borderColor: '#862C29',
+  },
   optionText: {
     fontSize: 18,
     fontWeight: '600',
+    color: '#333',
+  },
+  selectedOptionText: {
+    color: '#FFFFFF',
+  },
+  correctOptionText: {
+    color: '#FFFFFF',
+  },
+  incorrectOptionText: {
     color: '#333',
   },
   iconContainer: {
@@ -120,12 +203,48 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 15,
   },
+  selectedIconContainer: {
+    backgroundColor: '#FFB3AA',
+  },
+  correctIconContainer: {
+    backgroundColor: '#FFB3AA',
+  },
+  incorrectIconContainer: {
+    backgroundColor: '#FFD1CA',
+  },
+  feedbackMessage: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    padding: 10,
+    borderRadius: 10,
+    marginVertical: 10,
+  },
+  successMessage: {
+    backgroundColor: '#FFF0ED',
+  },
+  errorMessage: {
+    backgroundColor: '#FFD1CA',
+  },
+  feedbackText: {
+    fontSize: 16,
+    color: '#862C29',
+    marginLeft: 10,
+  },
+  correctAnswerText: {
+    fontSize: 14,
+    color: '#333',
+    marginTop: 5,
+  },
   checkButton: {
     backgroundColor: '#E97C71',
     paddingVertical: 15,
     borderRadius: 20,
     alignItems: 'center',
-    marginTop: 100
+    marginTop: 20,
+  },
+  continueButton: {
+    backgroundColor: '#862C29',
   },
   checkButtonText: {
     color: '#FFF',
