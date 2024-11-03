@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image, } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
-const progressPercentage = 1;
+const progressPercentage = 60; // Ejemplo de progreso, puedes ajustarlo según sea necesario
 
 const QuizImagenScreen = () => {
   return (
@@ -11,16 +11,16 @@ const QuizImagenScreen = () => {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.closeButton}>
-          <Ionicons name="close-outline" size={30} color="#BF2D2C" />
+          <Ionicons name="close-outline" size={24} color="#BF2D2C" />
         </TouchableOpacity>
         <View style={styles.progressBarContainer}>
           <View style={[styles.progressBar, { width: `${progressPercentage}%` }]} />
         </View>
       </View>
 
-      {/* Image Placeholder */}
+      {/* Image */}
       <Image 
-        source={require("../../../assets/icons/images/DALL·E-amaca_wayuu.jpg")} // Asegúrate de ajustar la ruta
+        source={require("../../../assets/icons/images/DALL·E-amaca_wayuu.jpg")}
         style={styles.imagePlaceholder}
       />
 
@@ -32,7 +32,9 @@ const QuizImagenScreen = () => {
         {['Jarara', 'Erra', 'Süyaa'].map((option, index) => (
           <TouchableOpacity key={index} style={styles.optionButton}>
             <Text style={styles.optionText}>{option}</Text>
-            <Ionicons name="volume-high-outline" size={20} color="#BF2D2C" />
+            <View style={styles.iconContainer}>
+              <Ionicons name="volume-high-outline" size={18} color="#862C29" />
+            </View>
           </TouchableOpacity>
         ))}
       </View>
@@ -69,8 +71,8 @@ const styles = StyleSheet.create({
   },
   progressBarContainer: {
     flex: 1,
-    height: 12,
-    width: 110,
+    height: 8,
+    width: 109,
     backgroundColor: '#FFD1CA',
     borderRadius: 4,
   },
@@ -89,7 +91,8 @@ const styles = StyleSheet.create({
   },
   instructionText: {
     fontSize: 18,
-    color: '#BF2D2C',
+    fontWeight: '600',
+    color: '#333333',
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -102,21 +105,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#FBCAC1',
-    padding: 15,
-    borderRadius: 10,
-    marginVertical: 5,
+    backgroundColor: '#FFB3AA',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 15,
   },
   optionText: {
     fontSize: 18,
+    fontWeight: '600',
     color: '#333',
   },
+  iconContainer: {
+    backgroundColor: '#FFD1CA',
+    padding: 10,
+    borderRadius: 15,
+  },
   checkButton: {
-    backgroundColor: '#BF2D2C',
+    backgroundColor: '#E97C71',
     paddingVertical: 15,
     borderRadius: 20,
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 100
   },
   checkButtonText: {
     color: '#FFF',
