@@ -40,7 +40,7 @@ const QuizRegister: React.FC<QuizRegisterProps> = ({closeModal }) => {
     const newPregunta: Pregunta = {
       Orden: preguntas.length,
       Pista: "",
-      TipoPregunta: 0,
+      TipoPregunta: TipoPregunta.Texto,
       EnunciadoPregunta: "",
       ArchivoPregunta: "",
       TipoRespuesta: TipoRespuesta.Texto,
@@ -71,7 +71,7 @@ const QuizRegister: React.FC<QuizRegisterProps> = ({closeModal }) => {
       RelatoId: relatoId,
       ExamenId: examenId,
       Preguntas: preguntas,
-      Estado: estado,
+      Estado: estado
     };
 
     try {
@@ -154,12 +154,19 @@ const QuizRegister: React.FC<QuizRegisterProps> = ({closeModal }) => {
               htmlFor="tipo-pregunta-select"
               className="block mt-4 mb-2 text-sm font-medium text-gray-700"
             >
-              Selección Tipo pregunta
+              Selección Tipo pregunta    
             </label>
             <select
               id="tipo-pregunta-select"
               value={tipoSeleccionado}
-              onChange={(e) => setTipoSeleccionado(e.target.value)}
+              onChange={(e) => {
+                setTipoSeleccionado(e.target.value) 
+                    const tipoSeleccionadoIndex = TipoPregunta[e.target.value as keyof typeof TipoPregunta];
+                    const newPreguntas = [...preguntas];
+                    newPreguntas[index].TipoPregunta = tipoSeleccionadoIndex,
+                    setPreguntas(newPreguntas);
+                }
+              }
               className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
               required
             >
@@ -198,21 +205,46 @@ const QuizRegister: React.FC<QuizRegisterProps> = ({closeModal }) => {
             }}
             className="block w-full p-2 mb-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
           />
-          {/* selección de archivoPregunta */}
-          <p className="text-sm text-gray-500 mb-2">
-            Debes agregar el link de imagen o audio...
-          </p>
-          <input
-            type="text"
-            placeholder="Link..."
-            value={pregunta.ArchivoPregunta}
-            onChange={(e) => {
-              const newPreguntas = [...preguntas];
-              newPreguntas[index].ArchivoPregunta = e.target.value;
-              setPreguntas(newPreguntas);
-            }}
-            className="block w-full p-2 mb-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
-          />
+          {tipoSeleccionado === "Audio" && (   
+            <> 
+            {/* selección de archivoPregunta */} 
+              <p className="text-sm text-gray-500 mb-2">
+                Debes agregar el link del audio...
+              </p>
+              <input
+                type="text"
+                placeholder="Link..."
+                value={pregunta.ArchivoPregunta}
+                onChange={(e) => {
+                  const newPreguntas = [...preguntas];
+                  newPreguntas[index].ArchivoPregunta = e.target.value;
+                  setPreguntas(newPreguntas);
+                }}
+                className="block w-full p-2 mb-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+              />
+            </>
+          )}
+          {/* Mostrar el selector de archivo para imagen */}
+          {tipoSeleccionado === "Imagen" && (
+            <>
+              <p className="text-sm text-gray-500 mb-2">
+                Debes seleccionar una imagen...
+              </p>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files && e.target.files[0];
+                  if (file) {
+                    const newPreguntas = [...preguntas];
+                    newPreguntas[index].ArchivoPregunta = URL.createObjectURL(file); // Guarda la URL del archivo seleccionado
+                    setPreguntas(newPreguntas);
+                  }
+                }}
+                className="block w-full p-2 mb-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+              />
+            </>
+          )}
           <input
             type="text"
             placeholder="Pista"
@@ -238,7 +270,7 @@ const QuizRegister: React.FC<QuizRegisterProps> = ({closeModal }) => {
               className="block w-full p-2 mb-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
             />
           </div>
-          {/*Agregar preguntas */}
+          {/*Agregar preguntas */}``
           <p className="text-sm text-gray-500 mb-2">
             Debe seleccionar la respuesta correcta utilizando el radio button.
           </p>

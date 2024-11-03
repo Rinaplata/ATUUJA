@@ -9,6 +9,8 @@ import Login from './components/Main/Login';
 import Reward from './components/Main/Reward/Reward.tsx';
 import Quiz from './components/Main/Quizes/Quiz.tsx';
 import { jwtDecode } from 'jwt-decode';
+import UserRecoveryPassword from './components/Main/User/UserRecoveryPassword.tsx';
+import UserResetPassword from './components/Main/User/UserResetPassword.tsx';
 import Profile from './pages/Profile.tsx';
 import Settings from './pages/Settings.tsx';
 
@@ -60,6 +62,8 @@ function App() {
   ) : (
     <Routes>
       <Route path="auth/login" element={<Login />}></Route>
+      <Route path="auth/userrecoverypassword" element={<UserRecoveryPassword />}></Route>
+      <Route path="auth/userresetpassword" element={<UserResetPassword />}></Route>
     </Routes>
   );
 }
