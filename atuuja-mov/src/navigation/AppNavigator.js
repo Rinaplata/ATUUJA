@@ -17,6 +17,8 @@ import EditEmailScreen from '../screens/EditEmailScreen';
 import ChangePasswordScreen from '../screens/ChangePasswordScreen';
 import LearnStartScreen from '../screens/LearnStartScreen'
 import QuizTextScreen from '../screens/Quiz/QuizTextoScreen'
+import QuizImagenScreen from '../screens/Quiz/QuizImagenScreen'
+import QuizImageAudioScreen from '../screens/Quiz/QuizAudioImagenScreen'
 import colors from '../constants/colors';
 import CustomTheme from '../constants/CustomTheme';
 
@@ -90,8 +92,10 @@ const AppNavigator = () => (
 
       <Stack.Screen name="LearnStart" component={LearnScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Learn" component={LearnStartScreen} options={{ headerShown: false }} />
+       
+      <Stack.Screen name="QuizImagen" component={QuizImagenScreen} options={{ headerShown: false }} />
 
-
+      
 
     </Stack.Navigator>
   </NavigationContainer>

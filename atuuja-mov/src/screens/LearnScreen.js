@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -25,6 +25,10 @@ const LearnScreen = ({ navigation }) => {
 };
 
 const StoryScreen = ({ navigation }) => {
+  const [isPaused, setIsPaused] = useState(true);
+  const togglePlayPause = () => {
+    setIsPaused((prev) => !prev);
+  };
   return (
     <View style={styles.storyContainer}>
       <View style={styles.imageContainer}>
@@ -36,7 +40,11 @@ const StoryScreen = ({ navigation }) => {
           style={styles.closeButton}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.closeText}>X</Text>
+          <Ionicons
+            name="close-outline"
+            size={scaleFontSize(24)}
+            color="#A43B36"
+          />
         </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={styles.textContainer}>
@@ -60,12 +68,18 @@ const StoryScreen = ({ navigation }) => {
             color={colors.iconColor}
           />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.iconButton}>
-          <Ionicons name="pause-outline" size={24} color={colors.iconColor} />
+        <TouchableOpacity style={styles.iconButton} onPress={togglePlayPause}>
+          <Ionicons
+            name={isPaused ? "pause-outline" : "play-outline"}
+            size={24}
+            color={colors.iconColor}
+          />
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.continueButton}>
+      <TouchableOpacity style={styles.continueButton}
+        onPress={() => navigation.navigate("QuizImagen")}
+      >
         <Text style={styles.continueText}>Continuar</Text>
       </TouchableOpacity>
     </View>
@@ -77,7 +91,7 @@ const scaleFontSize = (size) => size * PixelRatio.getFontScale();
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF0ED',
+    backgroundColor: "#FFF0ED",
   },
   storyContainer: {
     flex: 1,
@@ -99,9 +113,11 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 10,
     left: 10,
-    backgroundColor: "#FFF",
+    backgroundColor: "rgba(255, 200, 200, 1)",
     padding: width * 0.02,
-    borderRadius: 15,
+    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
   },
   closeText: {
     fontSize: scaleFontSize(16),
@@ -127,12 +143,17 @@ const styles = StyleSheet.create({
   },
   controlsContainer: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "center",
     alignItems: "center",
     paddingVertical: height * 0.01,
   },
   iconButton: {
-    padding: width * 0.02,
+    backgroundColor: "rgba(255, 200, 200, 0.7)",
+    padding: width * 0.03,
+    borderRadius: 15,
+    marginHorizontal: width * 0.02,
+    alignItems: "center",
+    justifyContent: "center",
   },
   continueButton: {
     backgroundColor: "#9A2C2B",

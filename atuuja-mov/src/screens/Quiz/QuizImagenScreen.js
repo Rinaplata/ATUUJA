@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image, } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
+const progressPercentage = 1;
 
 const QuizImagenScreen = () => {
   return (
@@ -10,15 +11,18 @@ const QuizImagenScreen = () => {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.closeButton}>
-          <Ionicons name="close-outline" size={24} color="#BF2D2C" />
+          <Ionicons name="close-outline" size={30} color="#BF2D2C" />
         </TouchableOpacity>
         <View style={styles.progressBarContainer}>
-          <View style={styles.progressBar} />
+          <View style={[styles.progressBar, { width: `${progressPercentage}%` }]} />
         </View>
       </View>
 
       {/* Image Placeholder */}
-      <View style={styles.imagePlaceholder} />
+      <Image 
+        source={require("../../../assets/icons/images/DALL·E-amaca_wayuu.jpg")} // Asegúrate de ajustar la ruta
+        style={styles.imagePlaceholder}
+      />
 
       {/* Instruction */}
       <Text style={styles.instructionText}>Escoge la opción correcta</Text>
@@ -45,31 +49,35 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FBECE8',
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingVertical: height * 0.05,
     justifyContent: 'space-between',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: height * 0.03,
   },
   closeButton: {
-    backgroundColor: '#FBECE8',
-    padding: 8,
-    borderRadius: 15,
+    backgroundColor: '#FFD1CA',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
   },
   progressBarContainer: {
     flex: 1,
-    height: 4,
-    backgroundColor: '#FBCAC1',
-    borderRadius: 2,
-    marginLeft: 10,
+    height: 12,
+    width: 110,
+    backgroundColor: '#FFD1CA',
+    borderRadius: 4,
   },
   progressBar: {
-    width: '50%', // Ajusta el porcentaje según el progreso
     height: '100%',
-    backgroundColor: '#BF2D2C',
-    borderRadius: 2,
+    backgroundColor: '#E97C71',
+    borderRadius: 4,
   },
   imagePlaceholder: {
     width: width * 0.5,
