@@ -44,13 +44,13 @@ const TabNavigator = () => (
     />
     <Tab.Screen
       name="Learn"
-      component={QuizTextScreen}
+      component={LearnStartScreen}
       options={{
         tabBarIcon: ({ color, size }) => (
           <MaterialIcons name="school" color={color} size={size} />
         ),
-        tabBarStyle: { display: 'none' }, // Oculta la barra solo en LearnScreen
-        unmountOnBlur: true, // Desmonta LearnScreen cuando no está en uso
+        tabBarStyle: { display: 'none' },
+        unmountOnBlur: true,
       }}
     />
     <Tab.Screen
@@ -87,6 +87,12 @@ const AppNavigator = () => (
       <Stack.Screen name="EditName" component={EditNameScreen} options={{ headerTitle: 'Editar nombre', headerShown: true }} />
       <Stack.Screen name="EditEmail" component={EditEmailScreen} options={{ headerTitle: 'Editar correo electrónico', headerShown: true }} />
       <Stack.Screen name="EditPassword" component={ChangePasswordScreen} options={{ headerTitle: 'Cambiar contraseña', headerShown: true }} />
+
+      <Stack.Screen name="LearnStart" component={LearnScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Learn" component={LearnStartScreen} options={{ headerShown: false }} />
+
+
+
     </Stack.Navigator>
   </NavigationContainer>
 );
