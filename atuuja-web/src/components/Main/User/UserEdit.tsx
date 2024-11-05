@@ -126,7 +126,7 @@ const UserEdit: React.FC<EditUserProps> = ({ isOpen, onClose, userData, onSucces
             value={edad}
             onChange={(e) => setEdad(parseInt(e.target.value))}
             className="border p-2 mb-4 rounded w-full"
-            placeholder="Ingrese el correo"
+            placeholder="Ingrese la edad"
           />
         </div>
         <div>
