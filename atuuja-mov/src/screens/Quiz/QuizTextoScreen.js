@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const QuizTextScreen = () => {
   return (
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   progressBar: {
-    width: '50%', // Ajusta el porcentaje según el progreso
+    width: '50%',
     height: '100%',
     backgroundColor: '#BF2D2C',
     borderRadius: 2,
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   checkButton: {
-    backgroundColor: '#BF2D2C',
+    backgroundColor: '#862C29',
     paddingVertical: 15,
     borderRadius: 20,
     alignItems: 'center',

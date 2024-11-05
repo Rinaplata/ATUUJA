@@ -13,12 +13,13 @@ import { Ionicons } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 
-const StoryIntroScreen = ({ navigation }) =>  {
+const StoryIntroScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.closeButton}
-        onPress={() => navigation.goBack()}
+        <TouchableOpacity
+          style={styles.closeButton}
+          onPress={() => navigation.goBack()}
         >
           <Ionicons name="chevron-back" size={scaleSize(25)} color="#FFF" />
         </TouchableOpacity>
@@ -75,12 +76,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#A43B36",
     alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: height * 0.03,
+    justifyContent: "space-between",
   },
   header: {
     position: "absolute",
     top: height * 0.02,
     left: width * 0.05,
     zIndex: 1,
+    paddingVertical: height * 0.02,
   },
   closeButton: {
     padding: width * 0.02,

@@ -37,7 +37,8 @@ const QuizImagenScreen = ({ navigation }) => {
     <View style={styles.container}>
       {/* Encabezado */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.closeButton}>
+        <TouchableOpacity style={styles.closeButton}
+        onPress={() => navigation.goBack()}>
           <Ionicons name="close-outline" size={24} color="#BF2D2C" />
         </TouchableOpacity>
         <View style={styles.progressBarContainer}>
@@ -98,7 +99,7 @@ const QuizImagenScreen = ({ navigation }) => {
           <Ionicons
             name={isCorrect ? "checkmark-circle" : "close-circle"}
             size={24}
-            color="#BF2D2C"
+            color="#333333"
           />
           <Text style={styles.feedbackText}>
             {isCorrect ? "¡Bien hecho! Has elegido bien" : "Incorrecto"}
@@ -125,7 +126,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FBECE8',
     paddingHorizontal: 20,
-    paddingVertical: height * 0.05,
+    paddingVertical: height * 0.06,
     justifyContent: 'space-between',
   },
   header: {
@@ -233,14 +234,18 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   successMessage: {
-    backgroundColor: '#FFF0ED',
+    backgroundColor: '#A0D995',
   },
   errorMessage: {
     backgroundColor: '#FFD1CA',
   },
+  successText: {
+    color: '#333333',
+    fontWeight: 'bold',
+  },  
   feedbackText: {
     fontSize: 16,
-    color: '#862C29',
+    color: '#333333',
     marginLeft: 10,
   },
   correctAnswerText: {
@@ -249,7 +254,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   checkButton: {
-    backgroundColor: '#E97C71',
+    backgroundColor: '#862C29',
     paddingVertical: 15,
     borderRadius: 20,
     alignItems: 'center',
