@@ -27,7 +27,7 @@ const QuizTextScreen = ({ navigation }) => {
 
   const handleContinue = () => {
     if (isAnswerChecked) {
-      navigation.navigate("QuizAudio");
+      navigation.navigate("ResultScreen");
     }
   };
 

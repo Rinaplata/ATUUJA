@@ -21,6 +21,7 @@ import QuizImagenScreen from '../screens/Quiz/QuizImagenScreen'
 import QuizImageAudioScreen from '../screens/Quiz/QuizAudioImagenScreen'
 import colors from '../constants/colors';
 import CustomTheme from '../constants/CustomTheme';
+import QuizResultScreen from '../components/QuizResultScreen'
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -96,6 +97,7 @@ const AppNavigator = () => (
       <Stack.Screen name="QuizImagen" component={QuizImagenScreen} options={{ headerShown: false }} />
       <Stack.Screen name="QuizAudio" component={QuizImageAudioScreen} options={{ headerShown: false }} />
       <Stack.Screen name="QuizText" component={QuizTextScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="ResultScreen" component={QuizResultScreen} options={{ headerShown: false }} />
       
       
       
