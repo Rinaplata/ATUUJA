@@ -86,7 +86,7 @@ const QuizImagenScreen = ({ navigation }) => {
               <Ionicons
                 name="volume-high-outline"
                 size={18}
-                color={selectedOption === option && isAnswerChecked ? "#862C29" : "#333"}
+                color={selectedOption === option && isAnswerChecked ? "#862C29" : "#BF2D2C"}
               />
             </View>
           </TouchableOpacity>

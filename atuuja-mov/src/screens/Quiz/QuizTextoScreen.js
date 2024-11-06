@@ -1,19 +1,45 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
+const progressPercentage = 10;
 
-const QuizTextScreen = () => {
+const QuizTextScreen = ({ navigation }) => {
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [isAnswerChecked, setIsAnswerChecked] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
+
+  const correctOption = "Jarara";
+
+  const handleOptionSelect = (option) => {
+    if (!isAnswerChecked) {
+      setSelectedOption(option);
+    }
+  };
+
+  const handleCheckButtonPress = () => {
+    if (selectedOption) {
+      setIsAnswerChecked(true);
+      setIsCorrect(selectedOption === correctOption);
+    }
+  };
+
+  const handleContinue = () => {
+    if (isAnswerChecked) {
+      navigation.navigate("QuizAudio");
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.closeButton}>
+        <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
           <Ionicons name="close-outline" size={24} color="#BF2D2C" />
         </TouchableOpacity>
         <View style={styles.progressBarContainer}>
-          <View style={styles.progressBar} />
+          <View style={[styles.progressBar, { width: `${progressPercentage}%` }]} />
         </View>
       </View>
 
@@ -22,17 +48,67 @@ const QuizTextScreen = () => {
 
       {/* Options */}
       <View style={styles.optionsContainer}>
-        {['Jarara', 'Erra', 'Süyaa'].map((option, index) => (
-          <TouchableOpacity key={index} style={styles.optionButton}>
-            <Text style={styles.optionText}>{option}</Text>
-            <Ionicons name="volume-high-outline" size={20} color="#BF2D2C" />
+        {["Jarara", "Erra", "Süyaa"].map((option, index) => (
+          <TouchableOpacity
+            key={index}
+            style={[
+              styles.optionButton,
+              selectedOption === option && styles.selectedOptionButton,
+              isAnswerChecked && selectedOption === option &&
+                (option === correctOption ? styles.correctOptionButton : styles.incorrectOptionButton),
+            ]}
+            onPress={() => handleOptionSelect(option)}
+            disabled={isAnswerChecked}
+          >
+            <Text style={[
+              styles.optionText,
+              selectedOption === option && styles.selectedOptionText,
+              isAnswerChecked && selectedOption === option &&
+                (option === correctOption ? styles.correctOptionText : styles.incorrectOptionText),
+            ]}>
+              {option}
+            </Text>
+            <View style={[
+              styles.iconContainer,
+              selectedOption === option && styles.selectedIconContainer,
+              isAnswerChecked && selectedOption === option && 
+              (option === correctOption ? styles.correctIconContainer : styles.incorrectIconContainer)
+            ]}>
+              <Ionicons
+                name="volume-high-outline"
+                size={18}
+                color={selectedOption === option && isAnswerChecked ? "#862C29" : "#BF2D2C"}
+              />
+            </View>
           </TouchableOpacity>
         ))}
       </View>
 
+      {/* Feedback Message */}
+      {isAnswerChecked && (
+        <View style={[styles.feedbackMessage, isCorrect ? styles.successMessage : styles.errorMessage]}>
+          <Ionicons
+            name={isCorrect ? "checkmark-circle" : "close-circle"}
+            size={24}
+            color="#333333"
+          />
+          <Text style={styles.feedbackText}>
+            {isCorrect ? "¡Correcto!" : "Incorrecto"}
+          </Text>
+          {!isCorrect && (
+            <Text style={styles.correctAnswerText}>
+              Respuesta correcta: <Text style={{ fontWeight: 'bold' }}>{correctOption}</Text>
+            </Text>
+          )}
+        </View>
+      )}
+
       {/* Check Button */}
-      <TouchableOpacity style={styles.checkButton}>
-        <Text style={styles.checkButtonText}>Comprobar</Text>
+      <TouchableOpacity
+        style={[styles.checkButton, isAnswerChecked && styles.continueButton]}
+        onPress={isAnswerChecked ? handleContinue : handleCheckButtonPress}
+      >
+        <Text style={styles.checkButtonText}>{isAnswerChecked ? "Continuar" : "Comprobar"}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -41,68 +117,133 @@ const QuizTextScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FBECE8',
-    padding: 20,
-    justifyContent: 'space-between',
+    backgroundColor: "#FBECE8",
+    paddingHorizontal: 20,
+    paddingVertical: height * 0.07,
+    justifyContent: "space-between",
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: height * 0.03,
   },
   closeButton: {
-    backgroundColor: '#FBECE8',
-    padding: 8,
-    borderRadius: 15,
+    backgroundColor: "#FFD1CA",
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 10,
   },
   progressBarContainer: {
     flex: 1,
-    height: 4,
-    backgroundColor: '#FBCAC1',
-    borderRadius: 2,
-    marginLeft: 10,
+    height: 8,
+    width: 109,
+    backgroundColor: "#FFD1CA",
+    borderRadius: 4,
   },
   progressBar: {
-    width: '50%',
-    height: '100%',
-    backgroundColor: '#BF2D2C',
-    borderRadius: 2,
+    height: "100%",
+    backgroundColor: "#E97C71",
+    borderRadius: 4,
   },
   questionText: {
-    fontSize: 18,
-    color: '#BF2D2C',
-    textAlign: 'center',
-    marginBottom: 20,
+    fontSize: 21,
+    fontWeight: "600",
+    color: "#333333",
+    textAlign: "left",
   },
   optionsContainer: {
     flex: 1,
-    justifyContent: 'space-around',
-    marginVertical: 20,
+    justifyContent: "space-around",
+    marginVertical: 130,
   },
   optionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#FBCAC1',
-    padding: 15,
-    borderRadius: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#FFB3AA",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 15,
     marginVertical: 5,
+  },
+  selectedOptionButton: {
+    backgroundColor: "#E97C71",
+    borderWidth: 2,
+    borderColor: "#862C29",
+  },
+  correctOptionButton: {
+    backgroundColor: "#E97C71",
+    borderColor: "#862C29",
+  },
+  incorrectOptionButton: {
+    backgroundColor: "#FFD1CA",
+    borderColor: "#862C29",
   },
   optionText: {
     fontSize: 18,
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
+  },
+  selectedOptionText: {
+    color: "#FFFFFF",
+  },
+  correctOptionText: {
+    color: "#FFFFFF",
+  },
+  incorrectOptionText: {
+    color: "#333",
+  },
+  feedbackMessage: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    borderRadius: 10,
+    marginVertical: 10,
+  },
+  successMessage: {
+    backgroundColor: "#A0D995",
+  },
+  errorMessage: {
+    backgroundColor: "#FFD1CA",
+  },
+  feedbackText: {
+    fontSize: 16,
+    color: "#333333",
+    marginLeft: 10,
+  },
+  correctAnswerText: {
+    fontSize: 14,
+    color: "#333",
+    marginTop: 5,
+  },
+  iconContainer: {
+    backgroundColor: '#FFD1CA',
+    padding: 10,
+    borderRadius: 15,
   },
   checkButton: {
     backgroundColor: '#862C29',
     paddingVertical: 15,
     borderRadius: 20,
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 50,
+  },
+  continueButton: {
+    backgroundColor: "#BF2D2C",
+  },
+  correctIconContainer: {
+    backgroundColor: '#FFB3AA',
+  },
+  incorrectIconContainer: {
+    backgroundColor: '#FFD1CA',
   },
   checkButtonText: {
-    color: '#FFF',
+    color: "#FFF",
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
 
