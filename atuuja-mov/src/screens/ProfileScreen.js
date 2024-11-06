@@ -1,34 +1,97 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useAuth } from '../context/AuthContext'; 
+import React from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+  Image,
+} from "react-native";
+import { useAuth } from "../context/AuthContext";
+import CircularProgress from "react-native-circular-progress-indicator";
+
+const { width, height } = Dimensions.get("window");
 
 const ProfileScreen = ({ navigation }) => {
-  const { user } = useAuth(); 
+  const { user } = useAuth();
+  const percentage = 5; // Puedes ajustar este porcentaje según sea necesario
+
   return (
     <View style={styles.container}>
+      {/* Top Menu */}
+      <View style={styles.topMenu}>
+        <View style={styles.pointsContainer}>
+          <Image
+            source={require("../../assets/icons/images/spiral-icon.png")}
+            style={[styles.pointsIcon, { width: 28, height: 28 }]}
+          />
+          <Text style={styles.pointsText}>120</Text>
+        </View>
+        <Image
+          source={require("../../assets/icons/images/isologoBanner.png")}
+          style={styles.logo}
+        />
+        <View style={styles.progressContainer}>
+          <CircularProgress
+            value={percentage}
+            radius={16}
+            progressValueColor={"#9A2C2B"}
+            activeStrokeColor={"#E97C71"}
+            strokeWidth={8}
+            backgroundWidth={8}
+            inActiveStrokeColor={"#FFF0ED"}
+            circleBackgroundColor={"#FFF0ED"}
+          />
+        </View>
+      </View>
+
+      {/* Header */}
       <View style={styles.header}>
-      <Text style={styles.title}>{user?.displayName|| 'Usuario'}</Text>      
-        <TouchableOpacity onPress={() => navigation.navigate('EditProfile')}>
-          <Text style={styles.editButton}>Editar perfil</Text>
+        <Text style={styles.userName}>{user?.displayName || "Rina"}</Text>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("EditProfile")}
+          style={styles.editProfileButton}
+        >
+          <Text style={styles.editProfileText}>Editar perfil</Text>
         </TouchableOpacity>
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.subtitle}>Estas en nivel 1</Text>
+      {/* Nivel Card */}
+      <View style={styles.levelCard}>
+        <Text style={styles.levelText}>Estás en nivel 1</Text>
         <Text style={styles.expText}>Tus EXP: 125</Text>
+        <Text style={styles.expSubText}>Con 55 EXP más, subes de nivel</Text>
+        <Text style={styles.levelDescription}>
+          Pasa al siguiente nivel sumando EXP completando correctamente los
+          relatos
+        </Text>
       </View>
 
+      {/* Logros Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Mis logros</Text>
-        {/* Coloca aquí tus componentes visuales para los logros */}
+        <View style={styles.achievementContainer}>
+          <View style={styles.achievementBox}>
+            <Text style={styles.achievementTitle}>Relato 1</Text>
+            <Text style={styles.achievementDescription}>Aprendiz destacado</Text>
+          </View>
+        </View>
       </View>
 
+      {/* Premios Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Mis premios</Text>
-        {/* Coloca aquí tus componentes visuales para los premios */}
+        <View style={styles.rewardContainer}>
+          <Image
+            source={require("../../assets/icons/images/DALL·E-amaca_wayuu.jpg")}
+            style={styles.rewardImage}
+          />
+          <Image
+            source={require("../../assets/icons/images/DALL·E-sobrero_wayuu.png")}
+            style={styles.rewardImage}
+          />
+        </View>
       </View>
-
-      
     </View>
   );
 };
@@ -36,53 +99,114 @@ const ProfileScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#9A2C2B', // Usando el color principal del tema
-    padding: 20,
+    backgroundColor: "#9A2C2B",
+    paddingHorizontal: 20,
+    paddingVertical: height * 0.06,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  topMenu: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 15,
+    paddingHorizontal: 10,
   },
-  title: {
-    fontSize: 24,
-    color: '#FFF0ED', // Color de texto variante
+  pointsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
-  editButton: {
-    color: '#FFF',
+  pointsIcon: {
+    marginRight: 5,
+  },
+  pointsText: {
+    color: "#FFF",
     fontSize: 16,
   },
-  card: {
-    backgroundColor: '#FFD1CA',
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: height * 0.03,
+  },
+  userName: {
+    fontSize: 28,
+    color: "#FFF0ED",
+    fontWeight: "bold",
+  },
+  editProfileButton: {
+    backgroundColor: "#FBECE8",
+    paddingVertical: 5,
+    paddingHorizontal: 15,
+    borderRadius: 20,
+  },
+  editProfileText: {
+    color: "#9A2C2B",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  levelCard: {
+    backgroundColor: "#FFD1CA",
     padding: 20,
     borderRadius: 10,
     marginVertical: 10,
+    alignItems: "center",
   },
-  subtitle: {
-    fontSize: 18,
-    color: '#FFF',
+  levelText: {
+    fontSize: 22,
+    color: "#862C29",
+    fontWeight: "bold",
   },
   expText: {
+    fontSize: 18,
+    color: "#333",
+    marginVertical: 5,
+  },
+  expSubText: {
     fontSize: 16,
-    color: '#FFF',
+    color: "#333",
+  },
+  levelDescription: {
+    fontSize: 14,
+    color: "#333",
+    textAlign: "center",
+    marginTop: 5,
   },
   section: {
     marginTop: 20,
   },
   sectionTitle: {
     fontSize: 18,
-    color: '#FFF',
+    color: "#FFF0ED",
+    fontWeight: "bold",
     marginBottom: 10,
   },
-  logoutButton: {
-    marginTop: 30,
-    backgroundColor: '#E74C3C', // Color para el botón de cerrar sesión
+  achievementContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+  achievementBox: {
+    backgroundColor: "#FFB3AA",
     padding: 15,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
-  logoutText: {
-    color: '#FFF',
+  achievementTitle: {
     fontSize: 16,
+    color: "#862C29",
+    fontWeight: "bold",
+  },
+  achievementDescription: {
+    fontSize: 14,
+    color: "#333",
+  },
+  rewardContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginTop: 10,
+  },
+  rewardImage: {
+    width: width * 0.4,
+    height: width * 0.4,
+    borderRadius: 10,
   },
 });
 
