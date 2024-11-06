@@ -12,7 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 const { width, height } = Dimensions.get("window");
 const progressPercentage = 10;
 
-const QuizImageAudioScreen = ({ navigation }) =>  {
+const QuizImageAudioScreen = ({ navigation }) => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [isAnswerChecked, setIsAnswerChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
@@ -27,7 +27,7 @@ const QuizImageAudioScreen = ({ navigation }) =>  {
 
   const handleOptionSelect = (index) => {
     setSelectedOption(index);
-    setIsAnswerChecked(false); 
+    setIsAnswerChecked(false);
   };
 
   const handleCheckAnswer = () => {
@@ -35,12 +35,21 @@ const QuizImageAudioScreen = ({ navigation }) =>  {
     setIsCorrect(selectedOption === correctOptionIndex);
   };
 
+  const handleContinue = () => {
+    if (isAnswerChecked) {
+      navigation.navigate("QuizText");
+    } else {
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.closeButton}
-        onPress={() => navigation.goBack()}>
+        <TouchableOpacity
+          style={styles.closeButton}
+          onPress={() => navigation.goBack()}
+        >
           <Ionicons name="close-outline" size={24} color="#BF2D2C" />
         </TouchableOpacity>
         <View style={styles.progressBarContainer}>
@@ -123,11 +132,7 @@ const QuizImageAudioScreen = ({ navigation }) =>  {
       {/* Check or Continue Button */}
       <TouchableOpacity
         style={[styles.checkButton, isAnswerChecked && styles.continueButton]}
-        onPress={
-          isAnswerChecked
-            ? () => alert("Navegar a la siguiente pantalla")
-            : handleCheckAnswer
-        }
+        onPress={isAnswerChecked ? handleContinue : handleCheckAnswer}
         disabled={selectedOption === null}
       >
         <Text style={styles.checkButtonText}>
