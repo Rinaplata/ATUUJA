@@ -21,7 +21,7 @@ public class AuthController : ControllerBase
     private readonly IEmailService _emailService;
     const string usersyKeyDescripcion = "users";
     const string userDescripcion = "Usuario";
-
+    const string progressKeyDescripcion = "progress";
 
     public AuthController(IConfiguration config, IEmailService emailService)
     {
@@ -76,6 +76,56 @@ public class AuthController : ControllerBase
             return StatusCode(500, $"{MessageTemplates.Format(MessageTemplates.ErrorGettingRegister, userDescripcion)}: {ex.Message}");
         }
     }
+
+      [HttpGet("getUserProgress/{userId}")]
+      public async Task<IActionResult> GetUserProgress(string userId)
+        {
+            try
+            {
+                // 1. Obtener los datos del usuario
+                var usersCollection = _firestoreDb.Collection(usersyKeyDescripcion);
+                var query = usersCollection.WhereEqualTo("Id", userId);
+                var querySnapshot = await query.GetSnapshotAsync();
+
+                if (querySnapshot.Count == 0)
+                    return NotFound(MessageTemplates.Format(MessageTemplates.RegisterNotFound, userDescripcion));
+
+                var userData = querySnapshot.Documents.First().ToDictionary();
+
+                // 2. Obtener los datos de progreso del usuario
+                var progressCollection = _firestoreDb.Collection(progressKeyDescripcion);
+                var progressQuery = progressCollection.WhereEqualTo("UsuarioId", userId);
+                var progressSnapshot = await progressQuery.GetSnapshotAsync();
+
+                List<Dictionary<string, object>> userProgressData = new List<Dictionary<string, object>>();
+
+                if (progressSnapshot.Documents.Any())
+                {
+                    userProgressData = progressSnapshot.Documents
+                        .Select(document =>
+                        {
+                            var progress = document.ToDictionary();
+                            progress["Id"] = document.Id;  // Agregar ID del documento de progreso
+                            return progress;
+                        })
+                        .ToList();
+                }
+
+                // 3. Combinar los datos del usuario con los de progreso
+                var userWithProgress = new
+                {
+                    User = userData,
+                    Progress = userProgressData
+                };
+
+                return Ok(userWithProgress);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"{MessageTemplates.Format(MessageTemplates.ErrorGettingRegister, userDescripcion)}: {ex.Message}");
+            }
+        }
+
 
     [HttpPut("update/{userId}")]
     public async Task<IActionResult> UpdateUser(string userId, [FromBody] UserRegister model)

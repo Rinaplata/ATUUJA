@@ -71,7 +71,8 @@ public class ProgressController : ControllerBase
             { nameof(model.ExamenId), model.ExamenId },
             { nameof(model.RelatoId), model.RelatoId },
             { nameof(model.OrdenPreguntaActual), model.OrdenPreguntaActual },
-            { nameof(model.PuntosAcumulados), model.PuntosAcumulados }
+            { nameof(model.PuntosAcumulados), model.PuntosAcumulados },
+            { nameof(model.UsuarioId), model.UsuarioId}
         };
 
         await progressDocument.UpdateAsync(updatedProgress);
