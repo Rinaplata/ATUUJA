@@ -203,7 +203,7 @@ public class AuthController : ControllerBase
 
         if (userData["Password"].ToString() == model.Password)
         {
-            var token = GenerateJwtToken(model.Email);
+            var token = GenerateJwtToken(model.Email, userData["Id"].ToString());
             return Ok(new { Token = token });
         }
         return Unauthorized();
@@ -225,7 +225,7 @@ public class AuthController : ControllerBase
         if (userData["Password"].ToString() == model.Password
         && bool.Parse(userData["IsAdmin"].ToString()) == true)
         {
-            var token = GenerateJwtToken(model.Email);
+            var token = GenerateJwtToken(model.Email, userData["Id"].ToString());
             var userId = userDoc.Id;
             return Ok(new { Token = token, UserId = userId });
         }
@@ -329,7 +329,7 @@ public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest
         return Ok(MessageTemplates.Format(MessageTemplates.Expiredpassword));
     }
 
-    private string GenerateJwtToken(string username)
+    private string GenerateJwtToken(string username, string userId)
     {
         var jwtSettings = _config.GetSection("JwtSettings");
 
@@ -339,6 +339,7 @@ public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest
         var claims = new[]
         {
             new Claim(JwtRegisteredClaimNames.Sub, username),
+            new Claim(JwtRegisteredClaimNames.Sid, userId),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
