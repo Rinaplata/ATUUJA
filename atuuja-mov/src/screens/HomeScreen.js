@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
@@ -11,11 +11,37 @@ import {
 import CircularProgress from "react-native-circular-progress-indicator";
 import Carousel from "react-native-reanimated-carousel";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useAuth } from "../context/AuthContext";
+import { useProgress } from "../context/ProgressContext";
 
 const { width: viewportWidth } = Dimensions.get("window");
 
 const HomeScreen = ({ navigation }) => {
-  const percentage = 5; // Ejemplo de porcentaje para el progreso
+  const { user: authUser } = useAuth();
+  const percentage = 5;
+  const { progress, fetchUserProgress, loading, error } = useProgress();
+
+  useEffect(() => {
+    if (authUser?.userId) {
+      fetchUserProgress(authUser.userId);
+    }
+  }, [authUser]);
+
+if (loading) {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.loadingText}>Cargando progreso...</Text>
+    </View>
+  );
+}
+
+if (error) {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.errorText}>Error: {error}</Text>
+    </View>
+  );
+}
 
   const data = [
     {
@@ -53,6 +79,8 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      {loading && <Text style={styles.loadingText}>Cargando progreso...</Text>}
+      {error && <Text style={styles.errorText}>Error: {error}</Text>}
       <View style={styles.topMenu}>
         <View style={styles.pointsContainer}>
           <Image
@@ -88,7 +116,9 @@ const HomeScreen = ({ navigation }) => {
       <View style={styles.containerBody}>
         <View style={styles.welcomeContainer}>
           <Text style={styles.cardSubtitle}>Bienvenido de vuelta,</Text>
-          <Text style={styles.welcomeText}> Rina</Text>
+          <Text style={styles.welcomeText}>
+            {progress?.user?.Username || "Usuario"}
+          </Text>
         </View>
 
         <View style={styles.card}>
@@ -261,12 +291,12 @@ const styles = StyleSheet.create({
     borderRadius: 25,
   },
   gradientOverlay: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.99)',
+    backgroundColor: "rgba(255, 255, 255, 0.99)",
     borderRadius: 25,
   },
   overlay: {
