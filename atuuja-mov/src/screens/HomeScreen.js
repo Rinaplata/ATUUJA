@@ -18,7 +18,6 @@ const { width: viewportWidth } = Dimensions.get("window");
 
 const HomeScreen = ({ navigation }) => {
   const { user: authUser } = useAuth();
-  const percentage = 5;
   const { progress, fetchUserProgress, loading, error } = useProgress();
 
   useEffect(() => {
@@ -76,6 +75,9 @@ if (error) {
       </ImageBackground>
     </View>
   );
+  const puntosAcumulados = progress?.progress?.[0]?.PuntosAcumulados || 0;
+  const maxPuntos = 100;
+  const percentage = Math.min((puntosAcumulados / maxPuntos) * 100, 100);
 
   return (
     <View style={styles.container}>
@@ -87,7 +89,7 @@ if (error) {
             source={require("../../assets/icons/images/spiral-icon.png")}
             style={[styles.pointsIcon, { width: 28, height: 28 }]}
           />
-          <Text style={styles.pointsText}>120</Text>
+          <Text style={styles.pointsText}>{puntosAcumulados}</Text>
         </View>
         <View style={styles.logoContainer}>
           <Image
