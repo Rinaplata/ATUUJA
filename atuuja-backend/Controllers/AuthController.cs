@@ -77,57 +77,57 @@ public class AuthController : ControllerBase
         }
     }
 
-      [HttpGet("getUserProgress/{userId}")]
-      public async Task<IActionResult> GetUserProgress(string userId)
+    [HttpGet("getUserProgress/{userId}")]
+    public async Task<IActionResult> GetUserProgress(string userId)
+    {
+        try
         {
-            try
+            // 1. Obtener los datos del usuario
+            var usersCollection = _firestoreDb.Collection(usersyKeyDescripcion);
+            var query = usersCollection.WhereEqualTo("Id", userId);
+            var querySnapshot = await query.GetSnapshotAsync();
+
+            if (querySnapshot.Count == 0)
+                return NotFound(MessageTemplates.Format(MessageTemplates.RegisterNotFound, userDescripcion));
+
+            var userData = querySnapshot.Documents.First().ToDictionary();
+
+            // 2. Obtener los datos de progreso del usuario
+            var progressCollection = _firestoreDb.Collection(progressKeyDescripcion);
+            var progressQuery = progressCollection.WhereEqualTo("UsuarioId", userId);
+            var progressSnapshot = await progressQuery.GetSnapshotAsync();
+
+            List<Dictionary<string, object>> userProgressData = new List<Dictionary<string, object>>();
+
+            if (progressSnapshot.Documents.Any())
             {
-                // 1. Obtener los datos del usuario
-                var usersCollection = _firestoreDb.Collection(usersyKeyDescripcion);
-                var query = usersCollection.WhereEqualTo("Id", userId);
-                var querySnapshot = await query.GetSnapshotAsync();
-
-                if (querySnapshot.Count == 0)
-                    return NotFound(MessageTemplates.Format(MessageTemplates.RegisterNotFound, userDescripcion));
-
-                var userData = querySnapshot.Documents.First().ToDictionary();
-
-                // 2. Obtener los datos de progreso del usuario
-                var progressCollection = _firestoreDb.Collection(progressKeyDescripcion);
-                var progressQuery = progressCollection.WhereEqualTo("UsuarioId", userId);
-                var progressSnapshot = await progressQuery.GetSnapshotAsync();
-
-                List<Dictionary<string, object>> userProgressData = new List<Dictionary<string, object>>();
-
-                if (progressSnapshot.Documents.Any())
-                {
-                    userProgressData = progressSnapshot.Documents
-                        .Select(document =>
-                        {
-                            var progress = document.ToDictionary();
-                            progress["Id"] = document.Id;  // Agregar ID del documento de progreso
-                            return progress;
-                        })
-                        .ToList();
-                }
-
-                // 3. Combinar los datos del usuario con los de progreso
-                var userWithProgress = new
-                {
-                    User = userData,
-                    Progress = userProgressData
-                };
-
-                return Ok(userWithProgress);
+                userProgressData = progressSnapshot.Documents
+                    .Select(document =>
+                    {
+                        var progress = document.ToDictionary();
+                        progress["Id"] = document.Id;  // Agregar ID del documento de progreso
+                        return progress;
+                    })
+                    .ToList();
             }
-            catch (Exception ex)
+
+            // 3. Combinar los datos del usuario con los de progreso
+            var userWithProgress = new
             {
-                return StatusCode(500, $"{MessageTemplates.Format(MessageTemplates.ErrorGettingRegister, userDescripcion)}: {ex.Message}");
-            }
+                User = userData,
+                Progress = userProgressData
+            };
+
+            return Ok(userWithProgress);
         }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"{MessageTemplates.Format(MessageTemplates.ErrorGettingRegister, userDescripcion)}: {ex.Message}");
+        }
+    }
 
 
-    [HttpPut("update/{userId}")]
+   [HttpPut("update/{userId}")]
     public async Task<IActionResult> UpdateUser(string userId, [FromBody] UserRegister model)
     {
         try
@@ -253,48 +253,48 @@ public class AuthController : ControllerBase
     }
 
 
- [HttpPost("forgot-password")]
-public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
-{
-    var userEmail = request.Email;  
-    var usersCollection = _firestoreDb.Collection("users");
-    var query = usersCollection.WhereEqualTo("Email", userEmail);
-    var querySnapshot = await query.GetSnapshotAsync();
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+    {
+        var userEmail = request.Email;
+        var usersCollection = _firestoreDb.Collection("users");
+        var query = usersCollection.WhereEqualTo("Email", userEmail);
+        var querySnapshot = await query.GetSnapshotAsync();
 
-    if (querySnapshot.Count == 0)
-        return NotFound(MessageTemplates.Format(MessageTemplates.RegisterNotFound, userEmail));
+        if (querySnapshot.Count == 0)
+            return NotFound(MessageTemplates.Format(MessageTemplates.RegisterNotFound, userEmail));
 
-    var userDoc = querySnapshot.Documents[0];
-    var resetToken = Guid.NewGuid().ToString();
+        var userDoc = querySnapshot.Documents[0];
+        var resetToken = Guid.NewGuid().ToString();
 
-     var tokenData = new Dictionary<string, object>
+        var tokenData = new Dictionary<string, object>
     {
         { "ResetToken", resetToken },
         { "TokenExpiration", DateTime.UtcNow.AddHours(1) }
     };
-    await userDoc.Reference.UpdateAsync(tokenData);
+        await userDoc.Reference.UpdateAsync(tokenData);
 
-    string baseUrl = _config["AppSettings:FrontendUrl"];
-    if (_config["ASPNETCORE_ENVIRONMENT"] == "Development")
-    {
-        baseUrl = _config["AppSettings:LocalFrontendUrl"];
+        string baseUrl = _config["AppSettings:FrontendUrl"];
+        if (_config["ASPNETCORE_ENVIRONMENT"] == "Development")
+        {
+            baseUrl = _config["AppSettings:LocalFrontendUrl"];
+        }
+
+        var resetLink = $"{baseUrl}/auth/userresetpassword?token={resetToken}";
+        var emailSubject = "Restablecimiento de Contraseña";
+        var emailBody = $"Hola, \n\nRecibimos una solicitud para restablecer tu contraseña. Haz clic en el enlace de abajo para continuar: \n\n{resetLink} \n\nEste enlace expirará en 1 hora.";
+
+        try
+        {
+            await _emailService.SendEmailAsync(userEmail, emailSubject, emailBody);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "Ocurrió un error al intentar enviar el correo." + ex.Message);
+        }
+
+        return Ok(new { message = "Instrucciones para restablecer la contraseña enviadas al correo electrónico." });
     }
-
-    var resetLink = $"{baseUrl}/auth/userresetpassword?token={resetToken}";
-    var emailSubject = "Restablecimiento de Contraseña";
-    var emailBody = $"Hola, \n\nRecibimos una solicitud para restablecer tu contraseña. Haz clic en el enlace de abajo para continuar: \n\n{resetLink} \n\nEste enlace expirará en 1 hora.";
-
-    try
-    {
-        await _emailService.SendEmailAsync(userEmail, emailSubject, emailBody);
-    }
-    catch (Exception ex)
-    {
-        return StatusCode(500, "Ocurrió un error al intentar enviar el correo." + ex.Message);
-    }
-
-    return Ok(new { message = "Instrucciones para restablecer la contraseña enviadas al correo electrónico." });
-}
 
 
     [HttpPost("reset-password")]
@@ -322,7 +322,7 @@ public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest
         await userDoc.Reference.UpdateAsync(new Dictionary<string, object>
         {
             { "Password", model.NewPassword },
-            { "ResetToken", null },  
+            { "ResetToken", null },
             { "TokenExpiration", null }
         });
 

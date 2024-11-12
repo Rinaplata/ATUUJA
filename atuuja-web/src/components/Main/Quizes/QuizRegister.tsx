@@ -205,12 +205,15 @@ const QuizRegister: React.FC<QuizRegisterProps> = ({closeModal }) => {
             }}
             className="block w-full p-2 mb-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
           />
-          {tipoSeleccionado === "Audio" && (   
-            <> 
-            {/* selección de archivoPregunta */} 
-              <p className="text-sm text-gray-500 mb-2">
-                Debes agregar el link del audio...
-              </p>
+
+        {(tipoSeleccionado === "Audio" || tipoSeleccionado === "Imagen") && (() => {
+          const mensaje = tipoSeleccionado === "Audio" 
+            ? "Debes agregar el link del audio..." 
+            : "Debes agregar el link de la imagen...";
+
+          return (
+            <>
+              <p className="text-sm text-gray-500 mb-2">{mensaje}</p>
               <input
                 type="text"
                 placeholder="Link..."
@@ -223,9 +226,10 @@ const QuizRegister: React.FC<QuizRegisterProps> = ({closeModal }) => {
                 className="block w-full p-2 mb-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
               />
             </>
-          )}
+          );
+        })()}
           {/* Mostrar el selector de archivo para imagen */}
-          {tipoSeleccionado === "Imagen" && (
+          {/* {tipoSeleccionado === "Imagen" && (
             <>
               <p className="text-sm text-gray-500 mb-2">
                 Debes seleccionar una imagen...
@@ -244,7 +248,7 @@ const QuizRegister: React.FC<QuizRegisterProps> = ({closeModal }) => {
                 className="block w-full p-2 mb-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
               />
             </>
-          )}
+          )} */}
           <input
             type="text"
             placeholder="Pista"
