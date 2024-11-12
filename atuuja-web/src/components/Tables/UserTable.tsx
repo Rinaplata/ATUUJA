@@ -9,6 +9,7 @@ import Modal from '../Modal/Modal';
 import { API_URL } from '../../config/config';
 import Alert from '../Alert/Alertas';
 import UserEditModal from '../Main/User/UserEdit';
+import ProgressBar from "@ramonak/react-progress-bar";
 
 interface IUserTable {
   users: User[];
@@ -158,11 +159,12 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
                   </p>
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                  <p className="text-black dark:text-white">{/* Progreso */}</p>
+                  <p className="text-black dark:text-white"> 
+                    <ProgressBar completed={user.Progreso} labelAlignment="center" labelSize="8px" bgColor="#9a2d2b" baseBgColor="#fef1ec"/></p>
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                   <p className="text-black dark:text-white">
-                    {/* Puntos Acumulados */}
+                    {user.PuntosAcumulados}
                   </p>
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
