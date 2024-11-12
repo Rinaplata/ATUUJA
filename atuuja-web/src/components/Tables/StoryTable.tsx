@@ -103,6 +103,9 @@ const TableThree: React.FC<IStoryTable> = ({ story }) => {
               <th className="min-w-[220px] py-4 px-4 font-medium text-white dark:text-white xl:pl-11">
                 Título del Relato
               </th>
+              <th className="min-w-[220px] py-4 px-4 font-medium text-white dark:text-white xl:pl-11">
+               Subtítulo
+              </th>
               <th className="min-w-[150px] py-4 px-4 font-medium text-white dark:text-white">
                 Contenido
               </th>
@@ -130,6 +133,11 @@ const TableThree: React.FC<IStoryTable> = ({ story }) => {
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                   <p className="text-black dark:text-white">
+                    {storyItem.Subtitle}
+                  </p>
+                </td>
+                <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                  <p className="text-black dark:text-white">
                     {storyItem.Contenido}
                   </p>
                 </td>
@@ -154,6 +162,7 @@ const TableThree: React.FC<IStoryTable> = ({ story }) => {
 
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                   <p className="text-black dark:text-white"></p>
+                  {storyItem.ImageUrl}
                 </td>
 
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
@@ -220,7 +229,9 @@ const TableThree: React.FC<IStoryTable> = ({ story }) => {
           titulo: selectedStory?.Titulo ?? '',
           contenido: selectedStory?.Contenido ?? '',
           palabrasResaltadas: selectedStory?.PalabrasResaltadas ?? [],
-          audioUrl: selectedStory?.AudioUrl ?? '', //
+          audioUrl: selectedStory?.AudioUrl ?? '', 
+          imageUrl: selectedStory?.ImageUrl?? '',
+          subtitle: selectedStory?.Subtitle?? ''
         }}
         onSuccess={handleUpdateSuccess}
       />

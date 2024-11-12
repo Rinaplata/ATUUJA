@@ -12,6 +12,8 @@ interface RegisterStoryProps {
     contenido: string;
     palabrasResaltadas: string[];
     audioUrl: string;
+    imageUrl: string,
+    subtitle: string
   };
   onSuccess: () => void;
 }
@@ -22,6 +24,8 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({ isOpen, onClose, storyDat
   const [contenido, setContenido] = useState('');
   const [palabrasResaltadas, setPalabrasResaltadas] = useState('');
   const [audioUrl, setAudioUrl] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const [subtitle, setSubtitle] = useState('');
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState<'success' | 'error' | undefined>(undefined);
 
@@ -32,6 +36,8 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({ isOpen, onClose, storyDat
       setContenido(storyData.contenido);
       setPalabrasResaltadas(storyData.palabrasResaltadas.join(', '));
       setAudioUrl(storyData.audioUrl);
+      setImageUrl(storyData.imageUrl);
+      setSubtitle(storyData.subtitle);
     }
   }, [storyData]);
 
@@ -48,14 +54,16 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({ isOpen, onClose, storyDat
           contenido,
           palabrasResaltadas: palabrasResaltadas.split(',').map(p => p.trim()),
           audioUrl,
+          imageUrl,
+          subtitle
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Error al registrar el relato');
+        throw new Error('Error al actualizar el relato');
       }
 
-      setAlertMessage('Relato registrado correctamente.');
+      setAlertMessage('Relato actualizado correctamente.');
       setAlertType('success');
 
       // Refresca la lista de relatos
@@ -64,14 +72,14 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({ isOpen, onClose, storyDat
       // Cierra el modal después de registrar
       onClose();
     } catch (error) {
-      console.error('Error al registrar el relato:', error);
-      setAlertMessage('Error al registrar el relato. Inténtalo nuevamente.');
+      console.error('Error al actualizar el relato:', error);
+      setAlertMessage('Error al actualizar el relato. Inténtalo nuevamente.');
       setAlertType('error');
     }
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Registrar Relato">
+    <Modal isOpen={isOpen} onClose={onClose} title="Actualizar Relato">
       {/* Renderizar alerta */}
       {alertMessage && (
         <Alert
@@ -135,8 +143,20 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({ isOpen, onClose, storyDat
           <label className="mb-2 block">URL Imagen:</label>
           <input
             type="text"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
             className="border p-2 mb-4 rounded w-full"
             placeholder="Ingrese la URL de la imagen"
+          />
+        </div>
+        <div>
+          <label className="mb-2 block">Subtítulo:</label>
+          <input
+            type="text"
+            value={subtitle}
+            onChange={(e) => setSubtitle(e.target.value)}
+            className="border p-2 mb-4 rounded w-full"
+            placeholder="Ingrese Subtítulo"
           />
         </div>
       </div>
@@ -151,7 +171,7 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({ isOpen, onClose, storyDat
           onClick={handleRegister}
           className="bg-primaryAtuuja text-white px-4 py-2 rounded-lg hover:bg-primaryAtuuja-700"
         >
-          Registrar
+          Actualizar
         </button>
       </div>
     </Modal>
