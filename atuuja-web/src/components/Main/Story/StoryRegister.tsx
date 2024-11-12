@@ -11,6 +11,8 @@ interface RegisterStoryProps {
     contenido: string;
     palabrasResaltadas: string[];
     audioUrl: string;
+    imageUrl: string;
+    subtitle: string;
   }) => void;
 }
 
@@ -23,6 +25,8 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({
   const [contenido, setContenido] = useState('');
   const [palabrasResaltadas, setPalabrasResaltadas] = useState('');
   const [audioUrl, setAudioUrl] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const [subtitle, setSubtitle] = useState('');
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState<'success' | 'error' | undefined>(undefined);
 
@@ -33,6 +37,8 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({
         contenido,
         palabrasResaltadas: palabrasResaltadas.split(',').map((word) => word.trim()),
         audioUrl,
+        imageUrl,
+        subtitle
       };
 
       const response = await fetch(`${API_URL}/Stories/create`, {
@@ -93,6 +99,16 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({
               className="border p-2 mb-4 rounded w-full"
               placeholder="Ingrese el contenido del relato"
             />
+          </div> 
+          <div className="col-span-2">
+            <label className="mb-2 block font-bold">Subtítulo:</label>
+            <input
+              type="text"
+              value={subtitle}
+              onChange={(e) => setSubtitle(e.target.value)}
+              className="border p-2 mb-4 rounded w-full"
+              placeholder="Ingrese Subtitulo"
+            />
           </div>
           <div className="col-span-2">
             <label className="mb-2 block font-bold">Palabras Resaltadas:</label>
@@ -110,6 +126,16 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({
               type="text"
               value={audioUrl}
               onChange={(e) => setAudioUrl(e.target.value)}
+              className="border p-2 mb-4 rounded w-full"
+              placeholder="Ingrese la URL del audio"
+            />
+          </div>
+          <div className="col-span-2">
+            <label className="mb-2 block font-bold">URL de la imagen:</label>
+            <input
+              type="text"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
               className="border p-2 mb-4 rounded w-full"
               placeholder="Ingrese la URL del audio"
             />
