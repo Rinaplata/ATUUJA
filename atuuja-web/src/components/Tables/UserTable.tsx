@@ -158,11 +158,11 @@ const TableThree: React.FC<IUserTable> = ({ users }) => {
                   </p>
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                  <p className="text-black dark:text-white">{/* Progreso */}</p>
+                  <p className="text-black dark:text-white"> {user.Progreso}%</p>
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                   <p className="text-black dark:text-white">
-                    {/* Puntos Acumulados */}
+                    {user.PuntosAcumulados}
                   </p>
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">

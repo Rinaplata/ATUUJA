@@ -17,6 +17,8 @@ interface EditUserProps {
     tipoDocumento: TipoDocumento,
     numDocumento: string,
     isAdmin: boolean;
+    puntosAcomulados:number,
+    progreso: number
   };
   onSuccess: () => void;
 }
@@ -31,6 +33,8 @@ const UserEdit: React.FC<EditUserProps> = ({ isOpen, onClose, userData, onSucces
   const [cuidad, setCuidad] = useState('');
   const [tipoDocumento, setTipoDocumento] = useState(TipoDocumento.Cedula);
   const [numeroDocumento, setNumeroDocumento] = useState('');
+  const [puntosAcomulados, setPuntosAcomulados] = useState(0);
+  const [progreso, setProgreso] = useState(0);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState<'success' | 'error' | undefined>(undefined);
 
@@ -44,7 +48,8 @@ const UserEdit: React.FC<EditUserProps> = ({ isOpen, onClose, userData, onSucces
       setEdad(userData.edad);
       setCuidad(userData.cuidad);
       setTipoDocumento(userData.tipoDocumento);
-      setNumeroDocumento(userData.numDocumento);
+      setPuntosAcomulados(userData.puntosAcomulados);
+      setProgreso(userData.progreso);
     }
   }, [userData]);
 
@@ -65,6 +70,8 @@ const UserEdit: React.FC<EditUserProps> = ({ isOpen, onClose, userData, onSucces
           cuidad,
           tipoDocumento,
           numeroDocumento,
+          puntosAcomulados,
+          progreso
         }),
       });
 

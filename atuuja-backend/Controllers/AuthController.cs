@@ -22,6 +22,7 @@ public class AuthController : ControllerBase
     const string usersyKeyDescripcion = "users";
     const string userDescripcion = "Usuario";
     const string progressKeyDescripcion = "progress";
+    const string quizKeyDescripcion = "examenes";
 
     public AuthController(IConfiguration config, IEmailService emailService)
     {
@@ -127,7 +128,7 @@ public class AuthController : ControllerBase
     }
 
 
-   [HttpPut("update/{userId}")]
+    [HttpPut("update/{userId}")]
     public async Task<IActionResult> UpdateUser(string userId, [FromBody] UserRegister model)
     {
         try
@@ -233,24 +234,73 @@ public class AuthController : ControllerBase
     }
 
     [HttpGet("list")]
-    public async Task<IActionResult> ListUsers()
-    {
+    public async Task<IActionResult> ListUsersWithPoints()
+    { 
         var usersSnapshot = await _firestoreDb.Collection(usersyKeyDescripcion).GetSnapshotAsync();
 
         if (!usersSnapshot.Documents.Any())
             return Ok(new List<Dictionary<string, object>>());
+ 
+        var progressSnapshot = await _firestoreDb.Collection(progressKeyDescripcion).GetSnapshotAsync();
+        var progressDictionary = progressSnapshot.Documents
+            .GroupBy(doc => doc.GetValue<string>("UsuarioId"))
+            .ToDictionary(
+                g => g.Key,
+                g => new
+                {
+                    PuntosAcumulados = g.First().GetValue<int>("PuntosAcumulados"),
+                    RelatoId = g.First().GetValue<string>("RelatoId"),
+                    OrdenPreguntaActual = g.First().ContainsField("OrdenPreguntaActual")
+                        ? g.First().GetValue<int>("OrdenPreguntaActual")
+                        : 0  
+                }
+            );
 
-        var usersList = usersSnapshot.Documents
-        .Select(document =>
+        // Obtener la colección de exámenes y contar las preguntas por cada RelatoId
+        var examSnapshot = await _firestoreDb.Collection("examenes").GetSnapshotAsync();
+        var preguntaCountByRelato = examSnapshot.Documents
+            .GroupBy(doc => doc.GetValue<string>("RelatoId"))
+            .ToDictionary(
+                g => g.Key,
+                g => g.Sum(doc => doc.GetValue<List<Dictionary<string, object>>>("Preguntas").Count) // Contar preguntas por RelatoId
+            );
+
+         var usersList = usersSnapshot.Documents
+            .Select(document =>
             {
                 var user = document.ToDictionary();
                 user["Id"] = document.Id;
+
+                var userId = document.Id;
+                var progressData = progressDictionary.ContainsKey(userId) ? progressDictionary[userId] : null;
+
+                if (progressData != null)
+                {
+                    user["PuntosAcumulados"] = progressData.PuntosAcumulados;
+                    // Agregar la cantidad de preguntas para el RelatoId del usuario
+                    var relatoId = progressData.RelatoId;
+                    var totalPreguntas = !string.IsNullOrEmpty(relatoId) && preguntaCountByRelato.ContainsKey(relatoId)
+                        ? preguntaCountByRelato[relatoId]
+                        : 0;
+                
+                    // Calcular y asignar el campo Progreso como un porcentaje
+                    user["Progreso"] = totalPreguntas > 0
+                        ? (progressData.OrdenPreguntaActual / (double)totalPreguntas) * 100
+                        : 0;
+                }
+                else
+                {  
+                    user["PuntosAcumulados"] = 0; 
+                    user["Progreso"] = 0;
+                }
+
                 return user;
-            }
-        ).ToList();
+            })
+            .ToList();
 
         return Ok(usersList);
     }
+
 
 
     [HttpPost("forgot-password")]
