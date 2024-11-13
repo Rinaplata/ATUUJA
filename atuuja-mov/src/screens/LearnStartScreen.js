@@ -92,8 +92,13 @@ const StoryIntroScreen = ({ navigation, route  }) => {
 
       <TouchableOpacity
         style={styles.startButton}
-        onPress={() => navigation.navigate("LearnStart")}
-      >
+        onPress={() => {
+          if (story?.RelatoId) {
+            navigation.navigate("LearnStart", { RelatoId: story.RelatoId });
+          } else {
+            console.error("RelatoId no encontrado en stories");
+          }
+        }}      >
         <Text style={styles.startButtonText}>Comenzar</Text>
         <View style={styles.iconCircle}>
           <Ionicons name="book-outline" size={scaleSize(18)} color="#FFF" />
