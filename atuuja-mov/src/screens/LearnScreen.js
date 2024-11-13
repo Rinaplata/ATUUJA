@@ -44,26 +44,48 @@ const LearnScreen = ({ navigation, route }) => {
   }, [audioPlayer]);
 
   const playPauseAudio = async () => {
-    if (audioPlayer === null && story?.AudioUrl) {
-      const { sound } = await Audio.Sound.createAsync({ uri: story.AudioUrl });
-      setAudioPlayer(sound);
-      setIsPlaying(true);
-      await sound.playAsync();
-    } else if (isPlaying) {
-      setIsPlaying(false);
-      await audioPlayer.pauseAsync();
-    } else {
-      setIsPlaying(true);
-      await audioPlayer.playAsync();
+    try {
+      if (audioPlayer === null && story?.AudioUrl) {
+        // Cargar el audio por primera vez
+        const { sound } = await Audio.Sound.createAsync({ uri: story.AudioUrl });
+        setAudioPlayer(sound);
+  
+        sound.setOnPlaybackStatusUpdate((status) => {
+          if (status.didJustFinish) {
+            setIsPlaying(false); // Audio terminó
+            sound.setPositionAsync(0); // Reiniciar posición
+          }
+        });
+  
+        setIsPlaying(true);
+        await sound.playAsync();
+      } else if (audioPlayer) {
+        const status = await audioPlayer.getStatusAsync();
+  
+        if (status.isLoaded) {
+          if (isPlaying) {
+            // Pausar el audio si está reproduciendo
+            await audioPlayer.pauseAsync();
+            setIsPlaying(false);
+          } else {
+            // Reproducir el audio si está pausado
+            await audioPlayer.playAsync();
+            setIsPlaying(true);
+          }
+        } else {
+          console.error("El audio no está cargado correctamente.");
+        }
+      }
+    } catch (error) {
+      console.error("Error al manejar el audio:", error);
     }
   };
-
   const highlightContent = (content, highlights) => {
     if (!content || !highlights) return content;
 
     const words = content.split(" ");
     return words.map((word, index) => {
-      const cleanWord = word.replace(/[\.,]/g, ""); // Remove punctuation
+      const cleanWord = word.replace(/[\.,]/g, ""); 
       if (highlights.includes(cleanWord)) {
         return (
           <Text key={index} style={styles.highlighted}>
@@ -164,11 +186,6 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",
-  },
-  closeText: {
-    fontSize: scaleFontSize(16),
-    fontWeight: "bold",
-    color: "#E56363",
   },
   textContainer: {
     padding: width * 0.04,
