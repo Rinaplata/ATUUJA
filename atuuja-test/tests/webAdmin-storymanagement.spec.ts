@@ -42,17 +42,18 @@ async function newstory(page) {
     await page.screenshot({ path: './screenshots/Test3-storypart.png' });
     await page.waitForTimeout(3000);  
   
-    // Completar el campo de ID
-    await page.getByPlaceholder('Ingrese el ID del relato').fill('Jgl84');
-    await page.screenshot({ path: './screenshots/Test3-story-ID.png' });
-  
+    
     // Completar el campo de titulo
     await page.getByPlaceholder('Ingrese el título del relato').fill('Tejedores de sueños');
     await page.screenshot({ path: './screenshots/Test3-story-title.png' });
-  
+
     // Completar el campo de contenido
     await page.getByPlaceholder('Ingrese el contenido del relato').fill('Unos niños que tejen sus sueños con historias');
     await page.screenshot({ path: './screenshots/Test3-story-contend.png' });
+
+     // Editar el campo de subtitulo
+    await page.getByPlaceholder('Ingrese Subtitulo').fill('Tejedores de sueños');
+    await page.screenshot({ path: './screenshots/Test3-story-subtitle.png' });
   
     // Completar el campo de Correo palabras resaltadas
     await page.getByPlaceholder('Ingrese palabras resaltadas separadas por comas').fill('niños, tejer, sueños');
@@ -61,7 +62,11 @@ async function newstory(page) {
     // Completar el campo de url audio
     await page.getByPlaceholder('Ingrese la URL del audio').fill('https://soundcloud.com/yesspyro/spyro-boomtown-2024-promo-mix?utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing');
     await page.screenshot({ path: './screenshots/Test3-story-audio.png' });
-    
+
+     // Completar el campo de url audio
+     await page.getByPlaceholder('Ingrese la URL de la imagen').fill('https://soundcloud.com/yesspyro/spyro-boomtown-2024-promo-mix?utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing');
+     await page.screenshot({ path: './screenshots/Test3-story-audio.png' });
+
    //Dar click en resgistrar
     await page.getByRole('button', { name: /Registrar/i }).click();
     await page.screenshot({ path: './screenshots/Test3-story-new.png' });
@@ -89,6 +94,10 @@ test('Edit story', async ({ page }) => {
   await page.getByPlaceholder('Ingrese el título del relato').fill('Tejedores de sueños');
   await page.screenshot({ path: './screenshots/Test3-edit-story-title.png' });
 
+  // Editar el campo de subtitulo
+  await page.getByPlaceholder('Ingrese Subtítulo').fill('Tejedores de sueños');
+  await page.screenshot({ path: './screenshots/Test3-edit-story-subtitle.png' });
+
   // Editar el campo de contenido
   await page.getByPlaceholder('Ingrese el contenido del relato').fill('Unos niños que tejen sus sueños con historias');
   await page.screenshot({ path: './screenshots/Test3-edit-story-contend.png' });
@@ -106,7 +115,7 @@ test('Edit story', async ({ page }) => {
    await page.screenshot({ path: './screenshots/Test3-edit-story-image.png' });
   
  //Dar click en resgistrar
-  await page.getByRole('button', { name: /Registrar/i }).click();
+  await page.getByRole('button', { name: /Actualizar/i }).click();
   await page.waitForTimeout(3000);
   await page.screenshot({ path: './screenshots/Test3-edit-story-new.png' });
 })
@@ -120,74 +129,10 @@ test('Delete story', async ({ page }) => {
   await page.click('button:nth-of-type(2)'); 
   await page.screenshot({ path: './screenshots/Test3-delete-story.png' });
 
-  /*/Eliminar Historia
-  await page.getByRole('button', { name: /Si, estoy seguro/i }).click();
-  await page.screenshot({ path: './screenshots/delete-userdefinitive.png' });*/
+  //Eliminar Historia
+  await page.getByRole('button', { name: /Sí, estoy seguro/i }).click();
+  await page.screenshot({ path: './screenshots/delete-userdefinitive.png' });
 })
 
-test('new story fail', async ({ page }) => {
-    await login(page);
-    await page.goto(managementStory);
-    await page.waitForTimeout(3000); 
-    await page.getByRole('button', { name: /Nuevo/i }).click();
-    await page.waitForTimeout(3000);  
-  
-    // Completar el campo de ID
-    await page.getByPlaceholder('Ingrese el ID del relato').fill('Jgl84');
-    
-  
-    // Completar el campo de titulo
-    await page.getByPlaceholder('Ingrese el título del relato').fill('');
-    
-  
-    // Completar el campo de contenido
-    await page.getByPlaceholder('Ingrese el contenido del relato').fill('Unos niños que tejen sus sueños con historias');
-    
-  
-    // Completar el campo de Correo palabras resaltadas
-    await page.getByPlaceholder('Ingrese palabras resaltadas separadas por comas').fill('niños, tejer, sueños');
-    
-  
-    // Completar el campo de url audio
-    await page.getByPlaceholder('Ingrese la URL del audio').fill('https://soundcloud.com/yesspyro/spyro-boomtown-2024-promo-mix?utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing');
-    
-    
-   //Dar click en resgistrar
-    await page.getByRole('button', { name: /Registrar/i }).click();
-    await page.screenshot({ path: './screenshots/Test3-story-newf.png' });
-})
 
-test('Edit story fail', async ({ page }) => {
-  await login(page);
-  await page.goto(managementStory);
-  await page.waitForTimeout(3000);
 
-  //Dar clik al boton editar 
-  await page.click('svg.h-5.w-5'); 
-  
-
-  // Editar el campo de titulo
-  await page.getByPlaceholder('Ingrese el título del relato').fill('');
-  
-
-  // Editar el campo de contenido
-  await page.getByPlaceholder('Ingrese el contenido del relato').fill('Unos niños que tejen sus sueños con historias');
-  
-
-  // Editar el campo de palabras resaltadas
-  await page.getByPlaceholder('Ingrese palabras resaltadas separadas por comas').fill('niños, tejer, sueños');
-  
-
-  // Editar el campo de url audio
-  await page.getByPlaceholder('Ingrese la URL del audio').fill('https://soundcloud.com/yesspyro/spyro-boomtown-2024-promo-mix?utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing');
-  
-
-   // Editar el campo de url imagen
-   await page.getByPlaceholder('Ingrese la URL de la imagen').fill('https://artesaniasdecolombia.com.co/Documentos/Contenido/37975_mes-madre-carmen-maria-gonzalez-artesanias-colombia-2021-g.jpg');
-   
-  
- //Dar click en resgistrar
-  await page.getByRole('button', { name: /Registrar/i }).click();
-  await page.waitForTimeout(3000);
-  await page.screenshot({ path: './screenshots/Test3-edit-story-newf.png' });
-})

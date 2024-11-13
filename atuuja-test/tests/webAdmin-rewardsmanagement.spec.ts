@@ -116,9 +116,9 @@ test('Delete redward', async ({ page }) => {
     await page.click('button:nth-of-type(2)'); 
     await page.screenshot({ path: './screenshots/Test5-delete-redward.png' });
   
-    /*/Eliminar Historia
-    await page.getByRole('button', { name: /Si, estoy seguro/i }).click();
-    await page.screenshot({ path: './screenshots/delete-userdefinitive.png' });*/
+    //Eliminar Recompensa
+    await page.getByRole('button', { name: /Sí, estoy seguro/i }).click();
+    await page.screenshot({ path: './screenshots/delete-redwarddefinitive.png' });
   })
 
   test('new reward fail', async ({ page }) => {

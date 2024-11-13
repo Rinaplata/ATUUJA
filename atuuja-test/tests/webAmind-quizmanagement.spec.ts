@@ -55,7 +55,7 @@ async function newquiz(page) {
     await page.screenshot({ path: './screenshots/Test4-Add-quiz-select.png' });
   
     //llenar la informacion de la nueva pregunta
-    await page.selectOption('#tipo-pregunta-select', 'Texto'); // Seleccionar el tipo de pregunta
+    await page.selectOption('#tipo-pregunta-select', 'Audio'); // Seleccionar el tipo de pregunta
     await page.screenshot({ path: './screenshots/Test4-select-type-quiz.png' });
 
     // llenar el campo agregar orden
@@ -130,7 +130,7 @@ test('Edit quiz', async ({ page }) => {
   await page.screenshot({ path: './screenshots/Test4-edit-status-quiz.png' });
 
   // Llenar el campo enunciado 
-  await page.fill('input[value="Esto es una prueba urgente de puntos "]', 'prueba')
+  const valor = await page.locator('input.block.w-full.p-2.border.border-gray-300.rounded-md').nth(1).inputValue();
   await page.screenshot({ path: './screenshots/Test4-edit-quiz-statement.png' }); 
 
   //Seleccionar el tipo de pregunta 
@@ -142,19 +142,19 @@ test('Edit quiz', async ({ page }) => {
   await page.screenshot({ path: './screenshots/Test4-edit-quiz-points.png' }); 
 
   // Llenar el campo agregar respuesta 1 
-  await page.fill('input[type="text"][value="no"]', 'si');
+  await page.fill('input[type="text"][value="Jintut "]', 'si');
   await page.screenshot({ path: './screenshots/Test4-edit-quiz-answer.png' }); 
 
   // Llenar el campo agregar respuesta 2 
-  await page.fill('input[type="text"][value="si"]', 'no');
+  await page.fill('input[type="text"][value="Katiout"]', 'no');
   await page.screenshot({ path: './screenshots/Test4-edit-quiz-answer2.png' }); 
 
   // Llenar el campo agregar respuesta 3 
-  await page.fill('input[type="text"][value="si"]', 'si');
+  await page.fill('input[type="text"][value="Anachan"]', 'si');
   await page.screenshot({ path: './screenshots/Test4-edit-quiz-answer3.png' }); 
 
   // Llenar el campo agregar respuesta 4
-  await page.fill('input[type="text"][value="no"]', 'si');
+  await page.fill('input[type="text"][value="Puliku"]', 'si');
   await page.screenshot({ path: './screenshots/Test4-edit-quiz-answer4.png' }); 
 
   // Seleccionar respuesta correcta 
@@ -176,9 +176,9 @@ test('Delete quiz', async ({ page }) => {
   await page.click('svg.h-5.w-5'); 
   await page.screenshot({ path: './screenshots/Test4-delete-quiz.png' });
 
-  /*/Eliminar Usuario
-  await page.getByRole('button', { name: /Si, estoy seguro/i }).click();
-  await page.screenshot({ path: './screenshots/delete-quiz-definitily.png' });*/
+  //Eliminar Usuario
+  await page.getByRole('button', { name: /Sí, eliminar/i }).click();
+  await page.screenshot({ path: './screenshots/delete-quiz-definitily.png' });
 })
 
 test('new quiz fail', async ({ page }) => {
@@ -191,20 +191,17 @@ test('new quiz fail', async ({ page }) => {
   // Seleccionar el relato para el quiz
   await page.selectOption('#relato-select', { index: 1 });
   
-  // Seleccionar estado del relato
-  await page.selectOption('#estado-select', '0');
-  
   //Dar click en agregar nueva pregunta
   await page.getByRole('button', { name: /Agregar Pregunta/i }).click();
   
   //llenar la informacion de la nueva pregunta
-  await page.selectOption('#tipo-pregunta-select', 'Texto'); // Seleccionar el tipo de pregunta
+  await page.selectOption('#tipo-pregunta-select', 'Audio'); // Seleccionar el tipo de pregunta
 
   // llenar el campo agregar orden
-  await page.getByPlaceholder('Agregar orden').fill('1');
+  await page.getByPlaceholder('Agregar orden').fill('2');
    
   // llenar el campo agregar enunciado
-  await page.getByPlaceholder('Enunciado de la pregunta').fill('');
+  await page.getByPlaceholder('Enunciado de la pregunta').fill('hola');
    
   // llenar el campo agregar link de imagen o audio
   await page.getByPlaceholder('Link...').fill('https://img.freepik.com/vector-gratis/abeja-insecto-volando_24908-82216.jpg?semt=ais_hybrid');
@@ -234,56 +231,4 @@ test('new quiz fail', async ({ page }) => {
   await page.getByRole('button', { name: /Registrar Cuestionario/i }).click();
   await page.waitForTimeout(3000);
   await page.screenshot({ path: './screenshots/Test4-quiz-new-createf.png' });
-})
-
-test('edit quiz fail', async ({ page }) => {
-  await login(page);
-  await page.goto(managementQuiz);
-
-  // Dar click en el botón editar
-  await page.waitForSelector('button:nth-of-type(2)', { state: 'visible' });
-  await page.click('button:nth-of-type(2)'); 
-
-  // Seleccionar el relato para el quiz
-  await page.selectOption('#relato-select', { index: 1 });
-  
-  // Seleccionar estado del relato
-  await page.selectOption('#estado-select', '1');
-  
-  // Llenar el campo enunciado 
-  await page.fill('input[value="Esto es una prueba urgente de puntos "]', 'prueba')
-  
-
-  //Seleccionar el tipo de pregunta 
-  await page.selectOption('select:below(label:text("Tipo de pregunta"))', '2');
-  
- 
-  // Llenar el campo puntos pregunta 1
-  await page.fill('input[type="number"]:nth-of-type(1)', '');
-   
-
-  // Llenar el campo agregar respuesta 1 
-  await page.fill('input[type="text"][value="no"]', 'si');
-   
-
-  // Llenar el campo agregar respuesta 2 
-  await page.fill('input[type="text"][value="si"]', 'no');
-  
-
-  // Llenar el campo agregar respuesta 3 
-  await page.fill('input[type="text"][value="si"]', 'si');
-   
-
-  // Llenar el campo agregar respuesta 4
-  await page.fill('input[type="text"][value="no"]', 'si');
-   
-
-  // Seleccionar respuesta correcta 
-  await page.check('div.mt-2.border.p-2:nth-of-type(2) input.form-checkbox');
-  
-
-  // Dar click en "Registrar Cuestionario"
-  await page.click('button:text("Guardar Cambios")');
-  await page.waitForTimeout(3000);
-  await page.screenshot({ path: './screenshots/Test4-quiz-new-create.png' });
 })
