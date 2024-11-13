@@ -137,7 +137,7 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({
               value={imageUrl}
               onChange={(e) => setImageUrl(e.target.value)}
               className="border p-2 mb-4 rounded w-full"
-              placeholder="Ingrese la URL del audio"
+              placeholder="Ingrese la URL de la imagen"
             />
           </div>
         </div>
