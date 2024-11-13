@@ -13,7 +13,7 @@ interface QuizRegisterProps {
   closeModal: () => void;
 }
 
-const QuizRegister: React.FC<QuizRegisterProps> = ({closeModal }) => {
+const QuizRegister: React.FC<QuizRegisterProps> = ({ closeModal }) => {
   const [examenId, setExamenId] = useState<string>("");
   const [relatoId, setRelatoId] = useState<string>("");
   const [preguntas, setPreguntas] = useState<Pregunta[]>([]);
@@ -21,7 +21,6 @@ const QuizRegister: React.FC<QuizRegisterProps> = ({closeModal }) => {
   const [relatos, setRelatos] = useState<
     { RelatoId: string; Contenido: string }[]
   >([]);
-  const [tipoSeleccionado, setTipoSeleccionado] = useState<string>("-1");
 
   useEffect(() => {
     const fetchStories = async () => {
@@ -86,10 +85,6 @@ const QuizRegister: React.FC<QuizRegisterProps> = ({closeModal }) => {
     }
   };
 
-  const tipoPreguntaNombres = Object.keys(TipoPregunta).filter((key) =>
-    isNaN(Number(key))
-  );
-
   return (
     <form
       onSubmit={handleSubmit}
@@ -148,34 +143,36 @@ const QuizRegister: React.FC<QuizRegisterProps> = ({closeModal }) => {
       {preguntas.map((pregunta, index) => (
         <div key={index} className="mt-6 border p-4 rounded-md shadow-sm">
           <h3 className="text-lg font-semibold mb-2">Pregunta {index + 1}</h3>
-          {/* seleccion tipo de pregunta */}
+          {/* Selección de tipo de pregunta */}
           <div className="mb-2">
             <label
-              htmlFor="tipo-pregunta-select"
+              htmlFor={`tipo-pregunta-select-${index}`}
               className="block mt-4 mb-2 text-sm font-medium text-gray-700"
             >
-              Selección Tipo pregunta    
+              Selección Tipo pregunta
             </label>
             <select
-              id="tipo-pregunta-select"
-              value={tipoSeleccionado}
+              id={`tipo-pregunta-select-${index}`}
+              value={preguntas[index].TipoPregunta}
               onChange={(e) => {
-                setTipoSeleccionado(e.target.value) 
-                    const tipoSeleccionadoIndex = TipoPregunta[e.target.value as keyof typeof TipoPregunta];
-                    const newPreguntas = [...preguntas];
-                    newPreguntas[index].TipoPregunta = tipoSeleccionadoIndex,
-                    setPreguntas(newPreguntas);
-                }
-              }
+                const tipoSeleccionado = e.target.value;
+                const tipoSeleccionadoNumber = parseInt(tipoSeleccionado, 10);
+                const newPreguntas = [...preguntas];
+                newPreguntas[index].TipoPregunta = tipoSeleccionadoNumber;
+
+                setPreguntas(newPreguntas);
+              }}
               className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
               required
             >
-              <option value="-1"></option>
-              {Object.entries(tipoPreguntaNombres).map(([key, value]) => (
-                <option key={key} value={value}>
-                  {value}
-                </option>
-              ))}
+              <option value="-1">Selecciona un tipo</option>
+              {Object.values(TipoPregunta)
+                .filter(value => typeof value === 'number')
+                .map((value, index) => (
+                  <option key={index} value={value}>
+                    {TipoPregunta[value]} {/* Muestra el nombre legible del valor */}
+                  </option>
+                ))}
             </select>
           </div>
 
@@ -206,49 +203,31 @@ const QuizRegister: React.FC<QuizRegisterProps> = ({closeModal }) => {
             className="block w-full p-2 mb-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
           />
 
-        {(tipoSeleccionado === "Audio" || tipoSeleccionado === "Imagen") && (() => {
-          const mensaje = tipoSeleccionado === "Audio" 
-            ? "Debes agregar el link del audio..." 
-            : "Debes agregar el link de la imagen...";
+          {(pregunta.TipoPregunta === TipoPregunta.Audio || pregunta.TipoPregunta === TipoPregunta.Imagen) && (
+            (() => {
+              const mensaje =
+                pregunta.TipoPregunta === TipoPregunta.Audio
+                  ? "Debes agregar el link del audio..."
+                  : "Debes agregar el link de la imagen...";
 
-          return (
-            <>
-              <p className="text-sm text-gray-500 mb-2">{mensaje}</p>
-              <input
-                type="text"
-                placeholder="Link..."
-                value={pregunta.ArchivoPregunta}
-                onChange={(e) => {
-                  const newPreguntas = [...preguntas];
-                  newPreguntas[index].ArchivoPregunta = e.target.value;
-                  setPreguntas(newPreguntas);
-                }}
-                className="block w-full p-2 mb-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
-              />
-            </>
-          );
-        })()}
-          {/* Mostrar el selector de archivo para imagen */}
-          {/* {tipoSeleccionado === "Imagen" && (
-            <>
-              <p className="text-sm text-gray-500 mb-2">
-                Debes seleccionar una imagen...
-              </p>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files && e.target.files[0];
-                  if (file) {
-                    const newPreguntas = [...preguntas];
-                    newPreguntas[index].ArchivoPregunta = URL.createObjectURL(file); // Guarda la URL del archivo seleccionado
-                    setPreguntas(newPreguntas);
-                  }
-                }}
-                className="block w-full p-2 mb-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
-              />
-            </>
-          )} */}
+              return (
+                <>
+                  <p className="text-sm text-gray-500 mb-2">{mensaje}</p>
+                  <input
+                    type="text"
+                    placeholder="Link..."
+                    value={pregunta.ArchivoPregunta}
+                    onChange={(e) => {
+                      const newPreguntas = [...preguntas];
+                      newPreguntas[index].ArchivoPregunta = e.target.value;
+                      setPreguntas(newPreguntas);
+                    }}
+                    className="block w-full p-2 mb-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                  />
+                </>
+              );
+            })()
+          )}
           <input
             type="text"
             placeholder="Pista"
