@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,10 +10,45 @@ import {
   PixelRatio,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useStories } from "../context/StoryContext";
 
 const { width, height } = Dimensions.get("window");
 
-const StoryIntroScreen = ({ navigation }) => {
+const StoryIntroScreen = ({ navigation, route  }) => {
+  const { RelatoId } = route.params || {};
+  const { stories, loadingStory, errorStory } = useStories();
+  const [story, setStory] = useState(null);
+
+
+  useEffect(() => {
+    if (!RelatoId) {
+      console.error("RelatoId no proporcionado en los parámetros");
+      return;
+    }
+    if (stories) {
+      const selectedStory = stories.find((s) => s.RelatoId === RelatoId);
+      setStory(selectedStory);
+    }
+  }, [stories, RelatoId]);
+
+  if (loadingStory) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.loadingText}>Cargando relato...</Text>
+      </View>
+    );
+  }
+
+  if (errorStory || !story) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>
+          {errorStory || "Relato no encontrado"}
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -27,19 +62,18 @@ const StoryIntroScreen = ({ navigation }) => {
 
       <View style={styles.imageContainer}>
         <Image
-          source={require("../../assets/icons/images/DALL·E-la_fiezta_de_la_yonna.png")}
-          style={styles.storyImage}
+         source={{ uri: story?.ImageUrl || "https://atuuja.blob.core.windows.net/audios/words/Jintut (niña).ogg" }}      
+        style={styles.storyImage}
         />
       </View>
 
       <View style={styles.containerText}>
         <View style={styles.contentContainer}>
           <Text style={styles.title}>Relato</Text>
-          <Text style={styles.subtitle}>Wayuu Jintut</Text>
-          <Text style={styles.subsecondtitle}>Niña Wayuu</Text>
+          <Text style={styles.subtitle}>{story.Titulo}</Text>
+          <Text style={styles.subsecondtitle}>{story.Subtitle}</Text>
           <Text style={styles.description}>
-            Este relato narra la vida de una niña y sus experiencias en el
-            resguardo.
+          Este relato describe las costumbres, tradiciones y vivencias únicas del pueblo Wayuu, reflejando la conexión espiritual con la naturaleza, su cultura ancestral y las historias que han pasado de generación en generación.
           </Text>
         </View>
 

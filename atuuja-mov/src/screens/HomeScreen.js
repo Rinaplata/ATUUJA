@@ -60,7 +60,7 @@ if (error || errorStory) {
         <Text style={styles.relatoSubtitle}>{item.Subtitle}</Text>
           <TouchableOpacity
             style={styles.startButton}
-            onPress={() => navigation.navigate("StoryIntro", { story: item })}
+            onPress={() => navigation.navigate("Learn", { RelatoId: item.RelatoId })}
           >
             <Text style={styles.startButtonText}>Comenzar</Text>
           </TouchableOpacity>

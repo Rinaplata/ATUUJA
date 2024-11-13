@@ -26,3 +26,16 @@ export const getUserProgress = async (userId) => {
     throw error;
   }
 };
+
+export const GetAuthList = async () => {
+  try {
+    const response = await api.get(`Auth/list`);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error al obtener la lista de usuario",
+      error.response ? error.response.data : error.message
+    );
+    throw error;
+  }
+};
