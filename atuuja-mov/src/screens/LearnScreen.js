@@ -64,11 +64,9 @@ const LearnScreen = ({ navigation, route }) => {
   
         if (status.isLoaded) {
           if (isPlaying) {
-            // Pausar el audio si está reproduciendo
             await audioPlayer.pauseAsync();
             setIsPlaying(false);
           } else {
-            // Reproducir el audio si está pausado
             await audioPlayer.playAsync();
             setIsPlaying(true);
           }
@@ -145,7 +143,7 @@ const LearnScreen = ({ navigation, route }) => {
 
         <TouchableOpacity
           style={styles.continueButton}
-          onPress={() => navigation.navigate("QuizImagen")}
+          onPress={() =>  navigation.navigate("QuizImagen", { RelatoId: story.RelatoId })}
         >
           <Text style={styles.continueText}>Continuar</Text>
         </TouchableOpacity>

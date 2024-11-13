@@ -17,11 +17,18 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#ffffff",
+        "newArchEnabled": true
       }
     },
+    "adaptiveIcon": {
+      "foregroundImage": "./assets/icons/adaptive-icon.png",
+      "backgroundColor": "#ffffff",
+      "newArchEnabled": true
+    },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-font"
     ]
   }
 }
