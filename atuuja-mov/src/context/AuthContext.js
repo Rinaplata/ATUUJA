@@ -12,12 +12,13 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       setLoading(true);
-      const nextUser = await AuthService.login({ email, password });
+      const token  = await AuthService.login({ email, password });
 
-      if (nextUser.token) {
-        setUser(nextUser);
+      if (token) {
+        setUser(token );
         return true;
-      } else {
+      }
+       else {
         setError("Token no recibido");
         setTimeout(() => setError(""), 3000);
         return false;

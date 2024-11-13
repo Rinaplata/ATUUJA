@@ -23,8 +23,8 @@ const DropdownUser = () => {
           },
         });
         setUserinformation(await response.json());
-
-      } catch (error) {
+      } 
+      catch (error) {
       console.error('Error fetching data:', error);
     }
 
@@ -35,9 +35,20 @@ const DropdownUser = () => {
   }, []);
 
   
+  useEffect(() => {
+    if (userInformation) {
+      FillUserInformation();
+    }
+  }, [userInformation]); 
+  
   const CloseSession = () => {
     localStorage.clear();
     navigate('/auth/login');
+  }
+
+  const FillUserInformation = () => { 
+    localStorage.setItem('userName',userInformation.Username); 
+    localStorage.setItem('userEmail',userInformation.Email); 
   }
 
   return (
@@ -76,9 +87,9 @@ const DropdownUser = () => {
       </Link>
 
       {/* <!-- Dropdown Start --> */}
-      {dropdownOpen && (
+      {dropdownOpen && (  
         <div
-          className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke shadow-default dark:border-strokedark`}
+          className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke shadow-default dark:border-strokedark  bg-bodyAtuuja`}
         >
           <ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark">
             <li>
@@ -157,7 +168,7 @@ const DropdownUser = () => {
         </div>
       )}
       {/* <!-- Dropdown End --> */}
-    </ClickOutside>
+    </ClickOutside> 
   );
 };
 

@@ -56,7 +56,7 @@ const Header = (props: {
           </Link> */}
         </div>
 
-        <div className="flex items-center gap-3 2xsm:gap-7 ml-auto">
+        <div className="flex items-center gap-3 2xsm:gap-7 ml-auto bg-bodyAtuuja">
 
           {/* <!-- User Area --> */}
           <DropdownUser />

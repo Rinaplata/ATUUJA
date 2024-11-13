@@ -22,6 +22,7 @@ public class AuthController : ControllerBase
     const string usersyKeyDescripcion = "users";
     const string userDescripcion = "Usuario";
     const string progressKeyDescripcion = "progress";
+    const string quizKeyDescripcion = "examenes";
 
     public AuthController(IConfiguration config, IEmailService emailService)
     {
@@ -77,54 +78,54 @@ public class AuthController : ControllerBase
         }
     }
 
-      [HttpGet("getUserProgress/{userId}")]
-      public async Task<IActionResult> GetUserProgress(string userId)
+    [HttpGet("getUserProgress/{userId}")]
+    public async Task<IActionResult> GetUserProgress(string userId)
+    {
+        try
         {
-            try
+            // 1. Obtener los datos del usuario
+            var usersCollection = _firestoreDb.Collection(usersyKeyDescripcion);
+            var query = usersCollection.WhereEqualTo("Id", userId);
+            var querySnapshot = await query.GetSnapshotAsync();
+
+            if (querySnapshot.Count == 0)
+                return NotFound(MessageTemplates.Format(MessageTemplates.RegisterNotFound, userDescripcion));
+
+            var userData = querySnapshot.Documents.First().ToDictionary();
+
+            // 2. Obtener los datos de progreso del usuario
+            var progressCollection = _firestoreDb.Collection(progressKeyDescripcion);
+            var progressQuery = progressCollection.WhereEqualTo("UsuarioId", userId);
+            var progressSnapshot = await progressQuery.GetSnapshotAsync();
+
+            List<Dictionary<string, object>> userProgressData = new List<Dictionary<string, object>>();
+
+            if (progressSnapshot.Documents.Any())
             {
-                // 1. Obtener los datos del usuario
-                var usersCollection = _firestoreDb.Collection(usersyKeyDescripcion);
-                var query = usersCollection.WhereEqualTo("Id", userId);
-                var querySnapshot = await query.GetSnapshotAsync();
-
-                if (querySnapshot.Count == 0)
-                    return NotFound(MessageTemplates.Format(MessageTemplates.RegisterNotFound, userDescripcion));
-
-                var userData = querySnapshot.Documents.First().ToDictionary();
-
-                // 2. Obtener los datos de progreso del usuario
-                var progressCollection = _firestoreDb.Collection(progressKeyDescripcion);
-                var progressQuery = progressCollection.WhereEqualTo("UsuarioId", userId);
-                var progressSnapshot = await progressQuery.GetSnapshotAsync();
-
-                List<Dictionary<string, object>> userProgressData = new List<Dictionary<string, object>>();
-
-                if (progressSnapshot.Documents.Any())
-                {
-                    userProgressData = progressSnapshot.Documents
-                        .Select(document =>
-                        {
-                            var progress = document.ToDictionary();
-                            progress["Id"] = document.Id;  // Agregar ID del documento de progreso
-                            return progress;
-                        })
-                        .ToList();
-                }
-
-                // 3. Combinar los datos del usuario con los de progreso
-                var userWithProgress = new
-                {
-                    User = userData,
-                    Progress = userProgressData
-                };
-
-                return Ok(userWithProgress);
+                userProgressData = progressSnapshot.Documents
+                    .Select(document =>
+                    {
+                        var progress = document.ToDictionary();
+                        progress["Id"] = document.Id;  // Agregar ID del documento de progreso
+                        return progress;
+                    })
+                    .ToList();
             }
-            catch (Exception ex)
+
+            // 3. Combinar los datos del usuario con los de progreso
+            var userWithProgress = new
             {
-                return StatusCode(500, $"{MessageTemplates.Format(MessageTemplates.ErrorGettingRegister, userDescripcion)}: {ex.Message}");
-            }
+                User = userData,
+                Progress = userProgressData
+            };
+
+            return Ok(userWithProgress);
         }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"{MessageTemplates.Format(MessageTemplates.ErrorGettingRegister, userDescripcion)}: {ex.Message}");
+        }
+    }
 
 
     [HttpPut("update/{userId}")]
@@ -203,7 +204,7 @@ public class AuthController : ControllerBase
 
         if (userData["Password"].ToString() == model.Password)
         {
-            var token = GenerateJwtToken(model.Email);
+            var token = GenerateJwtToken(model.Email, userData["Id"].ToString());
             return Ok(new { Token = token });
         }
         return Unauthorized();
@@ -225,7 +226,7 @@ public class AuthController : ControllerBase
         if (userData["Password"].ToString() == model.Password
         && bool.Parse(userData["IsAdmin"].ToString()) == true)
         {
-            var token = GenerateJwtToken(model.Email);
+            var token = GenerateJwtToken(model.Email, userData["Id"].ToString());
             var userId = userDoc.Id;
             return Ok(new { Token = token, UserId = userId });
         }
@@ -233,68 +234,117 @@ public class AuthController : ControllerBase
     }
 
     [HttpGet("list")]
-    public async Task<IActionResult> ListUsers()
-    {
+    public async Task<IActionResult> ListUsersWithPoints()
+    { 
         var usersSnapshot = await _firestoreDb.Collection(usersyKeyDescripcion).GetSnapshotAsync();
 
         if (!usersSnapshot.Documents.Any())
             return Ok(new List<Dictionary<string, object>>());
+ 
+        var progressSnapshot = await _firestoreDb.Collection(progressKeyDescripcion).GetSnapshotAsync();
+        var progressDictionary = progressSnapshot.Documents
+            .GroupBy(doc => doc.GetValue<string>("UsuarioId"))
+            .ToDictionary(
+                g => g.Key,
+                g => new
+                {
+                    PuntosAcumulados = g.First().GetValue<int>("PuntosAcumulados"),
+                    RelatoId = g.First().GetValue<string>("RelatoId"),
+                    OrdenPreguntaActual = g.First().ContainsField("OrdenPreguntaActual")
+                        ? g.First().GetValue<int>("OrdenPreguntaActual")
+                        : 0  
+                }
+            );
 
-        var usersList = usersSnapshot.Documents
-        .Select(document =>
+        // Obtener la colección de exámenes y contar las preguntas por cada RelatoId
+        var examSnapshot = await _firestoreDb.Collection("examenes").GetSnapshotAsync();
+        var preguntaCountByRelato = examSnapshot.Documents
+            .GroupBy(doc => doc.GetValue<string>("RelatoId"))
+            .ToDictionary(
+                g => g.Key,
+                g => g.Sum(doc => doc.GetValue<List<Dictionary<string, object>>>("Preguntas").Count) // Contar preguntas por RelatoId
+            );
+
+         var usersList = usersSnapshot.Documents
+            .Select(document =>
             {
                 var user = document.ToDictionary();
                 user["Id"] = document.Id;
+
+                var userId = document.Id;
+                var progressData = progressDictionary.ContainsKey(userId) ? progressDictionary[userId] : null;
+
+                if (progressData != null)
+                {
+                    user["PuntosAcumulados"] = progressData.PuntosAcumulados;
+                    // Agregar la cantidad de preguntas para el RelatoId del usuario
+                    var relatoId = progressData.RelatoId;
+                    var totalPreguntas = !string.IsNullOrEmpty(relatoId) && preguntaCountByRelato.ContainsKey(relatoId)
+                        ? preguntaCountByRelato[relatoId]
+                        : 0;
+                
+                    // Calcular y asignar el campo Progreso como un porcentaje
+                    user["Progreso"] = totalPreguntas > 0
+                        ? (progressData.OrdenPreguntaActual / (double)totalPreguntas) * 100
+                        : 0;
+                }
+                else
+                {  
+                    user["PuntosAcumulados"] = 0; 
+                    user["Progreso"] = 0;
+                }
+
                 return user;
-            }
-        ).ToList();
+            })
+            .ToList();
 
         return Ok(usersList);
     }
 
 
- [HttpPost("forgot-password")]
-public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
-{
-    var userEmail = request.Email;  
-    var usersCollection = _firestoreDb.Collection("users");
-    var query = usersCollection.WhereEqualTo("Email", userEmail);
-    var querySnapshot = await query.GetSnapshotAsync();
 
-    if (querySnapshot.Count == 0)
-        return NotFound(MessageTemplates.Format(MessageTemplates.RegisterNotFound, userEmail));
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+    {
+        var userEmail = request.Email;
+        var usersCollection = _firestoreDb.Collection("users");
+        var query = usersCollection.WhereEqualTo("Email", userEmail);
+        var querySnapshot = await query.GetSnapshotAsync();
 
-    var userDoc = querySnapshot.Documents[0];
-    var resetToken = Guid.NewGuid().ToString();
+        if (querySnapshot.Count == 0)
+            return NotFound(MessageTemplates.Format(MessageTemplates.RegisterNotFound, userEmail));
 
-     var tokenData = new Dictionary<string, object>
+        var userDoc = querySnapshot.Documents[0];
+        var resetToken = Guid.NewGuid().ToString();
+
+        var tokenData = new Dictionary<string, object>
     {
         { "ResetToken", resetToken },
         { "TokenExpiration", DateTime.UtcNow.AddHours(1) }
     };
-    await userDoc.Reference.UpdateAsync(tokenData);
+        await userDoc.Reference.UpdateAsync(tokenData);
 
-    string baseUrl = _config["AppSettings:FrontendUrl"];
-    if (_config["ASPNETCORE_ENVIRONMENT"] == "Development")
-    {
-        baseUrl = _config["AppSettings:LocalFrontendUrl"];
+        string baseUrl = _config["AppSettings:FrontendUrl"];
+        if (_config["ASPNETCORE_ENVIRONMENT"] == "Development")
+        {
+            baseUrl = _config["AppSettings:LocalFrontendUrl"];
+        }
+
+        var resetLink = $"{baseUrl}/auth/userresetpassword?token={resetToken}";
+        var emailSubject = "Restablecimiento de Contraseña";
+        var emailBody = $"Hola, \n\nRecibimos una solicitud para restablecer tu contraseña. Haz clic en el enlace de abajo para continuar: \n\n{resetLink} \n\nEste enlace expirará en 1 hora.";
+
+        try
+        {
+            await _emailService.SendEmailAsync(userEmail, emailSubject, emailBody);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "Ocurrió un error al intentar enviar el correo." + ex.Message);
+        }
+
+        return Ok(new { message = "Instrucciones para restablecer la contraseña enviadas al correo electrónico." });
     }
-
-    var resetLink = $"{baseUrl}/auth/userresetpassword?token={resetToken}";
-    var emailSubject = "Restablecimiento de Contraseña";
-    var emailBody = $"Hola, \n\nRecibimos una solicitud para restablecer tu contraseña. Haz clic en el enlace de abajo para continuar: \n\n{resetLink} \n\nEste enlace expirará en 1 hora.";
-
-    try
-    {
-        await _emailService.SendEmailAsync(userEmail, emailSubject, emailBody);
-    }
-    catch (Exception ex)
-    {
-        return StatusCode(500, "Ocurrió un error al intentar enviar el correo." + ex.Message);
-    }
-
-    return Ok(new { message = "Instrucciones para restablecer la contraseña enviadas al correo electrónico." });
-}
 
 
     [HttpPost("reset-password")]
@@ -322,14 +372,14 @@ public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest
         await userDoc.Reference.UpdateAsync(new Dictionary<string, object>
         {
             { "Password", model.NewPassword },
-            { "ResetToken", null },  
+            { "ResetToken", null },
             { "TokenExpiration", null }
         });
 
         return Ok(MessageTemplates.Format(MessageTemplates.Expiredpassword));
     }
 
-    private string GenerateJwtToken(string username)
+    private string GenerateJwtToken(string username, string userId)
     {
         var jwtSettings = _config.GetSection("JwtSettings");
 
@@ -339,6 +389,7 @@ public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest
         var claims = new[]
         {
             new Claim(JwtRegisteredClaimNames.Sub, username),
+            new Claim(JwtRegisteredClaimNames.Sid, userId),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
