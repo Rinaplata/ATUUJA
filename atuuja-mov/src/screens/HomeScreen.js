@@ -13,12 +13,14 @@ import Carousel from "react-native-reanimated-carousel";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useAuth } from "../context/AuthContext";
 import { useProgress } from "../context/ProgressContext";
+import { useStories } from "../context/StoryContext";
 
 const { width: viewportWidth } = Dimensions.get("window");
 
 const HomeScreen = ({ navigation }) => {
   const { user: authUser } = useAuth();
   const { progress, fetchUserProgress, loading, error } = useProgress();
+  const { stories, loadingStory, errorStory } = useStories();
 
   useEffect(() => {
     if (authUser?.userId) {
@@ -26,7 +28,7 @@ const HomeScreen = ({ navigation }) => {
     }
   }, [authUser]);
 
-if (loading) {
+if (loading || loadingStory) {
   return (
     <View style={styles.container}>
       <Text style={styles.loadingText}>Cargando progreso...</Text>
@@ -34,7 +36,7 @@ if (loading) {
   );
 }
 
-if (error) {
+if (error || errorStory) {
   return (
     <View style={styles.container}>
       <Text style={styles.errorText}>Error: {error}</Text>
@@ -42,43 +44,30 @@ if (error) {
   );
 }
 
-  const data = [
-    {
-      title: "El viaje al pozo de agua",
-      description: "Un fascinante relato sobre la vida en la naturaleza.",
-      image: require("../../assets/icons/images/DALL·E-la_fiezta_de_la_yonna.png"),
-    },
-    {
-      title: "La Fiesta de la Yonna",
-      description: "Una celebración llena de cultura y tradición.",
-      image: require("../../assets/icons/images/DALL·E-el_viaje_al_pozo_de_agua.png"),
-    },
-  ];
+  const puntosAcumulados = progress?.progress?.[0]?.PuntosAcumulados || 0;
+  const maxPuntos = 100;
+  const percentage = Math.min((puntosAcumulados / maxPuntos) * 100, 100);
 
   const renderItem = ({ item }) => (
     <View style={styles.carouselItem}>
       <ImageBackground
-        source={item.image}
+        source={{ uri: item.ImageUrl }}
         imageStyle={styles.cardImage}
         style={styles.relatoCard}
       >
         <View style={styles.overlay}>
-          <Text style={styles.relatoTitle}>{item.title}</Text>
-          <Text style={styles.relatoSubtitle}>{item.description}</Text>
+        <Text style={styles.relatoTitle}>{item.Titulo}</Text>
+        <Text style={styles.relatoSubtitle}>{item.Subtitle}</Text>
           <TouchableOpacity
             style={styles.startButton}
-            onPress={() => navigation.navigate("Learn")}
+            onPress={() => navigation.navigate("StoryIntro", { story: item })}
           >
             <Text style={styles.startButtonText}>Comenzar</Text>
           </TouchableOpacity>
         </View>
       </ImageBackground>
-    </View>
+      </View>
   );
-  const puntosAcumulados = progress?.progress?.[0]?.PuntosAcumulados || 0;
-  const maxPuntos = 100;
-  const percentage = Math.min((puntosAcumulados / maxPuntos) * 100, 100);
-
   return (
     <View style={styles.container}>
       {loading && <Text style={styles.loadingText}>Cargando progreso...</Text>}
@@ -144,13 +133,13 @@ if (error) {
         <View style={styles.section}>
           <Text style={styles.sectionTitleRelato}>Relatos</Text>
           <Text style={styles.sectionSubtitleRelato}>
-            3 relatos disponibles
+          {stories?.length || 0}
           </Text>
           {/* {numberOfRelatos} */}
           <Carousel
             width={viewportWidth}
-            height={viewportWidth}
-            data={data}
+            height={viewportWidth * 0.9}
+            data={stories}
             renderItem={renderItem}
             loop={true}
           />
@@ -308,15 +297,24 @@ const styles = StyleSheet.create({
     borderRadius: 25,
   },
   relatoTitle: {
-    fontSize: 18,
-    color: "#FFF",
+    fontSize: 20,
+    color: "#FFFFFF",
     fontWeight: "bold",
     textAlign: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    paddingVertical: 8, 
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginBottom: 5,
   },
   relatoSubtitle: {
-    fontSize: 14,
-    color: "#FFF",
+    fontSize: 18, 
+    color: "#FFFFFF",
     textAlign: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    paddingVertical: 5, 
+    paddingHorizontal: 10,
+    borderRadius: 6,
     marginBottom: 10,
   },
   startButton: {
