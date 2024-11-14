@@ -73,7 +73,7 @@ const StoryIntroScreen = ({ navigation, route  }) => {
           <Text style={styles.subtitle}>{story.Titulo}</Text>
           <Text style={styles.subsecondtitle}>{story.Subtitle}</Text>
           <Text style={styles.description}>
-          Este relato describe las costumbres, tradiciones y vivencias únicas del pueblo Wayuu, reflejando la conexión espiritual con la naturaleza, su cultura ancestral y las historias que han pasado de generación en generación.
+          {story.Traduccion}
           </Text>
         </View>
 

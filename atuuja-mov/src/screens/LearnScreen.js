@@ -47,21 +47,23 @@ const LearnScreen = ({ navigation, route }) => {
     try {
       if (audioPlayer === null && story?.AudioUrl) {
         // Cargar el audio por primera vez
-        const { sound } = await Audio.Sound.createAsync({ uri: story.AudioUrl });
+        const { sound } = await Audio.Sound.createAsync({
+          uri: story.AudioUrl,
+        });
         setAudioPlayer(sound);
-  
+
         sound.setOnPlaybackStatusUpdate((status) => {
           if (status.didJustFinish) {
             setIsPlaying(false); // Audio terminó
             sound.setPositionAsync(0); // Reiniciar posición
           }
         });
-  
+
         setIsPlaying(true);
         await sound.playAsync();
       } else if (audioPlayer) {
         const status = await audioPlayer.getStatusAsync();
-  
+
         if (status.isLoaded) {
           if (isPlaying) {
             await audioPlayer.pauseAsync();
@@ -83,7 +85,7 @@ const LearnScreen = ({ navigation, route }) => {
 
     const words = content.split(" ");
     return words.map((word, index) => {
-      const cleanWord = word.replace(/[\.,]/g, ""); 
+      const cleanWord = word.replace(/[\.,]/g, "");
       if (highlights.includes(cleanWord)) {
         return (
           <Text key={index} style={styles.highlighted}>
@@ -122,13 +124,24 @@ const LearnScreen = ({ navigation, route }) => {
             style={styles.closeButton}
             onPress={() => navigation.goBack()}
           >
-            <Ionicons name="close-outline" size={scaleFontSize(24)} color="#A43B36" />
+            <Ionicons
+              name="close-outline"
+              size={scaleFontSize(24)}
+              color="#A43B36"
+            />
           </TouchableOpacity>
         </View>
         <ScrollView contentContainerStyle={styles.textContainer}>
-          <Text style={styles.storyText}>
-            {highlightContent(story.Contenido, story.PalabrasResaltadas)}
-          </Text>
+          <View style={styles.contentContainerText}>
+            <Text style={styles.storyText}>
+              {highlightContent(story.Contenido)}
+            </Text>
+          </View>
+          <View style={styles.translationContainer}>
+            <Text style={styles.translationText}>
+              {highlightContent(story.Traduccion)}
+            </Text>
+          </View>
         </ScrollView>
 
         <View style={styles.controlsContainer}>
@@ -143,7 +156,9 @@ const LearnScreen = ({ navigation, route }) => {
 
         <TouchableOpacity
           style={styles.continueButton}
-          onPress={() =>  navigation.navigate("QuizImagen", { RelatoId: story.RelatoId })}
+          onPress={() =>
+            navigation.navigate("QuizImagen", { RelatoId: story.RelatoId })
+          }
         >
           <Text style={styles.continueText}>Continuar</Text>
         </TouchableOpacity>
@@ -227,6 +242,26 @@ const styles = StyleSheet.create({
     color: "#FFF",
     fontSize: scaleFontSize(16),
     fontWeight: "bold",
+  },
+  contentContainerText: {
+    marginBottom: height * 0.02, 
+  },
+  translationContainer: {
+    paddingTop: height * 0.01,
+    borderTopWidth: 1, 
+    borderTopColor: "#E5E5E5", 
+    marginTop: height * 0.02, 
+  },
+  translationTitle: {
+    fontSize: scaleFontSize(16),
+    fontWeight: "bold",
+    color: "#9A2C2B",
+    marginBottom: height * 0.01,
+  },
+  translationText: {
+    fontSize: scaleFontSize(14),
+    lineHeight: scaleFontSize(20), 
+    color: "#555",
   },
 });
 
