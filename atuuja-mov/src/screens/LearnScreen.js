@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,79 +10,145 @@ import {
   PixelRatio,
   SafeAreaView,
 } from "react-native";
+import { Audio } from "expo-av";
 import { Ionicons } from "@expo/vector-icons";
 import colors from "../constants/colors";
-import HighlightedWord from "../components/HighlightedWord";
+import { useStories } from "../context/StoryContext";
 
 const { width, height } = Dimensions.get("window");
 
-const LearnScreen = ({ navigation }) => {
+const LearnScreen = ({ navigation, route }) => {
+  const { RelatoId } = route.params || {};
+  const { stories, loadingStory, errorStory } = useStories();
+  const [story, setStory] = useState(null);
+  const [audioPlayer, setAudioPlayer] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    if (!RelatoId) {
+      console.error("RelatoId no proporcionado en los parámetros");
+      return;
+    }
+    if (stories) {
+      const selectedStory = stories.find((s) => s.RelatoId === RelatoId);
+      setStory(selectedStory);
+    }
+  }, [stories, RelatoId]);
+
+  useEffect(() => {
+    return () => {
+      if (audioPlayer) {
+        audioPlayer.unloadAsync();
+      }
+    };
+  }, [audioPlayer]);
+
+  const playPauseAudio = async () => {
+    try {
+      if (audioPlayer === null && story?.AudioUrl) {
+        // Cargar el audio por primera vez
+        const { sound } = await Audio.Sound.createAsync({ uri: story.AudioUrl });
+        setAudioPlayer(sound);
+  
+        sound.setOnPlaybackStatusUpdate((status) => {
+          if (status.didJustFinish) {
+            setIsPlaying(false); // Audio terminó
+            sound.setPositionAsync(0); // Reiniciar posición
+          }
+        });
+  
+        setIsPlaying(true);
+        await sound.playAsync();
+      } else if (audioPlayer) {
+        const status = await audioPlayer.getStatusAsync();
+  
+        if (status.isLoaded) {
+          if (isPlaying) {
+            await audioPlayer.pauseAsync();
+            setIsPlaying(false);
+          } else {
+            await audioPlayer.playAsync();
+            setIsPlaying(true);
+          }
+        } else {
+          console.error("El audio no está cargado correctamente.");
+        }
+      }
+    } catch (error) {
+      console.error("Error al manejar el audio:", error);
+    }
+  };
+  const highlightContent = (content, highlights) => {
+    if (!content || !highlights) return content;
+
+    const words = content.split(" ");
+    return words.map((word, index) => {
+      const cleanWord = word.replace(/[\.,]/g, ""); 
+      if (highlights.includes(cleanWord)) {
+        return (
+          <Text key={index} style={styles.highlighted}>
+            {word + " "}
+          </Text>
+        );
+      }
+      return word + " ";
+    });
+  };
+
+  if (loadingStory) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.loadingText}>Cargando relato...</Text>
+      </View>
+    );
+  }
+
+  if (errorStory || !story) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>
+          {errorStory || "Relato no encontrado"}
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
-      <StoryScreen navigation={navigation} />
-    </SafeAreaView>
-  );
-};
+      <View style={styles.storyContainer}>
+        <View style={styles.imageContainer}>
+          <Image source={{ uri: story.ImageUrl }} style={styles.storyImage} />
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Ionicons name="close-outline" size={scaleFontSize(24)} color="#A43B36" />
+          </TouchableOpacity>
+        </View>
+        <ScrollView contentContainerStyle={styles.textContainer}>
+          <Text style={styles.storyText}>
+            {highlightContent(story.Contenido, story.PalabrasResaltadas)}
+          </Text>
+        </ScrollView>
 
-const StoryScreen = ({ navigation }) => {
-  const [isPaused, setIsPaused] = useState(true);
-  const togglePlayPause = () => {
-    setIsPaused((prev) => !prev);
-  };
-  return (
-    <View style={styles.storyContainer}>
-      <View style={styles.imageContainer}>
-        <Image
-          source={require("../../assets/icons/images/DALL·E-la_fiezta_de_la_yonna.png")}
-          style={styles.storyImage}
-        />
+        <View style={styles.controlsContainer}>
+          <TouchableOpacity style={styles.iconButton} onPress={playPauseAudio}>
+            <Ionicons
+              name={isPlaying ? "pause-outline" : "play-outline"}
+              size={24}
+              color={colors.iconColor}
+            />
+          </TouchableOpacity>
+        </View>
+
         <TouchableOpacity
-          style={styles.closeButton}
-          onPress={() => navigation.goBack()}
+          style={styles.continueButton}
+          onPress={() =>  navigation.navigate("QuizImagen", { RelatoId: story.RelatoId })}
         >
-          <Ionicons
-            name="close-outline"
-            size={scaleFontSize(24)}
-            color="#A43B36"
-          />
+          <Text style={styles.continueText}>Continuar</Text>
         </TouchableOpacity>
       </View>
-      <ScrollView contentContainerStyle={styles.textContainer}>
-        <Text style={styles.storyText}>
-          Ejatu soozu wane
-          <HighlightedWord word="kai" translation="sol" />
-          wane
-          <HighlightedWord word="jintut" translation="niña" />
-          wayuu luzu wane michi anachonsu shiakat alalrajawaísü musia yotusu
-          süma´a annet, sümaa puliku, otta katiout
-          <HighlightedWord word="ülükü" translation="pájaros" />
-          ma'iraa jialeiraa shiirüin wayüünika.
-        </Text>
-      </ScrollView>
-
-      <View style={styles.controlsContainer}>
-        <TouchableOpacity style={styles.iconButton}>
-          <Ionicons
-            name="volume-high-outline"
-            size={24}
-            color={colors.iconColor}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.iconButton} onPress={togglePlayPause}>
-          <Ionicons
-            name={isPaused ? "pause-outline" : "play-outline"}
-            size={24}
-            color={colors.iconColor}
-          />
-        </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity style={styles.continueButton}
-        onPress={() => navigation.navigate("QuizImagen")}
-      >
-        <Text style={styles.continueText}>Continuar</Text>
-      </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -118,11 +184,6 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",
-  },
-  closeText: {
-    fontSize: scaleFontSize(16),
-    fontWeight: "bold",
-    color: "#E56363",
   },
   textContainer: {
     padding: width * 0.04,
