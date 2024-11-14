@@ -5,6 +5,7 @@ export type Story = {
     PalabrasResaltadas: string[];
     AudioUrl: string;
     ImageUrl: string;
-    Subtitle: string
+    Subtitle: string;
+    Traduccion: string;
   };
   

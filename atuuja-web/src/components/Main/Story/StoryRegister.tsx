@@ -13,6 +13,7 @@ interface RegisterStoryProps {
     audioUrl: string;
     imageUrl: string;
     subtitle: string;
+    traduccion: string
   }) => void;
 }
 
@@ -27,6 +28,7 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({
   const [audioUrl, setAudioUrl] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [subtitle, setSubtitle] = useState('');
+  const [traduccion, setTraduccion] = useState('');
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState<'success' | 'error' | undefined>(undefined);
 
@@ -38,7 +40,8 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({
         palabrasResaltadas: palabrasResaltadas.split(',').map((word) => word.trim()),
         audioUrl,
         imageUrl,
-        subtitle
+        subtitle,
+        traduccion
       };
 
       const response = await fetch(`${API_URL}/Stories/create`, {
@@ -98,6 +101,15 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({
               onChange={(e) => setContenido(e.target.value)}
               className="border p-2 mb-4 rounded w-full"
               placeholder="Ingrese el contenido del relato"
+            />
+          </div> 
+          <div className="col-span-2">
+            <label className="mb-2 block font-bold">Traducción:</label>
+            <textarea
+              value={traduccion}
+              onChange={(e) => setTraduccion(e.target.value)}
+              className="border p-2 mb-4 rounded w-full"
+              placeholder="Ingrese la traducción del relato"
             />
           </div> 
           <div className="col-span-2">
