@@ -17,8 +17,8 @@ const QuizImageAudioScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const { quizzes, loading, error } = useQuizzes();
+  const { RelatoId, totalPoints: initialPoints = 0 } = route.params || {};
 
-  const { RelatoId } = route.params || {};
   const [currentQuiz, setCurrentQuiz] = useState(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -26,6 +26,7 @@ const QuizImageAudioScreen = () => {
   const [isCorrect, setIsCorrect] = useState(false);
   const [sound, setSound] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [totalPoints, setTotalPoints] = useState(initialPoints);
 
   useEffect(() => {
     if (quizzes && RelatoId) {
@@ -46,22 +47,21 @@ const QuizImageAudioScreen = () => {
       if (sound) {
         const status = await sound.getStatusAsync();
         if (status.isPlaying) {
-          await sound.pauseAsync(); // Pausa el audio
-          setIsPlaying(false); // Cambia el estado para reflejar que está pausado
+          await sound.pauseAsync();
+          setIsPlaying(false);
           return;
         } else if (status.isLoaded) {
-          await sound.playAsync(); // Reproduce el audio
-          setIsPlaying(true); // Cambia el estado para reflejar que está reproduciendo
+          await sound.playAsync(); 
+          setIsPlaying(true);
           return;
         }
       }
 
-      // Si no hay sonido cargado, se carga y se reproduce
       const { sound: newSound } = await Audio.Sound.createAsync({
         uri: currentQuiz?.Preguntas[currentQuestionIndex]?.ArchivoPregunta,
       });
       setSound(newSound);
-      setIsPlaying(true); // Cambia el estado para reflejar que está reproduciendo
+      setIsPlaying(true); 
       await newSound.playAsync();
     } catch (error) {
       console.error("Error al manejar el audio:", error);
@@ -119,10 +119,17 @@ const QuizImageAudioScreen = () => {
 
   const handleCheckAnswer = () => {
     if (selectedOption) {
+      const pointsForQuestion = currentQuestion.Puntos; // Definimos los puntos de la pregunta actual
+      const isAnswerCorrect = selectedOption === correctOption;
       setIsAnswerChecked(true);
-      setIsCorrect(selectedOption === correctOption);
+      setIsCorrect(isAnswerCorrect);
+  
+      if (isAnswerCorrect) {
+        setTotalPoints((prevPoints) => prevPoints + pointsForQuestion);
+      }
     }
   };
+  
 
   const handleContinue = () => {
     if (isAnswerChecked) {
@@ -132,7 +139,10 @@ const QuizImageAudioScreen = () => {
         setIsAnswerChecked(false);
         setIsCorrect(false);
       } else {
-        navigation.navigate("QuizText", { RelatoId });
+        navigation.navigate("QuizText", {
+          RelatoId,
+          totalPoints,
+        });
       }
     }
   };

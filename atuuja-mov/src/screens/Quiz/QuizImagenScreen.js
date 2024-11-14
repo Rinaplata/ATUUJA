@@ -25,6 +25,7 @@ const QuizImagenScreen = () => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [isAnswerChecked, setIsAnswerChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [totalPoints, setTotalPoints] = useState(0);
 
   useEffect(() => {
     if (quizzes && RelatoId) {
@@ -69,6 +70,7 @@ const QuizImagenScreen = () => {
 
   const currentQuestion = filteredQuestions[currentQuestionIndex];
   const correctOption = currentQuestion.Respuestas.find((r) => r.EsCorrecta)?.Valor;
+  const pointsForQuestion = currentQuestion.Puntos; // Puntos asignados a la pregunta
 
   const handleOptionSelect = (option) => {
     if (!isAnswerChecked) {
@@ -78,8 +80,12 @@ const QuizImagenScreen = () => {
 
   const handleCheckButtonPress = () => {
     if (selectedOption) {
+      const isAnswerCorrect = selectedOption === correctOption;
       setIsAnswerChecked(true);
-      setIsCorrect(selectedOption === correctOption);
+      setIsCorrect(isAnswerCorrect);
+      if (isAnswerCorrect) {
+        setTotalPoints((prevPoints) => prevPoints + pointsForQuestion);
+      }
     }
   };
 
@@ -89,7 +95,7 @@ const QuizImagenScreen = () => {
         setCurrentQuestionIndex((prev) => prev + 1);
         resetState();
       } else {
-        navigation.navigate("QuizAudio", { RelatoId });
+        navigation.navigate("QuizAudio", { RelatoId, totalPoints });
       }
     }
   };
@@ -226,6 +232,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#E97C71",
     borderRadius: 4,
   },
+  pointsText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+    textAlign: "center",
+    marginBottom: 10,
+  },
   imagePlaceholder: {
     width: width * 0.8,
     height: width * 0.5,
@@ -266,20 +279,6 @@ const styles = StyleSheet.create({
   incorrectOptionButton: {
     backgroundColor: "#FFD1CA",
   },
-  optionText: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#333",
-  },
-  selectedOptionText: {
-    color: "#FFFFFF",
-  },
-  correctOptionText: {
-    color: "#FFFFFF",
-  },
-  incorrectOptionText: {
-    color: "#333",
-  },
   feedbackMessage: {
     flexDirection: "row",
     alignItems: "center",
@@ -296,11 +295,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333333",
     marginLeft: 10,
-  },
-  correctAnswerText: {
-    fontSize: 14,
-    color: "#333",
-    marginTop: 5,
   },
   checkButton: {
     backgroundColor: "#862C29",

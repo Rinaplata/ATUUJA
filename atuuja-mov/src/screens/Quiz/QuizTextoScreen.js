@@ -11,12 +11,13 @@ const QuizTextScreen = () => {
   const navigation = useNavigation();
   const { quizzes, loading, error } = useQuizzes();
 
-  const { RelatoId } = route.params || {};
+  const { RelatoId, totalPoints: initialPoints = 0 } = route.params || {};
   const [currentQuiz, setCurrentQuiz] = useState(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isAnswerChecked, setIsAnswerChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [totalPoints, setTotalPoints] = useState(initialPoints); // Inicializar con puntos acumulados
 
   useEffect(() => {
     if (quizzes && RelatoId) {
@@ -69,8 +70,14 @@ const QuizTextScreen = () => {
 
   const handleCheckAnswer = () => {
     if (selectedOption) {
+      const isAnswerCorrect = selectedOption === correctOption;
       setIsAnswerChecked(true);
-      setIsCorrect(selectedOption === correctOption);
+      setIsCorrect(isAnswerCorrect);
+
+      // Agregar puntos si la respuesta es correcta
+      if (isAnswerCorrect) {
+        setTotalPoints((prevPoints) => prevPoints + currentQuestion.Puntos);
+      }
     }
   };
 
@@ -82,7 +89,7 @@ const QuizTextScreen = () => {
         setIsAnswerChecked(false);
         setIsCorrect(false);
       } else {
-        navigation.navigate("ResultScreen", { RelatoId });
+        navigation.navigate("ResultScreen", { RelatoId, totalPoints });
       }
     }
   };

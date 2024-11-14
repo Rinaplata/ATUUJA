@@ -1,21 +1,32 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import React from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
 const QuizResultScreen = ({ navigation, route }) => {
-  const { correctAnswers = 0, incorrectAnswers = 0, totalPoints = 0 } = route.params || {};
+  const { correctAnswers = 0, incorrectAnswers = 0, totalPoints = 0, RelatoId } = route.params || {};
 
   const handleRetry = () => {
-    navigation.navigate("QuizImagen");
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "Learn", params: { RelatoId } }],
+    });
   };
+
+  const handleClaimReward = () => {
+    navigation.navigate("Rewards", { RelatoId, totalPoints });
+  };
+
+  const allQuestionsAnswered = correctAnswers + incorrectAnswers > 0;
 
   return (
     <View style={styles.container}>
       {/* Mensaje principal */}
-      <Text style={styles.mainMessage}>{correctAnswers > 0 ? '¡Bien Hecho!' : '¡Vaya!'}</Text>
+      <Text style={styles.mainMessage}>{correctAnswers > 0 ? "¡Bien Hecho!" : "¡Vaya!"}</Text>
       <Text style={styles.subMessage}>
-        {correctAnswers > 0 ? 'Completaste el Relato' : 'Parece que no todo ha ido bien'}
+        {correctAnswers > 0
+          ? "Completaste el Relato exitosamente."
+          : "Parece que necesitas intentarlo de nuevo."}
       </Text>
 
       {/* Contenedor de puntuación */}
@@ -40,9 +51,15 @@ const QuizResultScreen = ({ navigation, route }) => {
       </View>
 
       {/* Botón de acción */}
-      <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
-        <Text style={styles.retryButtonText}>Intentar Nuevamente</Text>
-      </TouchableOpacity>
+      {allQuestionsAnswered ? (
+        <TouchableOpacity style={styles.claimButton} onPress={handleClaimReward}>
+          <Text style={styles.claimButtonText}>Recubir Recompensas</Text>
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
+          <Text style={styles.retryButtonText}>Intentar Nuevamente</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
