@@ -11,13 +11,23 @@ const QuizTextScreen = () => {
   const navigation = useNavigation();
   const { quizzes, loading, error } = useQuizzes();
 
-  const { RelatoId, totalPoints: initialPoints = 0 } = route.params || {};
+  const { RelatoId, totalPoints: initialPoints = 0, initialCorrect = 0, initialIncorrect = 0,
+    correctAnswers: currentCorrect = 0,
+    incorrectAnswers: currentIncorrect = 0,
+   } =
+    route.params || {};
   const [currentQuiz, setCurrentQuiz] = useState(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isAnswerChecked, setIsAnswerChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
-  const [totalPoints, setTotalPoints] = useState(initialPoints); // Inicializar con puntos acumulados
+  const [totalPoints, setTotalPoints] = useState(initialPoints);
+  const [correctAnswers, setCorrectAnswers] = useState(
+    initialCorrect || currentCorrect
+  );
+  const [incorrectAnswers, setIncorrectAnswers] = useState(
+    initialIncorrect || currentIncorrect
+  );
 
   useEffect(() => {
     if (quizzes && RelatoId) {
@@ -74,9 +84,12 @@ const QuizTextScreen = () => {
       setIsAnswerChecked(true);
       setIsCorrect(isAnswerCorrect);
 
-      // Agregar puntos si la respuesta es correcta
+      // Actualizar los puntos y las respuestas correctas/incorrectas
       if (isAnswerCorrect) {
         setTotalPoints((prevPoints) => prevPoints + currentQuestion.Puntos);
+        setCorrectAnswers((prev) => prev + 1);
+      } else {
+        setIncorrectAnswers((prev) => prev + 1);
       }
     }
   };
@@ -89,10 +102,15 @@ const QuizTextScreen = () => {
         setIsAnswerChecked(false);
         setIsCorrect(false);
       } else {
-        navigation.navigate("ResultScreen", { RelatoId, totalPoints });
+        navigation.navigate("ResultScreen", {
+          RelatoId,
+          totalPoints,
+          correctAnswers,
+          incorrectAnswers,
+        });
       }
     }
-  };
+  }
 
   return (
     <View style={styles.container}>
@@ -163,7 +181,8 @@ const QuizTextScreen = () => {
           </Text>
           {!isCorrect && (
             <Text style={styles.correctAnswerText}>
-              Respuesta correcta: <Text style={{ fontWeight: "bold" }}>{correctOption}</Text>
+              Respuesta correcta:{" "}
+              <Text style={{ fontWeight: "bold" }}>{correctOption}</Text>
             </Text>
           )}
         </View>

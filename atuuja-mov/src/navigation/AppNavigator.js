@@ -84,6 +84,7 @@ const AppNavigator = () => (
       <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Register" component={RegisterScreen} options={{ headerShown: false }} />
       <Stack.Screen name="MainTabs" component={TabNavigator} options={{ headerShown: false }} />
+
       
       {/* Pantallas de edición de perfil */}
       <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ headerShown: true }} />
@@ -98,6 +99,9 @@ const AppNavigator = () => (
       <Stack.Screen name="QuizAudio" component={QuizImageAudioScreen} options={{ headerShown: false }} />
       <Stack.Screen name="QuizText" component={QuizTextScreen} options={{ headerShown: false }} />
       <Stack.Screen name="ResultScreen" component={QuizResultScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Rewards" component={RewardsScreen} options={{ headerShown: false }} />
+ 
+
       
       
       

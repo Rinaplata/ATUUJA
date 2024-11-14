@@ -18,7 +18,14 @@ const QuizImagenScreen = () => {
   const navigation = useNavigation();
   const { quizzes, loading, error } = useQuizzes();
 
-  const { RelatoId } = route.params || {};
+  const {
+    RelatoId,
+    totalPoints: initialPoints = 0,
+    initialCorrect = 0,
+    initialIncorrect = 0,
+    correctAnswers: currentCorrect = 0,
+    incorrectAnswers: currentIncorrect = 0,
+  } = route.params || {};
   const [currentQuiz, setCurrentQuiz] = useState(null);
   const [filteredQuestions, setFilteredQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -26,6 +33,12 @@ const QuizImagenScreen = () => {
   const [isAnswerChecked, setIsAnswerChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [totalPoints, setTotalPoints] = useState(0);
+  const [correctAnswers, setCorrectAnswers] = useState(
+    initialCorrect || currentCorrect
+  );
+  const [incorrectAnswers, setIncorrectAnswers] = useState(
+    initialIncorrect || currentIncorrect
+  );
 
   useEffect(() => {
     if (quizzes && RelatoId) {
@@ -53,7 +66,9 @@ const QuizImagenScreen = () => {
   if (error) {
     return (
       <View style={styles.container}>
-        <Text style={styles.errorText}>Error al cargar los quizzes: {error}</Text>
+        <Text style={styles.errorText}>
+          Error al cargar los quizzes: {error}
+        </Text>
       </View>
     );
   }
@@ -69,7 +84,9 @@ const QuizImagenScreen = () => {
   }
 
   const currentQuestion = filteredQuestions[currentQuestionIndex];
-  const correctOption = currentQuestion.Respuestas.find((r) => r.EsCorrecta)?.Valor;
+  const correctOption = currentQuestion.Respuestas.find(
+    (r) => r.EsCorrecta
+  )?.Valor;
   const pointsForQuestion = currentQuestion.Puntos; // Puntos asignados a la pregunta
 
   const handleOptionSelect = (option) => {
@@ -83,8 +100,13 @@ const QuizImagenScreen = () => {
       const isAnswerCorrect = selectedOption === correctOption;
       setIsAnswerChecked(true);
       setIsCorrect(isAnswerCorrect);
+
+      // Actualizar puntos y conteos de respuestas
       if (isAnswerCorrect) {
         setTotalPoints((prevPoints) => prevPoints + pointsForQuestion);
+        setCorrectAnswers((prev) => prev + 1);
+      } else {
+        setIncorrectAnswers((prev) => prev + 1);
       }
     }
   };
@@ -95,7 +117,18 @@ const QuizImagenScreen = () => {
         setCurrentQuestionIndex((prev) => prev + 1);
         resetState();
       } else {
-        navigation.navigate("QuizAudio", { RelatoId, totalPoints });
+        navigation.navigate("QuizAudio", {
+          RelatoId,
+          totalPoints,
+          correctAnswers,
+          incorrectAnswers,
+        });
+        console.log("Passing to QuizAudio:", {
+          RelatoId,
+          totalPoints,
+          correctAnswers,
+          incorrectAnswers,
+        });
       }
     }
   };
@@ -143,7 +176,9 @@ const QuizImagenScreen = () => {
       )}
 
       {/* Question */}
-      <Text style={styles.instructionText}>{currentQuestion.EnunciadoPregunta}</Text>
+      <Text style={styles.instructionText}>
+        {currentQuestion.EnunciadoPregunta}
+      </Text>
 
       {/* Options */}
       <View style={styles.optionsContainer}>
