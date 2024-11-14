@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
@@ -8,28 +8,52 @@ import {
   FlatList,
   ScrollView,
   Dimensions,
-} from 'react-native';
+} from "react-native";
 import CircularProgress from "react-native-circular-progress-indicator";
-import { MaterialIcons } from "@expo/vector-icons";
-import colors from '../constants/colors';
+import { useRewards } from "../context/RewardContext";
+import colors from "../constants/colors";
 
-const { width: viewportWidth } = Dimensions.get('window'); // Para calcular tamaños dinámicos
+const { height, width: viewportWidth } = Dimensions.get("window");
 
-const RewardsScreen = () => {
-  const percentage = 5; 
+const RewardsScreen =({ navigation, route }) => {
+  const {RelatoId} = route.params || {};
+  const { rewards, loadingRewards, errorRewards } = useRewards();
 
-  
+  const userPoints = 120; 
+
+  if (loadingRewards) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.loadingText}>Cargando premios...</Text>
+      </View>
+    );
+  }
+
+  if (errorRewards) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>
+          Error al cargar los premios: {errorRewards}
+        </Text>
+      </View>
+    );
+  }
+
+  const progressPercentage = Math.min((userPoints / 100) * 100, 100); // Example progress calculation
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 30 }}>
-      {/* Encabezado */}
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: 30 }}
+    >
+      {/* Top Bar */}
       <View style={styles.topMenu}>
         <View style={styles.pointsContainer}>
           <Image
             source={require("../../assets/icons/images/spiral-icon.png")}
             style={[styles.pointsIcon, { width: 28, height: 28 }]}
           />
-          <Text style={styles.pointsText}>120</Text>
+          <Text style={styles.pointsText}>{userPoints}</Text>
         </View>
         <View style={styles.logoContainer}>
           <Image
@@ -39,53 +63,49 @@ const RewardsScreen = () => {
         </View>
         <View style={styles.progressContainer}>
           <CircularProgress
-            value={percentage}
+            value={progressPercentage}
             radius={16}
-            titleFontSize={16}
             progressValueColor={"#9A2C2B"}
-            progressValueStyle={{ fontSize: 16, color: "#9A2C2B" }}
             activeStrokeColor={"#E97C71"}
             strokeWidth={8}
-            backgroundWidth={8}
             inActiveStrokeColor={"#FFF0ED"}
             circleBackgroundColor={"#FFF0ED"}
-            textColor={"#9A2C2B"}
-            titleColor={"#9A2C2B"}
           />
         </View>
       </View>
 
-      <View style={styles.containerBody}>
-        <View style={styles.welcomeContainer}>
-         <Text style={styles.welcomeText}> Rina</Text>
-         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Premios</Text>
-          <Text style={styles.headerSubtitle}>
-            Continúa aprendiendo y podrás ganar fabulosas recompensas
-          </Text>
+      {/* Header Section */}
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerTitle}>Premios</Text>
+        <Text style={styles.headerSubtitle}>
+          Continúa aprendiendo y podrás ganar fabulosas recompensas
+        </Text>
       </View>
-        </View>
-      </View>
-      
 
-      {/* Carrusel de Niveles */}
+      {/* Levels Section */}
       <Text style={styles.sectionTitle}>Desbloquea en cada nivel</Text>
       <FlatList
         horizontal
-        data={levels}
+        data={[
+          { id: 1, title: "Relatos Nivel 1", subtitle: "Aprendiz destacado" },
+          { id: 2, title: "Relatos Nivel 2", subtitle: "Aprendiz Relámpago" },
+          { id: 3, title: "Relatos Nivel 3", subtitle: "Aprendiz Audaz" },
+        ]}
         renderItem={({ item }) => <LevelCard level={item} />}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(item) => item.id.toString()}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.carouselContainer}
       />
 
-      {/* Carrusel de Premios */}
+      {/* Rewards Section */}
       <Text style={styles.sectionTitle}>Premios</Text>
       <FlatList
         horizontal
         data={rewards}
-        renderItem={({ item }) => <RewardCard reward={item} />}
-        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => (
+          <RewardCard reward={item} userPoints={userPoints} />
+        )}
+        keyExtractor={(item) => item.PremioId}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.carouselContainer}
       />
@@ -93,84 +113,54 @@ const RewardsScreen = () => {
   );
 };
 
-// Componente para tarjetas de niveles
 const LevelCard = ({ level }) => (
   <View style={styles.levelCard}>
-    <Image source={level.icon} style={styles.roundImage} />
+    <Image
+      style={styles.levelImage}
+    />
     <Text style={styles.levelTitle}>{level.title}</Text>
     <Text style={styles.levelSubtitle}>{level.subtitle}</Text>
   </View>
 );
 
-// Componente para tarjetas de premios
-const RewardCard = ({ reward }) => (
-  <View style={styles.rewardCard}>
-    <View style={styles.imageWrapper}>
-      <Image source={reward.image} style={styles.rewardImage} resizeMode="contain" />
-    </View>
-    <Text style={styles.rewardTitle}>{reward.title}</Text>
-    <Text style={styles.rewardPoints}>{reward.points}</Text>
-    <TouchableOpacity
-      style={[styles.rewardButton, reward.claimed ? styles.disabledButton : null]}
-      disabled={reward.claimed}
-    >
-      <Text style={styles.rewardButtonText}>
-        {reward.claimed ? 'Reclamado' : 'Reclamar'}
+const RewardCard = ({ reward, userPoints }) => {
+  const canClaim = userPoints >= reward.Puntos;
+
+  return (
+    <View style={styles.rewardCard}>
+      <View style={styles.imageWrapper}>
+        <Image
+          source={{ uri: reward.ImagenUrl }}
+          style={styles.rewardImage}
+          resizeMode="contain"
+        />
+      </View>
+      <Text style={styles.rewardTitle}>{reward.Nombre}</Text>
+      <Text style={styles.rewardPoints}>
+        {reward.Puntos}{" "}
+        <Image
+          source={require("../../assets/icons/images/spiral-icon.png")}
+          style={{ width: 14, height: 14 }}
+        />
       </Text>
-    </TouchableOpacity>
-  </View>
-);
-
-// Datos de niveles
-const levels = [
-  { icon: require('../../assets/icons/images/DALL·E-amaca_wayuu.jpg'), title: 'Nivel 1', subtitle: 'Aprendiz destacado' },
-  { icon: require('../../assets/icons/images/DALL·E-amaca_wayuu.jpg'), title: 'Nivel 2', subtitle: 'Aprendiz Relámpago' },
-  { icon: require('../../assets/icons/images/DALL·E-amaca_wayuu.jpg'), title: 'Nivel 3', subtitle: 'Aprendiz Audaz' },
-];
-
-// Datos de premios
-const rewards = [
-  { image: require('../../assets/icons/images/DALL·E-amaca_wayuu.jpg'), title: 'Mochila Wayuu', points: '150', claimed: true },
-  { image: require('../../assets/icons/images/DALL·E-sobrero_wayuu.png'), title: 'Sombrero Wayuu', points: '400', claimed: false },
-  { image: require('../../assets/icons/images/DALL·E-sobrero_wayuu.png'), title: 'Sombrero Ejemplo', points: '200', claimed: false },
-];
+      <TouchableOpacity
+        style={[styles.rewardButton, !canClaim && styles.disabledButton]}
+        disabled={!canClaim}
+      >
+        <Text style={styles.rewardButtonText}>
+          {canClaim ? "Reclamar" : "Bloqueado"}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#862C29",
-    paddingTop: 50,
-    paddingHorizontal: 0,
-  },
-  containerBody: {
-    flex: 1,
-    backgroundColor: "#A43B36",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    paddingTop: 20,
     paddingHorizontal: 20,
-  },
-  header: {
-    backgroundColor: colors.variante7,
-    padding: 20,
-    borderRadius: 10,
-    marginBottom: 20,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.luminous,
-    marginBottom: 5,
-  },
-  headerSubtitle: {
-    fontSize: 16,
-    color: colors.luminous,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    color: colors.luminous,
-    marginBottom: 20,
-    marginTop:30,
+    paddingVertical: height * 0.06,
   },
   topMenu: {
     flexDirection: "row",
@@ -184,7 +174,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   pointsIcon: {
-    marginRight: 5,
+    marginRight: 7,
   },
   pointsText: {
     color: "#FFF",
@@ -202,15 +192,26 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  welcomeContainer: {
-    flexDirection: "column",
-    alignItems: "flex-start",
-    marginBottom: 20,
+  headerContainer: {
+    backgroundColor: colors.variante7,
+    padding: 30,
+    borderRadius: 10,
+    marginBottom: 30,
   },
-  welcomeText: {
+  headerTitle: {
     fontSize: 24,
-    color: "#FFF",
     fontWeight: "bold",
+    color: colors.luminous,
+    marginBottom: 5,
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: colors.luminous,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    color: colors.luminous,
+    marginBottom: 20,
   },
   carouselContainer: {
     paddingVertical: 20,
@@ -219,40 +220,47 @@ const styles = StyleSheet.create({
     backgroundColor: colors.variante6,
     padding: 15,
     borderRadius: 10,
-    alignItems: 'center',
-    marginRight: 15,
-    width: 120,
+    alignItems: "center",
+    marginRight: 20,
+    width: viewportWidth * 0.35,
+  },
+  levelImage: {
+    width: 50,
+    height: 50,
+    marginBottom: 10,
+  },
+  levelTitle: {
+    fontSize: 14,
+    color: colors.principal,
+    fontWeight: "bold",
+  },
+  levelSubtitle: {
+    fontSize: 12,
+    color: "#FFF",
   },
   rewardCard: {
     backgroundColor: colors.variante2,
-    paddingTop: 60, 
+    padding: 15,
     borderRadius: 15,
-    alignItems: 'center',
+    alignItems: "center",
     marginRight: 20,
     width: viewportWidth * 0.45,
-    paddingBottom: 15,
   },
   imageWrapper: {
-    position: 'absolute',
-    top: -40, // Ajuste para que la imagen no se corte
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: colors.luminous,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 10,
   },
   rewardImage: {
     width: 90,
     height: 90,
-    borderRadius: 45,
+    borderRadius: 10,
   },
   rewardTitle: {
     fontSize: 16,
     color: colors.principal,
     marginBottom: 5,
-    textAlign: 'center',
-    marginTop: 10,
+    textAlign: "center",
   },
   rewardPoints: {
     fontSize: 16,
@@ -271,23 +279,6 @@ const styles = StyleSheet.create({
   },
   disabledButton: {
     backgroundColor: colors.variante3,
-  },
-  roundImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginBottom: 10,
-  },
-  section: {
-    backgroundColor: "#862C29",
-    borderRadius: 25,
-    padding: 15,
-    marginBottom: 15,
-    alignItems: "center",
-    justifyContent: "flex-start",
-    height: viewportWidth * 1.05,
-    width: "120%",
-    alignItems: "flex-start",
   },
 });
 

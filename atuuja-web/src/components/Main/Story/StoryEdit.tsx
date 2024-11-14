@@ -13,7 +13,8 @@ interface RegisterStoryProps {
     palabrasResaltadas: string[];
     audioUrl: string;
     imageUrl: string,
-    subtitle: string
+    subtitle: string,
+    traduccion: string
   };
   onSuccess: () => void;
 }
@@ -26,6 +27,7 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({ isOpen, onClose, storyDat
   const [audioUrl, setAudioUrl] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [subtitle, setSubtitle] = useState('');
+  const [traduccion, setTraduccion] = useState('');
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState<'success' | 'error' | undefined>(undefined);
 
@@ -38,6 +40,7 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({ isOpen, onClose, storyDat
       setAudioUrl(storyData.audioUrl);
       setImageUrl(storyData.imageUrl);
       setSubtitle(storyData.subtitle);
+      setTraduccion(storyData.traduccion);
     }
   }, [storyData]);
 
@@ -55,7 +58,8 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({ isOpen, onClose, storyDat
           palabrasResaltadas: palabrasResaltadas.split(',').map(p => p.trim()),
           audioUrl,
           imageUrl,
-          subtitle
+          subtitle,
+          traduccion
         }),
       });
 
@@ -115,6 +119,15 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({ isOpen, onClose, storyDat
           <textarea
             value={contenido}
             onChange={(e) => setContenido(e.target.value)}
+            className="border p-2 mb-4 rounded w-full"
+            placeholder="Ingrese el contenido del relato"
+          />
+        </div>
+        <div>
+          <label className="mb-2 block">Traducción:</label>
+          <textarea
+            value={traduccion}
+            onChange={(e) => setTraduccion(e.target.value)}
             className="border p-2 mb-4 rounded w-full"
             placeholder="Ingrese el contenido del relato"
           />

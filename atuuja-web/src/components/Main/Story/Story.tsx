@@ -32,9 +32,10 @@ export default function Story() {
     titulo: string; 
     contenido: string; 
     palabrasResaltadas: string[]; 
-    audioUrl: string; 
+    audioUrl: string;
     imageUrl: string,
-    subtitle: string
+    subtitle: string;
+    traduccion: string;
   }) => {
     console.log('Registrar relato:', data);
     // Aquí puedes manejar la lógica para almacenar los datos o actualizar la lista de relatos

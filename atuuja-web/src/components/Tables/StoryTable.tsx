@@ -109,6 +109,9 @@ const TableThree: React.FC<IStoryTable> = ({ story }) => {
               <th className="min-w-[150px] py-4 px-4 font-medium text-white dark:text-white">
                 Contenido
               </th>
+              <th className="min-w-[150px] py-4 px-4 font-medium text-white dark:text-white">
+                Traducción
+              </th>
               <th className="min-w-[120px] py-4 px-4 font-medium text-white dark:text-white">
                 Palabras Resaltadas
               </th>
@@ -139,6 +142,11 @@ const TableThree: React.FC<IStoryTable> = ({ story }) => {
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                   <p className="text-black dark:text-white">
                     {storyItem.Contenido}
+                  </p>
+                </td>
+                <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                  <p className="text-black dark:text-white">
+                    {storyItem.Traduccion}
                   </p>
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
@@ -231,7 +239,8 @@ const TableThree: React.FC<IStoryTable> = ({ story }) => {
           palabrasResaltadas: selectedStory?.PalabrasResaltadas ?? [],
           audioUrl: selectedStory?.AudioUrl ?? '', 
           imageUrl: selectedStory?.ImageUrl?? '',
-          subtitle: selectedStory?.Subtitle?? ''
+          subtitle: selectedStory?.Subtitle?? '',
+          traduccion: selectedStory?.Traduccion?? ''
         }}
         onSuccess={handleUpdateSuccess}
       />

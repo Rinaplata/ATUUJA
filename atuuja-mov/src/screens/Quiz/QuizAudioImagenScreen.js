@@ -1,46 +1,162 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   Dimensions,
-  Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { Audio } from "expo-av";
+import { useRoute, useNavigation } from "@react-navigation/native";
+import { useQuizzes } from "../../context/QuizContext";
 
 const { width, height } = Dimensions.get("window");
-const progressPercentage = 10;
 
-const QuizImageAudioScreen = ({ navigation }) => {
+const QuizImageAudioScreen = () => {
+  const route = useRoute();
+  const navigation = useNavigation();
+  const { quizzes, loading, error } = useQuizzes();
+
+  const { RelatoId, totalPoints: initialPoints = 0, initialCorrect = 0, initialIncorrect = 0,
+    correctAnswers: currentCorrect = 0,
+    incorrectAnswers: currentIncorrect = 0,
+   } =
+    route.params || {};
+  const [currentQuiz, setCurrentQuiz] = useState(null);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isAnswerChecked, setIsAnswerChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
-  const correctOptionIndex = 1;
+  const [sound, setSound] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [totalPoints, setTotalPoints] = useState(initialPoints);
+  const [correctAnswers, setCorrectAnswers] = useState(
+    initialCorrect || currentCorrect
+  );
+  const [incorrectAnswers, setIncorrectAnswers] = useState(
+    initialIncorrect || currentIncorrect
+  );
 
-  const images = [
-    require("../../../assets/icons/images/DALL·E-amaca_wayuu.jpg"),
-    require("../../../assets/icons/images/DALL·E-sobrero_wayuu.png"),
-    require("../../../assets/icons/images/DALL·E-el_viaje_al_pozo_de_agua.png"),
-    require("../../../assets/icons/images/DALL·E-la_fiezta_de_la_yonna.png"),
-  ];
+  useEffect(() => {
+    if (quizzes && RelatoId) {
+      const quiz = quizzes.find((q) => q.RelatoId === RelatoId);
+      if (quiz) {
+        const audioQuestions = quiz.Preguntas.filter(
+          (pregunta) => pregunta.TipoPregunta === 1
+        );
+        setCurrentQuiz({ ...quiz, Preguntas: audioQuestions });
+      } else {
+        console.error(`No se encontró un quiz con el RelatoId: ${RelatoId}`);
+      }
+    }
+  }, [quizzes, RelatoId]);
 
-  const handleOptionSelect = (index) => {
-    setSelectedOption(index);
-    setIsAnswerChecked(false);
+  const playAudio = async () => {
+    try {
+      if (sound) {
+        const status = await sound.getStatusAsync();
+        if (status.isPlaying) {
+          await sound.pauseAsync();
+          setIsPlaying(false);
+          return;
+        } else if (status.isLoaded) {
+          await sound.playAsync();
+          setIsPlaying(true);
+          return;
+        }
+      }
+
+      const { sound: newSound } = await Audio.Sound.createAsync({
+        uri: currentQuiz?.Preguntas[currentQuestionIndex]?.ArchivoPregunta,
+      });
+      setSound(newSound);
+      setIsPlaying(true);
+      await newSound.playAsync();
+    } catch (error) {
+      console.error("Error al manejar el audio:", error);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (sound) {
+        sound.unloadAsync();
+        setSound(null);
+        setIsPlaying(false);
+      }
+    };
+  }, [sound, currentQuestionIndex]);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.loadingText}>Cargando preguntas...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>Error al cargar las preguntas: {error}</Text>
+      </View>
+    );
+  }
+
+  if (!currentQuiz || !currentQuiz.Preguntas.length) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>
+          No se encontraron preguntas del tipo esperado (TipoPregunta: 1).
+        </Text>
+      </View>
+    );
+  }
+
+  const currentQuestion = currentQuiz.Preguntas[currentQuestionIndex];
+  const correctOption = currentQuestion.Respuestas.find((r) => r.EsCorrecta)?.Valor;
+
+  const handleOptionSelect = (option) => {
+    if (!isAnswerChecked) {
+      setSelectedOption(option);
+    }
   };
 
   const handleCheckAnswer = () => {
-    setIsAnswerChecked(true);
-    setIsCorrect(selectedOption === correctOptionIndex);
+    if (selectedOption) {
+      const pointsForQuestion = currentQuestion.Puntos; // Puntos de la pregunta actual
+      const isAnswerCorrect = selectedOption === correctOption;
+      setIsAnswerChecked(true);
+      setIsCorrect(isAnswerCorrect);
+
+      if (isAnswerCorrect) {
+        setTotalPoints((prevPoints) => prevPoints + pointsForQuestion);
+        setCorrectAnswers((prev) => prev + 1);
+      } else {
+        setIncorrectAnswers((prev) => prev + 1);
+      }
+    }
   };
 
   const handleContinue = () => {
     if (isAnswerChecked) {
-      navigation.navigate("QuizText");
-    } else {
+      if (currentQuestionIndex < currentQuiz.Preguntas.length - 1) {
+        setCurrentQuestionIndex((prev) => prev + 1);
+        setSelectedOption(null);
+        setIsAnswerChecked(false);
+        setIsCorrect(false);
+      } else {
+        navigation.navigate("QuizText", {
+          RelatoId,
+          totalPoints, // Pass updated total points
+          correctAnswers, // Pass cumulative correct answers
+          incorrectAnswers, // Pass cumulative incorrect answers
+        });
+      }
     }
   };
+  
 
   return (
     <View style={styles.container}>
@@ -54,60 +170,57 @@ const QuizImageAudioScreen = ({ navigation }) => {
         </TouchableOpacity>
         <View style={styles.progressBarContainer}>
           <View
-            style={[styles.progressBar, { width: `${progressPercentage}%` }]}
+            style={[
+              styles.progressBar,
+              {
+                width: `${
+                  ((currentQuestionIndex + 1) / currentQuiz.Preguntas.length) * 100
+                }%`,
+              },
+            ]}
           />
         </View>
       </View>
 
-      {/* Title with Sound Icon */}
-      <View style={styles.titleContainer}>
-        <Text style={styles.titleText}>
-          <Text>Tepichi</Text>
+      {/* Audio Question */}
+      <View style={styles.audioContainer}>
+        <TouchableOpacity style={styles.playButton} onPress={playAudio}>
+          <Ionicons
+            name={isPlaying ? "pause-circle-outline" : "play-circle-outline"}
+            size={40}
+            color="#862C29"
+          />
+        </TouchableOpacity>
+        <Text style={styles.instructionText}>
+          {currentQuestion.EnunciadoPregunta}
         </Text>
-        <View style={styles.iconBackground}>
-          <Ionicons name="volume-high-outline" size={18} color="#862C29" />
-        </View>
       </View>
-
-      <Text style={styles.instructionText}>Escoge la opción correcta</Text>
 
       {/* Options */}
       <View style={styles.optionsContainer}>
-        {images.map((image, index) => (
+        {currentQuestion.Respuestas.map((respuesta, index) => (
           <TouchableOpacity
             key={index}
             style={[
               styles.optionBox,
-              selectedOption === index && styles.selectedOption,
+              selectedOption === respuesta.Valor && styles.selectedOption,
               isAnswerChecked &&
-                index === correctOptionIndex &&
+                respuesta.Valor === correctOption &&
                 styles.correctOption,
               isAnswerChecked &&
-                selectedOption === index &&
-                index !== correctOptionIndex &&
+                selectedOption === respuesta.Valor &&
+                selectedOption !== correctOption &&
                 styles.incorrectOption,
             ]}
-            onPress={() => handleOptionSelect(index)}
-            disabled={isAnswerChecked} // Deshabilitar después de comprobar la respuesta
+            onPress={() => handleOptionSelect(respuesta.Valor)}
+            disabled={isAnswerChecked}
           >
-            <Image source={image} style={styles.imageOption} />
-            {isAnswerChecked && index === selectedOption && (
-              <Ionicons
-                name={
-                  index === correctOptionIndex
-                    ? "checkmark-circle"
-                    : "close-circle"
-                }
-                size={24}
-                color={index === correctOptionIndex ? "#A0D995" : "#BF2D2C"}
-                style={styles.feedbackIcon}
-              />
-            )}
+            <Text style={styles.optionText}>{respuesta.Valor}</Text>
           </TouchableOpacity>
         ))}
       </View>
 
-      {/* Feedback Message */}
+      {/* Feedback */}
       {isAnswerChecked && (
         <View
           style={[
@@ -121,15 +234,12 @@ const QuizImageAudioScreen = ({ navigation }) => {
             color="#333333"
           />
           <Text style={styles.feedbackText}>
-            {isCorrect ? "¡Correcto!" : "Incorrecto"}
+            {isCorrect ? "¡Correcto!" : "Respuesta incorrecta."}
           </Text>
-          {!isCorrect && (
-            <Text style={styles.correctAnswerText}>Te has equivocado</Text>
-          )}
         </View>
       )}
 
-      {/* Check or Continue Button */}
+      {/* Action Button */}
       <TouchableOpacity
         style={[styles.checkButton, isAnswerChecked && styles.continueButton]}
         onPress={isAnswerChecked ? handleContinue : handleCheckAnswer}

@@ -1,16 +1,76 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useRoute, useNavigation } from "@react-navigation/native";
+import { useQuizzes } from "../../context/QuizContext";
 
 const { width, height } = Dimensions.get("window");
-const progressPercentage = 10;
 
-const QuizTextScreen = ({ navigation }) => {
+const QuizTextScreen = () => {
+  const route = useRoute();
+  const navigation = useNavigation();
+  const { quizzes, loading, error } = useQuizzes();
+
+  const { RelatoId, totalPoints: initialPoints = 0, initialCorrect = 0, initialIncorrect = 0,
+    correctAnswers: currentCorrect = 0,
+    incorrectAnswers: currentIncorrect = 0,
+   } =
+    route.params || {};
+  const [currentQuiz, setCurrentQuiz] = useState(null);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isAnswerChecked, setIsAnswerChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [totalPoints, setTotalPoints] = useState(initialPoints);
+  const [correctAnswers, setCorrectAnswers] = useState(
+    initialCorrect || currentCorrect
+  );
+  const [incorrectAnswers, setIncorrectAnswers] = useState(
+    initialIncorrect || currentIncorrect
+  );
 
-  const correctOption = "Jarara";
+  useEffect(() => {
+    if (quizzes && RelatoId) {
+      const quiz = quizzes.find((q) => q.RelatoId === RelatoId);
+      if (quiz) {
+        const textQuestions = quiz.Preguntas.filter(
+          (pregunta) => pregunta.TipoPregunta === 0
+        );
+        setCurrentQuiz({ ...quiz, Preguntas: textQuestions });
+      } else {
+        console.error(`No se encontró un quiz con el RelatoId: ${RelatoId}`);
+      }
+    }
+  }, [quizzes, RelatoId]);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.loadingText}>Cargando preguntas...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>Error al cargar las preguntas: {error}</Text>
+      </View>
+    );
+  }
+
+  if (!currentQuiz || !currentQuiz.Preguntas.length) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>
+          No se encontraron preguntas del tipo esperado (TipoPregunta: 0).
+        </Text>
+      </View>
+    );
+  }
+
+  const currentQuestion = currentQuiz.Preguntas[currentQuestionIndex];
+  const correctOption = currentQuestion.Respuestas.find((r) => r.EsCorrecta)?.Valor;
 
   const handleOptionSelect = (option) => {
     if (!isAnswerChecked) {
@@ -18,97 +78,125 @@ const QuizTextScreen = ({ navigation }) => {
     }
   };
 
-  const handleCheckButtonPress = () => {
+  const handleCheckAnswer = () => {
     if (selectedOption) {
+      const isAnswerCorrect = selectedOption === correctOption;
       setIsAnswerChecked(true);
-      setIsCorrect(selectedOption === correctOption);
+      setIsCorrect(isAnswerCorrect);
+
+      // Actualizar los puntos y las respuestas correctas/incorrectas
+      if (isAnswerCorrect) {
+        setTotalPoints((prevPoints) => prevPoints + currentQuestion.Puntos);
+        setCorrectAnswers((prev) => prev + 1);
+      } else {
+        setIncorrectAnswers((prev) => prev + 1);
+      }
     }
   };
 
   const handleContinue = () => {
     if (isAnswerChecked) {
-      navigation.navigate("ResultScreen");
+      if (currentQuestionIndex < currentQuiz.Preguntas.length - 1) {
+        setCurrentQuestionIndex((prev) => prev + 1);
+        setSelectedOption(null);
+        setIsAnswerChecked(false);
+        setIsCorrect(false);
+      } else {
+        navigation.navigate("ResultScreen", {
+          RelatoId,
+          totalPoints,
+          correctAnswers,
+          incorrectAnswers,
+        });
+      }
     }
-  };
+  }
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
+        <TouchableOpacity
+          style={styles.closeButton}
+          onPress={() => navigation.goBack()}
+        >
           <Ionicons name="close-outline" size={24} color="#BF2D2C" />
         </TouchableOpacity>
         <View style={styles.progressBarContainer}>
-          <View style={[styles.progressBar, { width: `${progressPercentage}%` }]} />
+          <View
+            style={[
+              styles.progressBar,
+              {
+                width: `${
+                  ((currentQuestionIndex + 1) / currentQuiz.Preguntas.length) * 100
+                }%`,
+              },
+            ]}
+          />
         </View>
       </View>
 
-      {/* Question Text */}
-      <Text style={styles.questionText}>¿Cómo se escribe "Pozo"?</Text>
+      {/* Question */}
+      <Text style={styles.questionText}>{currentQuestion.EnunciadoPregunta}</Text>
 
       {/* Options */}
       <View style={styles.optionsContainer}>
-        {["Jarara", "Erra", "Süyaa"].map((option, index) => (
+        {currentQuestion.Respuestas.map((respuesta, index) => (
           <TouchableOpacity
             key={index}
             style={[
               styles.optionButton,
-              selectedOption === option && styles.selectedOptionButton,
-              isAnswerChecked && selectedOption === option &&
-                (option === correctOption ? styles.correctOptionButton : styles.incorrectOptionButton),
+              selectedOption === respuesta.Valor && styles.selectedOptionButton,
+              isAnswerChecked &&
+                respuesta.Valor === correctOption &&
+                styles.correctOptionButton,
+              isAnswerChecked &&
+                selectedOption === respuesta.Valor &&
+                selectedOption !== correctOption &&
+                styles.incorrectOptionButton,
             ]}
-            onPress={() => handleOptionSelect(option)}
+            onPress={() => handleOptionSelect(respuesta.Valor)}
             disabled={isAnswerChecked}
           >
-            <Text style={[
-              styles.optionText,
-              selectedOption === option && styles.selectedOptionText,
-              isAnswerChecked && selectedOption === option &&
-                (option === correctOption ? styles.correctOptionText : styles.incorrectOptionText),
-            ]}>
-              {option}
-            </Text>
-            <View style={[
-              styles.iconContainer,
-              selectedOption === option && styles.selectedIconContainer,
-              isAnswerChecked && selectedOption === option && 
-              (option === correctOption ? styles.correctIconContainer : styles.incorrectIconContainer)
-            ]}>
-              <Ionicons
-                name="volume-high-outline"
-                size={18}
-                color={selectedOption === option && isAnswerChecked ? "#862C29" : "#BF2D2C"}
-              />
-            </View>
+            <Text style={styles.optionText}>{respuesta.Valor}</Text>
           </TouchableOpacity>
         ))}
       </View>
 
-      {/* Feedback Message */}
+      {/* Feedback */}
       {isAnswerChecked && (
-        <View style={[styles.feedbackMessage, isCorrect ? styles.successMessage : styles.errorMessage]}>
+        <View
+          style={[
+            styles.feedbackMessage,
+            isCorrect ? styles.successMessage : styles.errorMessage,
+          ]}
+        >
           <Ionicons
             name={isCorrect ? "checkmark-circle" : "close-circle"}
             size={24}
             color="#333333"
           />
           <Text style={styles.feedbackText}>
-            {isCorrect ? "¡Correcto!" : "Incorrecto"}
+            {isCorrect ? "¡Correcto!" : "Respuesta incorrecta."}
           </Text>
           {!isCorrect && (
             <Text style={styles.correctAnswerText}>
-              Respuesta correcta: <Text style={{ fontWeight: 'bold' }}>{correctOption}</Text>
+              Respuesta correcta:{" "}
+              <Text style={{ fontWeight: "bold" }}>{correctOption}</Text>
             </Text>
           )}
         </View>
       )}
 
-      {/* Check Button */}
+      {/* Action Button */}
       <TouchableOpacity
         style={[styles.checkButton, isAnswerChecked && styles.continueButton]}
-        onPress={isAnswerChecked ? handleContinue : handleCheckButtonPress}
+        onPress={isAnswerChecked ? handleContinue : handleCheckAnswer}
+        disabled={selectedOption === null}
       >
-        <Text style={styles.checkButtonText}>{isAnswerChecked ? "Continuar" : "Comprobar"}</Text>
+        <Text style={styles.checkButtonText}>
+          {isAnswerChecked ? "Continuar" : "Comprobar"}
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -199,9 +287,9 @@ const styles = StyleSheet.create({
   feedbackMessage: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 10,
+    padding: 9,
     borderRadius: 10,
-    marginVertical: 10,
+    marginVertical: 8,
   },
   successMessage: {
     backgroundColor: "#A0D995",
@@ -212,7 +300,6 @@ const styles = StyleSheet.create({
   feedbackText: {
     fontSize: 16,
     color: "#333333",
-    marginLeft: 10,
   },
   correctAnswerText: {
     fontSize: 14,
