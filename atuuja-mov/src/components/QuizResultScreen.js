@@ -1,31 +1,55 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+} from "react-native";
 
 const { width, height } = Dimensions.get("window");
 
 const QuizResultScreen = ({ navigation, route }) => {
-  const { correctAnswers = 0, incorrectAnswers = 0, totalPoints = 0, RelatoId } = route.params || {};
+  const {
+    correctAnswers = 0,
+    incorrectAnswers = 0,
+    totalPoints = 0,
+    RelatoId,
+  } = route.params || {};
 
-  const handleRetry = () => {
+  // Depuración para verificar los valores recibidos
+  console.log("Respuestas correctas:", correctAnswers);
+  console.log("Respuestas incorrectas:", incorrectAnswers);
+  console.log("Puntos totales:", totalPoints);
+
+
+  const handleRetry = () => {    
     navigation.reset({
       index: 0,
-      routes: [{ name: "Learn", params: { RelatoId } }],
+      routes: [{ name: "QuizImagen", params: { RelatoId } }],
     });
+    console.log('handleRetry', RelatoId)
   };
 
   const handleClaimReward = () => {
+    console.log('handleClaimReward ', RelatoId)
+
     navigation.navigate("Rewards", { RelatoId, totalPoints });
+    console.log('Despues handleClaimReward ', RelatoId)
+
   };
 
-  const allQuestionsAnswered = correctAnswers + incorrectAnswers > 0;
+  const allCorrectAnswers = incorrectAnswers === 0 && correctAnswers > 0;
 
   return (
     <View style={styles.container}>
       {/* Mensaje principal */}
-      <Text style={styles.mainMessage}>{correctAnswers > 0 ? "¡Bien Hecho!" : "¡Vaya!"}</Text>
+      <Text style={styles.mainMessage}>
+        {allCorrectAnswers ? "¡Felicidades!" : "¡Vaya!"}
+      </Text>
       <Text style={styles.subMessage}>
-        {correctAnswers > 0
-          ? "Completaste el Relato exitosamente."
+        {allCorrectAnswers
+          ? "Respondiste correctamente todas las preguntas."
           : "Parece que necesitas intentarlo de nuevo."}
       </Text>
 
@@ -51,9 +75,12 @@ const QuizResultScreen = ({ navigation, route }) => {
       </View>
 
       {/* Botón de acción */}
-      {allQuestionsAnswered ? (
-        <TouchableOpacity style={styles.claimButton} onPress={handleClaimReward}>
-          <Text style={styles.claimButtonText}>Recubir Recompensas</Text>
+      {allCorrectAnswers ? (
+        <TouchableOpacity
+          style={styles.claimButton}
+          onPress={handleClaimReward}
+        >
+          <Text style={styles.claimButtonText}>Recibir Recompensas</Text>
         </TouchableOpacity>
       ) : (
         <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
@@ -143,6 +170,18 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   retryButtonText: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  claimButton: {
+    backgroundColor: "#28A745",
+    paddingVertical: 15,
+    borderRadius: 20,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  claimButtonText: {
     color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "bold",

@@ -5,6 +5,7 @@ import { ScrollView } from "react-native";
 import { ProgressProvider } from "./src/context/ProgressContext";
 import { StoryProvider } from "./src/context/StoryContext";
 import { QuizProvider } from "./src/context/QuizContext";
+import { RewardProvider } from './src/context/RewardContext';
 
 
 export default function App() {
@@ -14,7 +15,9 @@ export default function App() {
         <ProgressProvider>
           <StoryProvider>
           <QuizProvider>
+          <RewardProvider>
             <AppNavigator />
+            </RewardProvider>
             </QuizProvider>
           </StoryProvider>
         </ProgressProvider>

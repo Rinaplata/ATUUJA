@@ -17,8 +17,12 @@ const QuizImageAudioScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const { quizzes, loading, error } = useQuizzes();
-  const { RelatoId, totalPoints: initialPoints = 0 } = route.params || {};
 
+  const { RelatoId, totalPoints: initialPoints = 0, initialCorrect = 0, initialIncorrect = 0,
+    correctAnswers: currentCorrect = 0,
+    incorrectAnswers: currentIncorrect = 0,
+   } =
+    route.params || {};
   const [currentQuiz, setCurrentQuiz] = useState(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -27,6 +31,12 @@ const QuizImageAudioScreen = () => {
   const [sound, setSound] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [totalPoints, setTotalPoints] = useState(initialPoints);
+  const [correctAnswers, setCorrectAnswers] = useState(
+    initialCorrect || currentCorrect
+  );
+  const [incorrectAnswers, setIncorrectAnswers] = useState(
+    initialIncorrect || currentIncorrect
+  );
 
   useEffect(() => {
     if (quizzes && RelatoId) {
@@ -51,7 +61,7 @@ const QuizImageAudioScreen = () => {
           setIsPlaying(false);
           return;
         } else if (status.isLoaded) {
-          await sound.playAsync(); 
+          await sound.playAsync();
           setIsPlaying(true);
           return;
         }
@@ -61,7 +71,7 @@ const QuizImageAudioScreen = () => {
         uri: currentQuiz?.Preguntas[currentQuestionIndex]?.ArchivoPregunta,
       });
       setSound(newSound);
-      setIsPlaying(true); 
+      setIsPlaying(true);
       await newSound.playAsync();
     } catch (error) {
       console.error("Error al manejar el audio:", error);
@@ -89,9 +99,7 @@ const QuizImageAudioScreen = () => {
   if (error) {
     return (
       <View style={styles.container}>
-        <Text style={styles.errorText}>
-          Error al cargar las preguntas: {error}
-        </Text>
+        <Text style={styles.errorText}>Error al cargar las preguntas: {error}</Text>
       </View>
     );
   }
@@ -107,9 +115,7 @@ const QuizImageAudioScreen = () => {
   }
 
   const currentQuestion = currentQuiz.Preguntas[currentQuestionIndex];
-  const correctOption = currentQuestion.Respuestas.find(
-    (r) => r.EsCorrecta
-  )?.Valor;
+  const correctOption = currentQuestion.Respuestas.find((r) => r.EsCorrecta)?.Valor;
 
   const handleOptionSelect = (option) => {
     if (!isAnswerChecked) {
@@ -119,17 +125,19 @@ const QuizImageAudioScreen = () => {
 
   const handleCheckAnswer = () => {
     if (selectedOption) {
-      const pointsForQuestion = currentQuestion.Puntos; // Definimos los puntos de la pregunta actual
+      const pointsForQuestion = currentQuestion.Puntos; // Puntos de la pregunta actual
       const isAnswerCorrect = selectedOption === correctOption;
       setIsAnswerChecked(true);
       setIsCorrect(isAnswerCorrect);
-  
+
       if (isAnswerCorrect) {
         setTotalPoints((prevPoints) => prevPoints + pointsForQuestion);
+        setCorrectAnswers((prev) => prev + 1);
+      } else {
+        setIncorrectAnswers((prev) => prev + 1);
       }
     }
   };
-  
 
   const handleContinue = () => {
     if (isAnswerChecked) {
@@ -141,11 +149,14 @@ const QuizImageAudioScreen = () => {
       } else {
         navigation.navigate("QuizText", {
           RelatoId,
-          totalPoints,
+          totalPoints, // Pass updated total points
+          correctAnswers, // Pass cumulative correct answers
+          incorrectAnswers, // Pass cumulative incorrect answers
         });
       }
     }
   };
+  
 
   return (
     <View style={styles.container}>
@@ -163,8 +174,7 @@ const QuizImageAudioScreen = () => {
               styles.progressBar,
               {
                 width: `${
-                  ((currentQuestionIndex + 1) / currentQuiz.Preguntas.length) *
-                  100
+                  ((currentQuestionIndex + 1) / currentQuiz.Preguntas.length) * 100
                 }%`,
               },
             ]}
