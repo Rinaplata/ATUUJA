@@ -2,7 +2,7 @@ import api from "../api";
 
 export const GetQuizList = async () => {
   try {
-    const response = await api.get(`Auth/list`);
+    const response = await api.get(`Quiz/list`);
     return response.data;
   } catch (error) {
     console.error(

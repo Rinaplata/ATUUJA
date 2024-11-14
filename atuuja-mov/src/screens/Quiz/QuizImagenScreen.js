@@ -20,27 +20,27 @@ const QuizImagenScreen = () => {
 
   const { RelatoId } = route.params || {};
   const [currentQuiz, setCurrentQuiz] = useState(null);
+  const [filteredQuestions, setFilteredQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isAnswerChecked, setIsAnswerChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
 
-  // Fetch quiz data based on ExamenId
   useEffect(() => {
-    console.log("RelatoId recibido:", RelatoId);
-    console.log("Quizzes disponibles:", quizzes);
-
     if (quizzes && RelatoId) {
       const quiz = quizzes.find((q) => q.RelatoId === RelatoId);
       if (quiz) {
+        const questionsOfType2 = quiz.Preguntas.filter(
+          (pregunta) => pregunta.TipoPregunta === 2
+        );
         setCurrentQuiz(quiz);
+        setFilteredQuestions(questionsOfType2);
       } else {
         console.error(`No se encontró un quiz con el RelatoId: ${RelatoId}`);
       }
     }
-  }, [quizzes, RelatoId])
+  }, [quizzes, RelatoId]);
 
-  // Handle loading and error states
   if (loading) {
     return (
       <View style={styles.container}>
@@ -57,27 +57,17 @@ const QuizImagenScreen = () => {
     );
   }
 
-  if (!currentQuiz) {
+  if (!filteredQuestions.length) {
     return (
       <View style={styles.container}>
         <Text style={styles.errorText}>
-          No se encontró el examen con ID: {RelatoId}
+          No se encontraron preguntas del tipo esperado (TipoPregunta: 2).
         </Text>
       </View>
     );
   }
 
-  const currentQuestion = currentQuiz.Preguntas[currentQuestionIndex];
-  if (!currentQuestion) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.errorText}>
-          No se encontraron preguntas en el examen.
-        </Text>
-      </View>
-    );
-  }
-
+  const currentQuestion = filteredQuestions[currentQuestionIndex];
   const correctOption = currentQuestion.Respuestas.find((r) => r.EsCorrecta)?.Valor;
 
   const handleOptionSelect = (option) => {
@@ -95,11 +85,11 @@ const QuizImagenScreen = () => {
 
   const handleContinue = () => {
     if (isAnswerChecked) {
-      if (currentQuestionIndex < currentQuiz.Preguntas.length - 1) {
+      if (currentQuestionIndex < filteredQuestions.length - 1) {
         setCurrentQuestionIndex((prev) => prev + 1);
         resetState();
       } else {
-        navigation.navigate("QuizCompleted", { ExamenId });
+        navigation.navigate("QuizAudio", { RelatoId });
       }
     }
   };
@@ -126,7 +116,7 @@ const QuizImagenScreen = () => {
               styles.progressBar,
               {
                 width: `${
-                  ((currentQuestionIndex + 1) / currentQuiz.Preguntas.length) * 100
+                  ((currentQuestionIndex + 1) / filteredQuestions.length) * 100
                 }%`,
               },
             ]}
@@ -142,7 +132,7 @@ const QuizImagenScreen = () => {
         />
       ) : (
         <View style={styles.imagePlaceholder}>
-          <Text style={styles.errorText}>Sin imagen disponible</Text>
+          <Text style={styles.errorText}>Imagen no disponible</Text>
         </View>
       )}
 

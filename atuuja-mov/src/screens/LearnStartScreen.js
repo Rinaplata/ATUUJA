@@ -95,6 +95,7 @@ const StoryIntroScreen = ({ navigation, route  }) => {
         onPress={() => {
           if (story?.RelatoId) {
             navigation.navigate("LearnStart", { RelatoId: story.RelatoId });
+            console.log("RelatoId recibido:", RelatoId);
           } else {
             console.error("RelatoId no encontrado en stories");
           }
