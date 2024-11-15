@@ -32,7 +32,8 @@ public class StoriesController : ControllerBase
             { nameof(model.PalabrasResaltadas), model.PalabrasResaltadas },
             { nameof(model.AudioUrl), model.AudioUrl },
             { nameof(model.ImageUrl), model.ImageUrl },
-            { nameof (model.Subtitle), model.Subtitle }
+            { nameof (model.Subtitle), model.Subtitle },
+            { nameof (model.Traduccion), model.Traduccion }
         };
 
         // Guardar el relato en Firestore
@@ -100,7 +101,8 @@ public class StoriesController : ControllerBase
                 { nameof(model.PalabrasResaltadas), model.PalabrasResaltadas },
                 { nameof(model.AudioUrl), model.AudioUrl },
                 { nameof(model.ImageUrl), model.ImageUrl },
-                { nameof(model.Subtitle), model.Subtitle }
+                { nameof(model.Subtitle), model.Subtitle },
+                { nameof(model.Traduccion), model.Traduccion }
             };
 
             await storiesCollection.UpdateAsync(updatedStory);
