@@ -6,14 +6,14 @@ import Alert from '../../Alert/Alertas';
 interface RegisterStoryProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (data: { 
+  onSuccess: (data: {
     titulo: string;
     contenido: string;
     palabrasResaltadas: string[];
     audioUrl: string;
     imageUrl: string;
     subtitle: string;
-    traduccion: string
+    traduccion: string;
   }) => void;
 }
 
@@ -21,10 +21,10 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({
   isOpen,
   onClose,
   onSuccess,
-}) => { 
+}) => {
   const [titulo, setTitulo] = useState('');
   const [contenido, setContenido] = useState('');
-  const [palabrasResaltadas, setPalabrasResaltadas] = useState('');
+  const [palabrasResaltadas, setPalabrasResaltadas] = useState<any[]>([]);
   const [audioUrl, setAudioUrl] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [subtitle, setSubtitle] = useState('');
@@ -32,12 +32,41 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState<'success' | 'error' | undefined>(undefined);
 
+  const [newPalabra, setNewPalabra] = useState('');
+  const [newTraduccion, setNewTraduccion] = useState('');
+  const [newAudioUrl, setNewAudioUrl] = useState('');
+
+  
+  const addPalabraResaltada = () => {
+    // Verificar que todos los campos no estén vacíos
+    if (newPalabra.trim() && newTraduccion.trim() && newAudioUrl.trim()) {
+      // Agregar la nueva palabra resaltada al estado
+      setPalabrasResaltadas((prevState) => [
+        ...prevState,
+        { palabra: newPalabra, traduccion: newTraduccion, audioUrl: newAudioUrl },
+      ]);
+  
+      // Limpiar los campos después de agregar la palabra
+      setNewPalabra('');
+      setNewTraduccion('');
+      setNewAudioUrl('');
+    } else {
+      // Si faltan campos, mostrar un mensaje de alerta
+      alert('Por favor, complete todos los campos para agregar una palabra resaltada.');
+    }
+  };
+  
+
+  const removePalabraResaltada = (index: number) => {
+    setPalabrasResaltadas((prevState) => prevState.filter((_, i) => i !== index));
+  };
+
   const handleRegisterStory = async () => {
     try {
-      const storyData = { 
+      const storyData = {
         titulo,
         contenido,
-        palabrasResaltadas: palabrasResaltadas.split(',').map((word) => word.trim()),
+        palabrasResaltadas,
         audioUrl,
         imageUrl,
         subtitle,
@@ -59,7 +88,7 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({
       setAlertMessage('Relato registrado correctamente.');
       setAlertType('success');
       window.location.reload();
-      
+
       // Llama a onSuccess para actualizar la lista de relatos o cualquier otra acción
       onSuccess(storyData);
 
@@ -83,7 +112,8 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({
         />
       )}
       <div className="w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-6">
-        <div className="grid grid-cols-2 gap-4"> 
+        <div className="grid grid-cols-2 gap-4">
+          {/* Campos existentes */}
           <div className="col-span-2">
             <label className="mb-2 block font-bold">Título:</label>
             <input
@@ -102,7 +132,7 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({
               className="border p-2 mb-4 rounded w-full"
               placeholder="Ingrese el contenido del relato"
             />
-          </div> 
+          </div>
           <div className="col-span-2">
             <label className="mb-2 block font-bold">Traducción:</label>
             <textarea
@@ -111,7 +141,7 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({
               className="border p-2 mb-4 rounded w-full"
               placeholder="Ingrese la traducción del relato"
             />
-          </div> 
+          </div>
           <div className="col-span-2">
             <label className="mb-2 block font-bold">Subtítulo:</label>
             <input
@@ -122,16 +152,54 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({
               placeholder="Ingrese Subtitulo"
             />
           </div>
+
+          {/* Campos de palabras resaltadas */}
           <div className="col-span-2">
-            <label className="mb-2 block font-bold">Palabras Resaltadas:</label>
-            <input
-              type="text"
-              value={palabrasResaltadas}
-              onChange={(e) => setPalabrasResaltadas(e.target.value)}
-              className="border p-2 mb-4 rounded w-full"
-              placeholder="Ingrese palabras resaltadas separadas por comas"
-            />
+            <label className="mb-2 block font-bold">Palabra Resaltada:</label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={newPalabra}
+                onChange={(e) => setNewPalabra(e.target.value)}
+                className="border p-2 rounded w-full"
+                placeholder="Palabra"
+              />
+              <input
+                type="text"
+                value={newTraduccion}
+                onChange={(e) => setNewTraduccion(e.target.value)}
+                className="border p-2 rounded w-full"
+                placeholder="Traducción"
+              />
+              <input
+                type="text"
+                value={newAudioUrl}
+                onChange={(e) => setNewAudioUrl(e.target.value)}
+                className="border p-2 rounded w-full"
+                placeholder="URL del Audio"
+              />
+              <button
+                onClick={addPalabraResaltada}
+                className="bg-primaryAtuuja text-white px-4 py-2 rounded-lg hover:bg-primaryAtuuja-700"
+              >
+                Agregar
+              </button>
+            </div>
+            <ul className="mt-2">
+              {palabrasResaltadas.map((item, index) => (
+                <li key={index} className="text-sm text-gray-700">
+                  {item.palabra} ({item.traduccion}) - <a href={item.audioUrl}>Audio</a>
+                  <button
+                    onClick={() => removePalabraResaltada(index)}
+                    className="ml-2 text-red-500 hover:text-red-700"
+                  >
+                    X
+                  </button>
+                </li>
+              ))}
+            </ul>
           </div>
+          {/* Otros campos */}
           <div className="col-span-2">
             <label className="mb-2 block font-bold">URL del Audio:</label>
             <input
@@ -143,13 +211,13 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({
             />
           </div>
           <div className="col-span-2">
-            <label className="mb-2 block font-bold">URL de la imagen:</label>
+            <label className="mb-2 block font-bold">URL de la Imagen:</label>
             <input
               type="text"
               value={imageUrl}
               onChange={(e) => setImageUrl(e.target.value)}
               className="border p-2 mb-4 rounded w-full"
-              placeholder="Ingrese la URL del audio"
+              placeholder="Ingrese la URL de la imagen"
             />
           </div>
         </div>

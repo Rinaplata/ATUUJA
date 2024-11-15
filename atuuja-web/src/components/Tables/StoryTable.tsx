@@ -104,7 +104,7 @@ const TableThree: React.FC<IStoryTable> = ({ story }) => {
                 Título del Relato
               </th>
               <th className="min-w-[220px] py-4 px-4 font-medium text-white dark:text-white xl:pl-11">
-               Subtítulo
+                Subtítulo
               </th>
               <th className="min-w-[150px] py-4 px-4 font-medium text-white dark:text-white">
                 Contenido
@@ -150,17 +150,20 @@ const TableThree: React.FC<IStoryTable> = ({ story }) => {
                   </p>
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                  <p className="text-black dark:text-white">
-                    {storyItem.PalabrasResaltadas.map((palabra, index) => (
-                      <span
-                        key={index}
-                        className="inline-block bg-gray-200 px-2 py-1 rounded-md mr-2"
-                      >
-                        {palabra}
-                      </span>
-                    ))}
-                  </p>
-                </td>
+  <p className="text-black dark:text-white">
+    {storyItem.PalabrasResaltadas.map((palabraResaltada, index) => (
+      <span
+        key={index}
+        className="inline-block bg-gray-200 px-2 py-1 rounded-md mr-2"
+      >
+        {palabraResaltada.Palabra} 
+        {palabraResaltada.Traduccion && (
+          <span className="text-sm text-gray-500 italic"> ({palabraResaltada.Traduccion})</span>
+        )}
+      </span>
+    ))}
+  </p>
+</td>
 
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                   <p className="text-black dark:text-white">
@@ -237,10 +240,10 @@ const TableThree: React.FC<IStoryTable> = ({ story }) => {
           titulo: selectedStory?.Titulo ?? '',
           contenido: selectedStory?.Contenido ?? '',
           palabrasResaltadas: selectedStory?.PalabrasResaltadas ?? [],
-          audioUrl: selectedStory?.AudioUrl ?? '', 
-          imageUrl: selectedStory?.ImageUrl?? '',
-          subtitle: selectedStory?.Subtitle?? '',
-          traduccion: selectedStory?.Traduccion?? ''
+          audioUrl: selectedStory?.AudioUrl ?? '',
+          imageUrl: selectedStory?.ImageUrl ?? '',
+          subtitle: selectedStory?.Subtitle ?? '',
+          traduccion: selectedStory?.Traduccion ?? ''
         }}
         onSuccess={handleUpdateSuccess}
       />

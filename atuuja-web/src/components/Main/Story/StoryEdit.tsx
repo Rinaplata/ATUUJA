@@ -129,7 +129,7 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({ isOpen, onClose, storyDat
             value={traduccion}
             onChange={(e) => setTraduccion(e.target.value)}
             className="border p-2 mb-4 rounded w-full"
-            placeholder="Ingrese el contenido del relato"
+            placeholder="Ingrese el contenido de la traducción"
           />
         </div>
         <div>

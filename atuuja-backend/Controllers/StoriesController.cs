@@ -1,7 +1,5 @@
 using Google.Cloud.Firestore;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -29,17 +27,26 @@ public class StoriesController : ControllerBase
             { nameof(model.RelatoId), storiesId },
             { nameof(model.Titulo), model.Titulo },
             { nameof(model.Contenido), model.Contenido },
-            { nameof(model.PalabrasResaltadas), model.PalabrasResaltadas },
+            { nameof(model.PalabrasResaltadas), model.PalabrasResaltadas.Select(p => new
+                {
+                    p.Palabra,
+                    p.Traduccion,
+                    p.AudioUrl
+                }).ToList() },
             { nameof(model.AudioUrl), model.AudioUrl },
             { nameof(model.ImageUrl), model.ImageUrl },
-            { nameof (model.Subtitle), model.Subtitle },
-            { nameof (model.Traduccion), model.Traduccion }
+            { nameof(model.Subtitle), model.Subtitle },
+            { nameof(model.Traduccion), model.Traduccion }
         };
 
         // Guardar el relato en Firestore
         await storiesCollection.Document(storiesId).SetAsync(newStory);
 
-        return Ok(new { message = MessageTemplates.Format(MessageTemplates.RegisterInserted, storyDescripcion), RelatoId = storiesId });
+        return Ok(new
+        {
+            message = MessageTemplates.Format(MessageTemplates.RegisterInserted, storyDescripcion),
+            RelatoId = storiesId
+        });
     }
 
     [HttpDelete("delete/{relatoId}")]
@@ -51,7 +58,7 @@ public class StoriesController : ControllerBase
             var storySnapshot = await storiesCollection.GetSnapshotAsync();
 
             if (!storySnapshot.Exists)
-                return NotFound( MessageTemplates.Format(MessageTemplates.RegisterNotFound, storyDescripcion));
+                return NotFound(MessageTemplates.Format(MessageTemplates.RegisterNotFound, storyDescripcion));
 
             await storiesCollection.DeleteAsync();
             return Ok(new { message = MessageTemplates.Format(MessageTemplates.RegisterDeleted, storyDescripcion) });
@@ -95,19 +102,24 @@ public class StoriesController : ControllerBase
                 return NotFound(MessageTemplates.Format(MessageTemplates.RegisterNotFound, storyDescripcion));
 
             var updatedStory = new Dictionary<string, object>
-            {
-                { nameof(model.Titulo), model.Titulo },
-                { nameof(model.Contenido), model.Contenido },
-                { nameof(model.PalabrasResaltadas), model.PalabrasResaltadas },
-                { nameof(model.AudioUrl), model.AudioUrl },
-                { nameof(model.ImageUrl), model.ImageUrl },
-                { nameof(model.Subtitle), model.Subtitle },
-                { nameof(model.Traduccion), model.Traduccion }
-            };
+        {
+            { nameof(model.Titulo), model.Titulo },
+            { nameof(model.Contenido), model.Contenido },
+            { nameof(model.PalabrasResaltadas), model.PalabrasResaltadas.Select(p => new
+                {
+                    p.Palabra,
+                    p.Traduccion,
+                    p.AudioUrl
+                }).ToList() },
+            { nameof(model.AudioUrl), model.AudioUrl },
+            { nameof(model.ImageUrl), model.ImageUrl },
+            { nameof(model.Subtitle), model.Subtitle },
+            { nameof(model.Traduccion), model.Traduccion }
+        };
 
             await storiesCollection.UpdateAsync(updatedStory);
 
-            return Ok(new { message = MessageTemplates.Format(MessageTemplates.RegisterUpdated, storyDescripcion)});
+            return Ok(new { message = MessageTemplates.Format(MessageTemplates.RegisterUpdated, storyDescripcion) });
         }
         catch (Exception ex)
         {
