@@ -99,7 +99,7 @@ const AppNavigator = () => (
       <Stack.Screen name="QuizAudio" component={QuizImageAudioScreen} options={{ headerShown: false }} />
       <Stack.Screen name="QuizText" component={QuizTextScreen} options={{ headerShown: false }} />
       <Stack.Screen name="ResultScreen" component={QuizResultScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="Rewards" component={RewardsScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Rewards" component={TabNavigator} options={{ headerShown: false }} />
  
 
       

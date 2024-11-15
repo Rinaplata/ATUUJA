@@ -39,3 +39,16 @@ export const GetAuthList = async () => {
     throw error;
   }
 };
+
+export const useUpdateUser = async (Id, userData) => {
+  try {
+    const data = await api.put(`Auth/update/${Id}/`, userData);
+    return data;
+  } catch (error) {
+    console.error(
+      "Error al actualizar la información del usuario:",
+      error.response ? error.response.data : error.message
+    );
+    throw error;
+  }
+};
