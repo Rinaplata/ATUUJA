@@ -1,1 +1,1 @@
-export const API_URL = 'http://localhost:5220/api';
+export const API_URL = 'https://atuuja-api-g2dqbygvb7a6cccw.centralus-01.azurewebsites.net/api';
