@@ -35,7 +35,7 @@ export default function Story() {
     audioUrl: string; 
     imageUrl: string,
     subtitle: string,
-    traduccion: string
+    relatoTraduccion: string
   }) => {
     console.log('Registrar relato:', data);
     // Aquí puedes manejar la lógica para almacenar los datos o actualizar la lista de relatos

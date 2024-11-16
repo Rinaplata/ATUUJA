@@ -36,7 +36,7 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({
   const [newTraduccion, setNewTraduccion] = useState('');
   const [newAudioUrl, setNewAudioUrl] = useState('');
 
-  
+
   const addPalabraResaltada = () => {
     // Verificar que todos los campos no estén vacíos
     if (newPalabra.trim() && newTraduccion.trim() && newAudioUrl.trim()) {
@@ -188,7 +188,7 @@ const RegisterStory: React.FC<RegisterStoryProps> = ({
             <ul className="mt-2">
               {palabrasResaltadas.map((item, index) => (
                 <li key={index} className="text-sm text-gray-700">
-                  {item.palabra} ({item.traduccion}) - <a href={item.audioUrl}>Audio</a>
+                  {item.Palabra} ({item.traduccion}) - <a href={item.AudioUrl}>Audio</a>
                   <button
                     onClick={() => removePalabraResaltada(index)}
                     className="ml-2 text-red-500 hover:text-red-700"
