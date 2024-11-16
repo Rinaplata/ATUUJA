@@ -31,6 +31,7 @@ const StoryIntroScreen = ({ navigation, route  }) => {
     }
   }, [stories, RelatoId]);
 
+
   if (loadingStory) {
     return (
       <View style={styles.container}>
