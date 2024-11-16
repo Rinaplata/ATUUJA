@@ -87,9 +87,9 @@ const RewardsScreen =({ navigation, route }) => {
       <FlatList
         horizontal
         data={[
-          { id: 1, title: "Relatos Nivel 1", subtitle: "Aprendiz destacado" },
-          { id: 2, title: "Relatos Nivel 2", subtitle: "Aprendiz Relámpago" },
-          { id: 3, title: "Relatos Nivel 3", subtitle: "Aprendiz Audaz" },
+          { id: 1, title: "Relato 1", subtitle: "Nivel 1" },
+          { id: 2, title: "Relato 2", subtitle: "Nivel 2" },
+          { id: 3, title: "Relato 3", subtitle: "Nivel 3" },
         ]}
         renderItem={({ item }) => <LevelCard level={item} />}
         keyExtractor={(item) => item.id.toString()}

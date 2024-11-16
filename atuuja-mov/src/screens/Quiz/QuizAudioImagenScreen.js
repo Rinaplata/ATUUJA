@@ -11,6 +11,7 @@ import { Audio } from "expo-av";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { useQuizzes } from "../../context/QuizContext";
 
+
 const { width, height } = Dimensions.get("window");
 
 const QuizImageAudioScreen = () => {

@@ -27,6 +27,34 @@ export const getUserProgress = async (userId) => {
   }
 };
 
+export const CreateProgress = async (payload) => {
+  try {
+    const response = await api.post(`Auth/Progress/saveProgress`, payload);
+    if (response.status === 200) {
+      return response.data;
+    } else {
+      throw new Error("Error al crear un progress.");
+    }
+  } catch (error) {
+    console.error("Error al crear el progress:", error.message);
+    throw error;
+  }
+};
+
+export const PutUserProgress = async (progressId, payload) => {
+  try {
+    const response = await api.put(`Progress/updateProgress/${progressId}`, payload);
+    if (response.status === 200) {
+      return response.data;
+    } else {
+      throw new Error("Error en la actualizacion del progress.");
+    }
+  } catch (error) {
+    console.error("Error en el registro:", error.message);
+    throw error;
+  }
+};
+
 export const GetAuthList = async () => {
   try {
     const response = await api.get(`Auth/list`);

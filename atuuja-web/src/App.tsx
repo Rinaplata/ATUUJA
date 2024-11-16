@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 
 import Loader from './common/Loader';
 import DefaultLayout from './layout/DefaultLayout';
@@ -17,6 +17,7 @@ import Settings from './pages/Settings.tsx';
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
   const { pathname } = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -30,7 +31,8 @@ function App() {
 
       if (!token || token == undefined) {
         localStorage.removeItem('token');
-        window.location.href = '/auth/login';
+        navigate('/auth/login');
+        return;
       }
 
       const decodedToken = jwtDecode(token || '');
@@ -41,7 +43,8 @@ function App() {
         console.log('El token ha expirado.');
         localStorage.removeItem('token');
         // Redirige al login
-        window.location.href = '/auth/login';
+        navigate('/auth/login'); 
+        return;
       }
     }
   }, []);
@@ -61,9 +64,9 @@ function App() {
     </DefaultLayout>
   ) : (
     <Routes>
-      <Route path="auth/login" element={<Login />}></Route>
-      <Route path="auth/userrecoverypassword" element={<UserRecoveryPassword />}></Route>
-      <Route path="auth/userresetpassword" element={<UserResetPassword />}></Route>
+      <Route path="/auth/login" element={<Login />}></Route>
+      <Route path="/auth/userrecoverypassword" element={<UserRecoveryPassword />}></Route>
+      <Route path="/auth/userresetpassword" element={<UserResetPassword />}></Route>
     </Routes>
   );
 }

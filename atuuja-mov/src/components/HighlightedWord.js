@@ -1,31 +1,89 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Audio } from 'expo-av';
 
 const { width } = Dimensions.get('window');
 
-const HighlightedWord = ({ word, translation }) => {
+export const HighlightedWord = ({ word, translation, audioUrl }) => {
+
   const [visible, setVisible] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [audioPlayer, setAudioPlayer] = useState(null);
 
   const openTooltip = () => setVisible(true);
-  const closeTooltip = () => setVisible(false);
+  
+  const closeTooltip = () => {
+    setVisible(false);
+    stopAudio();
+  };
 
+  const playAudio = async () => {
+    try {
+      if (audioPlayer === null) {
+        const { sound } = await Audio.Sound.createAsync({ uri: audioUrl });
+        setAudioPlayer(sound);
+
+        await sound.playAsync();
+        setIsPlaying(true);
+
+        sound.setOnPlaybackStatusUpdate((status) => {
+          if (status.didJustFinish) {
+            setIsPlaying(false);
+            sound.unloadAsync();
+            setAudioPlayer(null);
+          }
+        });
+      } else {
+        const status = await audioPlayer.getStatusAsync();
+        if (status.isPlaying) {
+          await audioPlayer.pauseAsync();
+          setIsPlaying(false);
+        } else {
+          await audioPlayer.playAsync();
+          setIsPlaying(true);
+        }
+      }
+    } catch (error) {
+      console.error('Error al reproducir el audio:', error);
+    }
+  };
+
+  const stopAudio = async () => {
+    if (audioPlayer) {
+      await audioPlayer.stopAsync();
+      await audioPlayer.unloadAsync();
+      setAudioPlayer(null);
+      setIsPlaying(false);
+    }
+  };
+  
   return (
     <View>
       <TouchableOpacity onPress={openTooltip} style={styles.highlighted}>
         <Text style={styles.highlightedText}>{word}</Text>
       </TouchableOpacity>
       <Modal transparent={true} visible={visible} animationType="fade">
-        <TouchableOpacity style={styles.modalOverlay} onPress={closeTooltip}>
+        <View style={styles.modalOverlay}>
+          <TouchableOpacity style={styles.closeButton} onPress={closeTooltip}>
+            <Ionicons name="close-outline" size={24} color="#fff" />
+          </TouchableOpacity>
           <View style={styles.tooltipContainer}>
             <View style={styles.tooltipContent}>
-              <Ionicons name="volume-high-outline" size={24} color="#333" style={styles.icon} />
+            <TouchableOpacity onPress={playAudio} style={styles.audioButton}>
+                <Ionicons
+                  name={isPlaying ? "pause-outline" : "play-outline"}
+                  size={24}
+                  color="#333"
+                  style={styles.icon}
+                />
+              </TouchableOpacity>
               <Text style={styles.tooltipWord}>{word}</Text>
               <Text style={styles.tooltipTranslation}>{translation}</Text>
             </View>
             <View style={styles.tooltipTriangle} />
           </View>
-        </TouchableOpacity>
+        </View>
       </Modal>
     </View>
   );

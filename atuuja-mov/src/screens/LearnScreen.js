@@ -14,7 +14,7 @@ import { Audio } from "expo-av";
 import { Ionicons } from "@expo/vector-icons";
 import colors from "../constants/colors";
 import { useStories } from "../context/StoryContext";
-
+import { HighlightedWord } from "../components/HighlightedWord";
 const { width, height } = Dimensions.get("window");
 
 const LearnScreen = ({ navigation, route }) => {
@@ -80,23 +80,40 @@ const LearnScreen = ({ navigation, route }) => {
       console.error("Error al manejar el audio:", error);
     }
   };
-  const highlightContent = (content, highlights) => {
-    if (!content || !highlights) return content;
 
+  const highlightContent = (content, palabrasResaltadas) => {
+    if (!content || !palabrasResaltadas || palabrasResaltadas.length === 0) return content;
+  
+    // Divide el contenido en palabras
     const words = content.split(" ");
+  
     return words.map((word, index) => {
-      const cleanWord = word.replace(/[\.,]/g, "");
-      if (highlights.includes(cleanWord)) {
+      // Limpia la palabra actual (remueve puntuación y espacios extra)
+      const cleanWord = word.trim().replace(/[\.,]/g, "").toLowerCase();
+  
+      // Encuentra una coincidencia exacta en palabras resaltadas
+      const matchedWord = palabrasResaltadas.find(
+        (resaltada) => resaltada.Palabra.trim().toLowerCase() === cleanWord
+      );
+  
+      // Si hay coincidencia, renderiza el componente HighlightedWord
+      if (matchedWord) {
         return (
-          <Text key={index} style={styles.highlighted}>
-            {word + " "}
-          </Text>
+          <HighlightedWord
+            key={index}
+            word={matchedWord.Palabra}
+            translation={matchedWord.Traduccion}
+            audioUrl={matchedWord.AudioUrl}
+          />
         );
       }
-      return word + " ";
+  
+      // Si no hay coincidencia, renderiza la palabra como texto normal
+      return <Text key={index}>{word + " "}</Text>;
     });
   };
-
+  
+  
   if (loadingStory) {
     return (
       <View style={styles.container}>
@@ -115,6 +132,7 @@ const LearnScreen = ({ navigation, route }) => {
     );
   }
 
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.storyContainer}>
@@ -132,15 +150,14 @@ const LearnScreen = ({ navigation, route }) => {
           </TouchableOpacity>
         </View>
         <ScrollView contentContainerStyle={styles.textContainer}>
-          <View style={styles.contentContainerText}>
-            <Text style={styles.storyText}>
-              {highlightContent(story.Contenido)}
-            </Text>
-          </View>
+        <View style={styles.contentContainerText}>
+  <Text style={styles.storyText}>
+    {highlightContent(story.Contenido, story.PalabrasResaltadas)}
+  </Text>
+</View>
+
           <View style={styles.translationContainer}>
-            <Text style={styles.translationText}>
-              {highlightContent(story.Traduccion)}
-            </Text>
+            <Text style={styles.translationText}>{story.Traduccion}</Text>
           </View>
         </ScrollView>
 
@@ -156,9 +173,9 @@ const LearnScreen = ({ navigation, route }) => {
 
         <TouchableOpacity
           style={styles.continueButton}
-          onPress={() =>
-            navigation.navigate("QuizImagen", { RelatoId: story.RelatoId })
-          }
+          onPress={() => {
+            navigation.navigate("QuizImagen", { RelatoId: story.RelatoId });
+          }}
         >
           <Text style={styles.continueText}>Continuar</Text>
         </TouchableOpacity>
@@ -244,13 +261,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   contentContainerText: {
-    marginBottom: height * 0.02, 
+    marginBottom: height * 0.02,
   },
   translationContainer: {
     paddingTop: height * 0.01,
-    borderTopWidth: 1, 
-    borderTopColor: "#E5E5E5", 
-    marginTop: height * 0.02, 
+    borderTopWidth: 1,
+    borderTopColor: "#E5E5E5",
+    marginTop: height * 0.02,
   },
   translationTitle: {
     fontSize: scaleFontSize(16),
@@ -260,7 +277,7 @@ const styles = StyleSheet.create({
   },
   translationText: {
     fontSize: scaleFontSize(14),
-    lineHeight: scaleFontSize(20), 
+    lineHeight: scaleFontSize(20),
     color: "#555",
   },
 });
