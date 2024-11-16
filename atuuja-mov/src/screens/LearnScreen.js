@@ -15,14 +15,11 @@ import { Ionicons } from "@expo/vector-icons";
 import colors from "../constants/colors";
 import { useStories } from "../context/StoryContext";
 import { HighlightedWord } from "../components/HighlightedWord";
-import { useProgress } from "../context/ProgressContext";
-
 const { width, height } = Dimensions.get("window");
 
 const LearnScreen = ({ navigation, route }) => {
   const { RelatoId } = route.params || {};
   const { stories, loadingStory, errorStory } = useStories();
-  const { createUserProgress } = useProgress();
   const [story, setStory] = useState(null);
   const [audioPlayer, setAudioPlayer] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -84,27 +81,39 @@ const LearnScreen = ({ navigation, route }) => {
     }
   };
 
-  const highlightContent = (content, highlights, translations) => {
-    if (!content || !highlights || !translations) return content;
-
+  const highlightContent = (content, palabrasResaltadas) => {
+    if (!content || !palabrasResaltadas || palabrasResaltadas.length === 0) return content;
+  
+    // Divide el contenido en palabras
     const words = content.split(" ");
+  
     return words.map((word, index) => {
-      const cleanWord = word.replace(/[\.,]/g, ""); // Limpia puntuaciones
-      const highlightIndex = highlights.indexOf(cleanWord);
-
-      if (highlightIndex !== -1) {
+      // Limpia la palabra actual (remueve puntuación y espacios extra)
+      const cleanWord = word.trim().replace(/[\.,]/g, "").toLowerCase();
+  
+      // Encuentra una coincidencia exacta en palabras resaltadas
+      const matchedWord = palabrasResaltadas.find(
+        (resaltada) => resaltada.Palabra.trim().toLowerCase() === cleanWord
+      );
+  
+      // Si hay coincidencia, renderiza el componente HighlightedWord
+      if (matchedWord) {
         return (
           <HighlightedWord
             key={index}
-            word={word}
-            translation={translations[highlightIndex]}
+            word={matchedWord.Palabra}
+            translation={matchedWord.Traduccion}
+            audioUrl={matchedWord.AudioUrl}
           />
         );
       }
+  
+      // Si no hay coincidencia, renderiza la palabra como texto normal
       return <Text key={index}>{word + " "}</Text>;
     });
   };
-
+  
+  
   if (loadingStory) {
     return (
       <View style={styles.container}>
@@ -123,6 +132,7 @@ const LearnScreen = ({ navigation, route }) => {
     );
   }
 
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.storyContainer}>
@@ -140,19 +150,14 @@ const LearnScreen = ({ navigation, route }) => {
           </TouchableOpacity>
         </View>
         <ScrollView contentContainerStyle={styles.textContainer}>
-          <View style={styles.contentContainerText}>
-            <Text style={styles.storyText}>
-              {highlightContent(
-                story.Contenido,
-                story.PalabrasResaltadas,
-                story.PalabrasTraducciones
-              )}
-            </Text>
-          </View>
+        <View style={styles.contentContainerText}>
+  <Text style={styles.storyText}>
+    {highlightContent(story.Contenido, story.PalabrasResaltadas)}
+  </Text>
+</View>
+
           <View style={styles.translationContainer}>
-            <Text style={styles.translationText}>
-              {highlightContent(story.Traduccion)}
-            </Text>
+            <Text style={styles.translationText}>{story.Traduccion}</Text>
           </View>
         </ScrollView>
 
