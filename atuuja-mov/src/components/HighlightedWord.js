@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
-const HighlightedWord = ({ word, translation }) => {
+export const HighlightedWord = ({ word, translation }) => {
   const [visible, setVisible] = useState(false);
 
   const openTooltip = () => setVisible(true);
