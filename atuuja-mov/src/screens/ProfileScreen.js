@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
@@ -9,13 +9,22 @@ import {
 } from "react-native";
 import { useAuth } from "../context/AuthContext";
 import CircularProgress from "react-native-circular-progress-indicator";
+import { useProgress } from "../context/ProgressContext";
 
 const { width, height } = Dimensions.get("window");
 
 const ProfileScreen = ({ navigation }) => {
   const { user } = useAuth();
-  const percentage = 5; // Puedes ajustar este porcentaje según sea necesario
+  const percentage = 5;
+  const puntosAcumulados = progress?.progress?.[0]?.PuntosAcumulados || 0;
+  const { progress, fetchUserProgress, loading, error } = useProgress();
+  const { user: authUser } = useAuth();
 
+  useEffect(() => {
+    if (authUser?.userId) {
+      fetchUserProgress(authUser.userId);
+    }
+  }, [authUser]);
   return (
     <View style={styles.container}>
       {/* Top Menu */}
@@ -25,7 +34,7 @@ const ProfileScreen = ({ navigation }) => {
             source={require("../../assets/icons/images/spiral-icon.png")}
             style={[styles.pointsIcon, { width: 28, height: 28 }]}
           />
-          <Text style={styles.pointsText}>120</Text>
+          <Text style={styles.pointsText}>{puntosAcumulados}</Text>
         </View>
         <Image
           source={require("../../assets/icons/images/isologoBanner.png")}
@@ -58,12 +67,11 @@ const ProfileScreen = ({ navigation }) => {
 
       {/* Nivel Card */}
       <View style={styles.levelCard}>
-        <Text style={styles.levelText}>Estás en nivel 1</Text>
-        <Text style={styles.expText}>Tus EXP: 125</Text>
-        <Text style={styles.expSubText}>Con 55 EXP más, subes de nivel</Text>
+        <Text style={styles.levelText}>Continua aprendiendo..</Text>
+        <Text style={styles.expText}></Text>
         <Text style={styles.levelDescription}>
-          Pasa al siguiente nivel sumando EXP completando correctamente los
-          relatos
+          Pasa al siguiente los diferentes relatos para seguir aprendindo
+          wayuunaiki
         </Text>
       </View>
 
@@ -73,7 +81,9 @@ const ProfileScreen = ({ navigation }) => {
         <View style={styles.achievementContainer}>
           <View style={styles.achievementBox}>
             <Text style={styles.achievementTitle}>Relato 1</Text>
-            <Text style={styles.achievementDescription}>Aprendiz destacado</Text>
+            <Text style={styles.achievementDescription}>
+              Aprendiz destacado
+            </Text>
           </View>
         </View>
       </View>
@@ -171,7 +181,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   section: {
-    marginTop: 20,
+    marginTop: 40,
   },
   sectionTitle: {
     fontSize: 18,

@@ -14,12 +14,15 @@ import { Audio } from "expo-av";
 import { Ionicons } from "@expo/vector-icons";
 import colors from "../constants/colors";
 import { useStories } from "../context/StoryContext";
+import { HighlightedWord } from "../components/HighlightedWord";
+import { useProgress } from "../context/ProgressContext";
 
 const { width, height } = Dimensions.get("window");
 
 const LearnScreen = ({ navigation, route }) => {
   const { RelatoId } = route.params || {};
   const { stories, loadingStory, errorStory } = useStories();
+  const { createUserProgress } = useProgress();
   const [story, setStory] = useState(null);
   const [audioPlayer, setAudioPlayer] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -80,20 +83,25 @@ const LearnScreen = ({ navigation, route }) => {
       console.error("Error al manejar el audio:", error);
     }
   };
-  const highlightContent = (content, highlights) => {
-    if (!content || !highlights) return content;
+
+  const highlightContent = (content, highlights, translations) => {
+    if (!content || !highlights || !translations) return content;
 
     const words = content.split(" ");
     return words.map((word, index) => {
-      const cleanWord = word.replace(/[\.,]/g, "");
-      if (highlights.includes(cleanWord)) {
+      const cleanWord = word.replace(/[\.,]/g, ""); // Limpia puntuaciones
+      const highlightIndex = highlights.indexOf(cleanWord);
+
+      if (highlightIndex !== -1) {
         return (
-          <Text key={index} style={styles.highlighted}>
-            {word + " "}
-          </Text>
+          <HighlightedWord
+            key={index}
+            word={word}
+            translation={translations[highlightIndex]}
+          />
         );
       }
-      return word + " ";
+      return <Text key={index}>{word + " "}</Text>;
     });
   };
 
@@ -134,7 +142,11 @@ const LearnScreen = ({ navigation, route }) => {
         <ScrollView contentContainerStyle={styles.textContainer}>
           <View style={styles.contentContainerText}>
             <Text style={styles.storyText}>
-              {highlightContent(story.Contenido)}
+              {highlightContent(
+                story.Contenido,
+                story.PalabrasResaltadas,
+                story.PalabrasTraducciones
+              )}
             </Text>
           </View>
           <View style={styles.translationContainer}>
@@ -156,9 +168,9 @@ const LearnScreen = ({ navigation, route }) => {
 
         <TouchableOpacity
           style={styles.continueButton}
-          onPress={() =>
-            navigation.navigate("QuizImagen", { RelatoId: story.RelatoId })
-          }
+          onPress={() => {
+            navigation.navigate("QuizImagen", { RelatoId: story.RelatoId });
+          }}
         >
           <Text style={styles.continueText}>Continuar</Text>
         </TouchableOpacity>
@@ -244,13 +256,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   contentContainerText: {
-    marginBottom: height * 0.02, 
+    marginBottom: height * 0.02,
   },
   translationContainer: {
     paddingTop: height * 0.01,
-    borderTopWidth: 1, 
-    borderTopColor: "#E5E5E5", 
-    marginTop: height * 0.02, 
+    borderTopWidth: 1,
+    borderTopColor: "#E5E5E5",
+    marginTop: height * 0.02,
   },
   translationTitle: {
     fontSize: scaleFontSize(16),
@@ -260,7 +272,7 @@ const styles = StyleSheet.create({
   },
   translationText: {
     fontSize: scaleFontSize(14),
-    lineHeight: scaleFontSize(20), 
+    lineHeight: scaleFontSize(20),
     color: "#555",
   },
 });
